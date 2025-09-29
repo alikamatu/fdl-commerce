@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
-import Navbar from "@/components/home/Navbar";
 
 const fontPoppins = Poppins({
   variable: "--font-poppins",
@@ -26,7 +25,6 @@ export default function RootLayout({
         className={`${fontPoppins.variable} antialiased flex flex-col items-center min-w-7xl mx-auto transition-colors duration-500`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <Navbar />
           {children}
         </ThemeProvider>
       </body>
