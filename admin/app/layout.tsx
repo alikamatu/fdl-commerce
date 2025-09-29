@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Poppins } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
+import { AuthProvider } from "@/context/AuthContext";
+import { AlertProvider } from "@/components/ui/Alert";
 
 const fontPoppins = Poppins({
   variable: "--font-poppins",
@@ -20,14 +22,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
+    <AuthProvider>
+      <AlertProvider>
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${fontPoppins.variable} antialiased flex flex-col items-center min-w-7xl mx-auto transition-colors duration-500`}
+        className={`${fontPoppins.variable} antialiased transition-colors duration-500`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
         </ThemeProvider>
       </body>
     </html>
+    </AlertProvider>
+    </AuthProvider>
   );
 }
