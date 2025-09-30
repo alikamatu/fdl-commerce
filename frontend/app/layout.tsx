@@ -3,6 +3,8 @@ import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import Navbar from "@/components/home/Navbar";
+import { CartProvider } from "@/context/CartContext";
+import { WishlistProvider } from "@/context/WishlistContext";
 
 const fontPoppins = Poppins({
   variable: "--font-poppins",
@@ -23,11 +25,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${fontPoppins.variable} antialiased flex flex-col items-center min-w-7xl mx-auto transition-colors duration-500`}
+        className={`${fontPoppins.variable} antialiased transition-colors duration-500`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <CartProvider>
+            <WishlistProvider>
+
           <Navbar />
           {children}
+            </WishlistProvider>
+          </CartProvider>
         </ThemeProvider>
       </body>
     </html>

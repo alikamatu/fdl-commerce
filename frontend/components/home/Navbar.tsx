@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ThemeToggle from "../ThemeToggle";
+import { CartIcon } from "../cart/CartIcon";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -107,6 +108,8 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
+
+            <CartIcon />
 
             {/* Theme Toggle */}
             <ThemeToggle />

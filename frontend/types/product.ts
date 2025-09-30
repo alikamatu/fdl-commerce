@@ -1,0 +1,54 @@
+export interface ProductImage {
+  url: string;
+  alt: string;
+  position: number;
+}
+
+export interface ProductSpecification {
+  key: string;
+  value: string;
+}
+
+export interface Category {
+  _id: string;
+  slug: string;
+  name: string;
+  isActive: boolean;
+}
+
+export interface Product {
+  _id: string;
+  sku: string;
+  title: string;
+  description: string;
+  priceCents: number;
+  currency: string;
+  categoryId: Category;
+  images: ProductImage[];
+  stock: number;
+  brand: string;
+  specifications: ProductSpecification[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProductsResponse {
+  success: boolean;
+  data: Product[];
+  pagination: {
+    total: number;
+    page: number;
+    totalPages: number;
+  };
+}
+
+export interface ProductsFilters {
+  page?: number;
+  limit?: number;
+  category?: string;
+  search?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  inStock?: boolean;
+}

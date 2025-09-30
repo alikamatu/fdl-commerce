@@ -317,7 +317,7 @@ export default function AddProductPage() {
       }
 
       alert('Product created successfully!');
-      router.push('/admin/products');
+      router.push('/dashboard/products');
 
     } catch (error) {
       console.error('Product creation error:', error);
