@@ -1,18 +1,14 @@
-// hooks/useProducts.ts - UPDATED
 "use client";
 
 import { useState, useEffect } from 'react';
 import { Product, Category } from '@/types/product';
-import { useAuth } from '@/context/AuthContext';
+import { productApi } from '@/lib/api/products';
 
 export function useProducts() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
-
-  const { getAccessToken } = useAuth();
-  
 
   useEffect(() => {
     loadCategories();
@@ -21,14 +17,10 @@ export function useProducts() {
   const loadCategories = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to load categories: ${response.status}`);
+      const response = await productApi.getCategories();
+      if (response.success && response.data) {
+        setCategories(response.data);
       }
-      
-      const data = await response.json();
-      setCategories(data.data || data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load categories');
     } finally {
@@ -40,27 +32,13 @@ export function useProducts() {
     try {
       setLoading(true);
       setError(null);
+      const response = await productApi.createProduct(productData);
       
-      if (!getAccessToken) {
-        throw new Error('No authentication getAccessToken available');
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to create product');
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/products`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getAccessToken}`,
-        },
-        body: JSON.stringify(productData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to create product: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data.data;
+      return response.data;
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to create product';
       setError(message);
@@ -69,10 +47,10 @@ export function useProducts() {
       setLoading(false);
     }
   };
-  
-    const fetchCategories = async () => {
+
+  const fetchCategories = async () => {
     try {
-      const response = await fetch(`/api/categories`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`);
       if (!response.ok) {
         throw new Error('Failed to fetch categories');
       }
@@ -81,64 +59,6 @@ export function useProducts() {
     } catch (err) {
       console.error('Error fetching categories:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch categories');
-    }
-  };
-
-  // Upload image - FIXED VERSION
-  const uploadImage = async (file: File): Promise<string> => {
-    if (!getAccessToken) {
-      throw new Error('No authentication getAccessToken available. Please login again.');
-    }
-
-    console.log('=== Upload Debug ===');
-    console.log('Token exists:', !!getAccessToken);
-    console.log('API URL:', process.env.NEXT_PUBLIC_API_URL);
-
-    const formData = new FormData();
-    formData.append('image', file);
-
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/upload`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Authorization': `Bearer ${getAccessToken}`,
-          // Don't set Content-Type for FormData, let browser set it
-        },
-      });
-
-      console.log('Upload response status:', response.status);
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Authentication failed. Please logout and login again.');
-        }
-        
-        const errorText = await response.text();
-        console.error('Upload error response:', errorText);
-        
-        try {
-          const errorData = JSON.parse(errorText);
-          throw new Error(errorData.message || `Upload failed: ${response.status}`);
-        } catch {
-          throw new Error(`Upload failed with status ${response.status}`);
-        }
-      }
-
-      const data = await response.json();
-      console.log('Upload successful response:', data);
-      
-      // Handle different response structures
-      if (data.data && data.data.url) {
-        return data.data.url;
-      } else if (data.url) {
-        return data.url;
-      } else {
-        throw new Error('Invalid response format from server');
-      }
-    } catch (error) {
-      console.error('Upload error:', error);
-      throw error;
     }
   };
 
@@ -156,7 +76,183 @@ export function useProducts() {
     }
   };
 
-  // ... rest of your existing functions
+  // Initial load
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([fetchCategories(), fetchProducts()]);
+      setLoading(false);
+    };
+    loadData();
+  }, []);
+
+  // Create category
+  const createCategory = async (categoryData: { name: string; slug: string }) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
+    if (!token) {
+      throw new Error('No authentication token found. Please login again.');
+    }
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/categories`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(categoryData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to create category');
+    }
+
+    const data = await response.json();
+    await fetchCategories();
+    return data;
+  };
+
+  // Update category
+  const updateCategory = async (id: string, categoryData: { name: string; slug: string }) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
+    if (!token) {
+      throw new Error('No authentication token found. Please login again.');
+    }
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/categories/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(categoryData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to update category');
+    }
+
+    const data = await response.json();
+    await fetchCategories();
+    return data;
+  };
+
+  // Delete category
+  const deleteCategory = async (id: string) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
+    if (!token) {
+      throw new Error('No authentication token found. Please login again.');
+    }
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/categories/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to delete category');
+    }
+
+    await fetchCategories();
+  };
+
+  // Update product
+  const updateProduct = async (id: string, productData: Partial<Product>) => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(productData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to update product');
+    }
+
+    const data = await response.json();
+    await fetchProducts();
+    return data;
+  };
+
+  // Delete product
+  const deleteProduct = async (id: string) => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to delete product');
+    }
+
+    await fetchProducts();
+  };
+
+  const uploadImage = async (file: File): Promise<string> => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  
+  console.log('=== Upload Debug ===');
+  console.log('Token exists:', !!token);
+  
+  if (!token) {
+    throw new Error('No authentication token found. Please login again.');
+  }
+
+  // Verify token hasn't expired before attempting upload
+  try {
+    const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+    const isExpired = tokenPayload.exp * 1000 < Date.now();
+    console.log('Token expired:', isExpired);
+    
+    if (isExpired) {
+      localStorage.removeItem('token');
+      throw new Error('Your session has expired. Please login again.');
+    }
+  } catch (e) {
+    console.error('Token validation error:', e);
+  }
+
+  const formData = new FormData();
+  formData.append('image', file);
+
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/upload`, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  console.log('Upload response status:', response.status);
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('Upload error response:', errorText);
+    
+    if (response.status === 401) {
+      // Clear invalid token
+      localStorage.removeItem('token');
+      throw new Error('Authentication failed. Please logout and login again.');
+    }
+
+    try {
+      const errorData = JSON.parse(errorText);
+      throw new Error(errorData.message || 'Upload failed');
+    } catch {
+      throw new Error(`Upload failed with status ${response.status}`);
+    }
+  }
+
+  const data = await response.json();
+  return data.data?.url || data.url;
+};
 
   return {
     categories,
@@ -166,6 +262,11 @@ export function useProducts() {
     uploadImage,
     clearError: () => setError(null),
     products,
+    createCategory,
+    updateCategory,
+    deleteCategory,
+    updateProduct,
+    deleteProduct,
     refreshCategories: fetchCategories,
     refreshProducts: fetchProducts,
   };

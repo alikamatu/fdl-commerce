@@ -18,16 +18,24 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    console.log('JWT Validation - Payload:', payload);
-    
-    const user = await this.userModel.findById(payload.userId).select('-passwordHash');
-    
-    if (!user || !user.isActive) {
-      console.log('JWT Validation - User not found or inactive');
-      throw new UnauthorizedException();
-    }
-    
-    console.log('JWT Validation - User found:', user.email);
-    return user;
+  console.log('=== JWT Validation Start ===');
+  console.log('Payload:', payload);
+  console.log('Looking for userId:', payload.userId);
+  
+  const user = await this.userModel.findById(payload.userId).select('-passwordHash');
+  
+  console.log('User found:', !!user);
+  if (user) {
+    console.log('User email:', user.email);
+    console.log('User active:', user.isActive);
   }
+  
+  if (!user || !user.isActive) {
+    console.log('❌ JWT Validation FAILED - User not found or inactive');
+    throw new UnauthorizedException('User not found or inactive');
+  }
+  
+  console.log('✅ JWT Validation SUCCESS');
+  return user;
+}
 }

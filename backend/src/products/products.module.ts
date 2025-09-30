@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
+import { ProductsController } from './products.controller';
 import { Product, ProductSchema } from '../schemas/product.schema';
 import { Category, CategorySchema } from '../schemas/category.schema';
 import { FileUploadModule } from '../file-upload/file-upload.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
@@ -13,9 +14,9 @@ import { FileUploadModule } from '../file-upload/file-upload.module';
       { name: Category.name, schema: CategorySchema },
     ]),
     FileUploadModule,
+    AuthModule,
   ],
   controllers: [ProductsController],
   providers: [ProductsService],
-  exports: [ProductsService],
 })
 export class ProductsModule {}

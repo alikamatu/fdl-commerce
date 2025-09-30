@@ -3,7 +3,7 @@ import {
   Get,
   Post,
   Body,
-  Patch,
+  Put,
   Param,
   Delete,
   Query,
@@ -77,9 +77,15 @@ export class ProductsController {
       inStock: inStock ? inStock === 'true' : undefined,
     });
 
+    // FIX: Return products array directly, not the nested object
     return {
       success: true,
-      data: result,
+      data: result.products,  // Changed from 'result' to 'result.products'
+      pagination: {
+        total: result.total,
+        page: result.page,
+        totalPages: result.totalPages,
+      },
     };
   }
 
@@ -107,7 +113,7 @@ export class ProductsController {
     };
   }
 
-  @Patch('admin/products/:id')
+  @Put('admin/products/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @ApiBearerAuth()

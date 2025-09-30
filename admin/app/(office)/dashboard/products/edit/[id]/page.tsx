@@ -2,15 +2,22 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
-import { Package, ArrowLeft, Save, X, AlertCircle, Upload } from 'lucide-react';
-
-interface Category {
-  _id: string;
-  name: string;
-  slug: string;
-}
+import { 
+  Package, 
+  ArrowLeft, 
+  Save, 
+  X, 
+  AlertCircle, 
+  Upload,
+  DollarSign,
+  Tag,
+  Box,
+  Image as ImageIcon
+} from 'lucide-react';
+import { Product, Category, ProductSpecification } from '@/types/product';
+import { useAlert } from '@/components/ui/Alert';
 
 interface ProductFormData {
   sku: string;
@@ -23,13 +30,8 @@ interface ProductFormData {
   stock: string;
 }
 
-interface ProductSpecification {
-  key: string;
-  value: string;
-}
-
 interface ImageFile {
-  file: File;
+  file?: File;
   preview: string;
   uploading: boolean;
   uploaded: boolean;
@@ -37,72 +39,92 @@ interface ImageFile {
   error?: string;
 }
 
-export default function AddProductPage() {
+export default function ProductEditPage() {
   const router = useRouter();
+  const params = useParams();
+  const { addAlert } = useAlert();
+  const productId = params.id as string;
+
+  const [product, setProduct] = useState<Product | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [imageFiles, setImageFiles] = useState<ImageFile[]>([]);
-  const [specifications, setSpecifications] = useState<ProductSpecification[]>([
-    { key: '', value: '' }
-  ]);
+  const [specifications, setSpecifications] = useState<ProductSpecification[]>([]);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setError,
-    clearErrors,
-  } = useForm<ProductFormData>({
-    defaultValues: {
-      currency: 'USD',
-    }
-  });
+    reset,
+    setValue,
+    watch,
+  } = useForm<ProductFormData>();
 
-  // Load categories on mount and verify auth
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    console.log('🔐 Auth Status on Mount:');
-    console.log('  Token exists:', !!token);
-    if (token) {
-      console.log('  Token length:', token.length);
-      console.log('  Token preview:', token.substring(0, 30) + '...');
-      
-      try {
-        const parts = token.split('.');
-        if (parts.length === 3) {
-          const payload = JSON.parse(atob(parts[1]));
-          console.log('  Token payload:', payload);
-          console.log('  Token expires:', new Date(payload.exp * 1000).toLocaleString());
-          console.log('  Token expired:', payload.exp * 1000 < Date.now());
-        }
-      } catch (e) {
-        console.error('  Failed to decode token:', e);
-      }
-    } else {
-      console.error('  ❌ NO TOKEN - User should login');
+    if (productId) {
+      loadData();
     }
-    
-    loadCategories();
-  }, []);
+  }, [productId]);
 
-  const loadCategories = async () => {
+  const loadData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to load categories');
-      }
-
-      const data = await response.json();
-      setCategories(data.data || data);
+      await Promise.all([fetchProduct(), fetchCategories()]);
     } catch (error) {
-      console.error('Error loading categories:', error);
-      alert('Failed to load categories. Please refresh the page.');
+      addAlert({
+        type: 'error',
+        title: 'Error',
+        message: 'Failed to load product data'
+      });
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchProduct = async () => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${productId}`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch product');
+    }
+
+    const data = await response.json();
+    const productData = data.data || data;
+    setProduct(productData);
+
+    // Set form values
+    setValue('sku', productData.sku);
+    setValue('title', productData.title);
+    setValue('description', productData.description);
+    setValue('price', (productData.priceCents / 100).toString());
+    setValue('currency', productData.currency);
+    setValue('categoryId', productData.categoryId);
+    setValue('brand', productData.brand);
+    setValue('stock', productData.stock.toString());
+
+    // Set images
+    const existingImages: ImageFile[] = productData.images.map((img: any) => ({
+      preview: img.url,
+      uploading: false,
+      uploaded: true,
+      url: img.url
+    }));
+    setImageFiles(existingImages);
+
+    // Set specifications
+    setSpecifications(productData.specifications || []);
+  };
+
+  const fetchCategories = async () => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch categories');
+    }
+
+    const data = await response.json();
+    setCategories(data.data || data);
   };
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -144,7 +166,9 @@ export default function AddProductPage() {
 
   const removeImage = (index: number) => {
     const newFiles = [...imageFiles];
-    URL.revokeObjectURL(newFiles[index].preview);
+    if (!newFiles[index].uploaded) {
+      URL.revokeObjectURL(newFiles[index].preview);
+    }
     newFiles.splice(index, 1);
     setImageFiles(newFiles);
   };
@@ -183,18 +207,9 @@ export default function AddProductPage() {
       if (response.status === 401) {
         localStorage.removeItem('token');
         sessionStorage.removeItem('token');
-        
-        let errorDetails = 'Session expired';
-        try {
-          const errorJson = JSON.parse(errorText);
-          errorDetails = errorJson.message || errorDetails;
-        } catch (e) {
-          errorDetails = errorText || errorDetails;
-        }
-        
-        throw new Error(`Authentication failed: ${errorDetails}. Please logout and login again.`);
+        throw new Error('Authentication failed. Please logout and login again.');
       }
-      
+
       const error = await response.json().catch(() => ({ message: errorText }));
       throw new Error(error.message || `Upload failed: ${response.status}`);
     }
@@ -213,6 +228,8 @@ export default function AddProductPage() {
         uploadedUrls.push(imageFile.url);
         continue;
       }
+
+      if (!imageFile.file) continue;
 
       try {
         setImageFiles(prev => {
@@ -238,7 +255,7 @@ export default function AddProductPage() {
           return updated;
         });
 
-        throw new Error(`Failed to upload ${imageFile.file.name}: ${errorMessage}`);
+        throw new Error(`Failed to upload image: ${errorMessage}`);
       }
     }
 
@@ -260,8 +277,6 @@ export default function AddProductPage() {
   };
 
   const onSubmit = async (data: ProductFormData) => {
-    clearErrors();
-
     if (imageFiles.length === 0) {
       alert('Please select at least one product image');
       return;
@@ -297,8 +312,8 @@ export default function AddProductPage() {
 
       const token = getAuthToken();
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/products`, {
-        method: 'POST',
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/products/${productId}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
@@ -313,15 +328,24 @@ export default function AddProductPage() {
         }
         
         const error = await response.json().catch(() => ({}));
-        throw new Error(error.message || 'Failed to create product');
+        throw new Error(error.message || 'Failed to update product');
       }
 
-      alert('Product created successfully!');
-      router.push('/admin/products');
+      addAlert({
+        type: 'success',
+        title: 'Success!',
+        message: 'Product updated successfully',
+      });
+      
+      router.push(`/dashboard/products/${productId}`);
 
     } catch (error) {
-      console.error('Product creation error:', error);
-      alert(error instanceof Error ? error.message : 'Failed to create product');
+      console.error('Product update error:', error);
+      addAlert({
+        type: 'error',
+        title: 'Error',
+        message: error instanceof Error ? error.message : 'Failed to update product'
+      });
     } finally {
       setSubmitting(false);
     }
@@ -329,7 +353,11 @@ export default function AddProductPage() {
 
   useEffect(() => {
     return () => {
-      imageFiles.forEach(img => URL.revokeObjectURL(img.preview));
+      imageFiles.forEach(img => {
+        if (!img.uploaded) {
+          URL.revokeObjectURL(img.preview);
+        }
+      });
     };
   }, []);
 
@@ -343,21 +371,19 @@ export default function AddProductPage() {
     );
   }
 
-  if (categories.length === 0) {
+  if (!product) {
     return (
       <div className="p-8 max-w-4xl mx-auto">
-        <div className="border rounded-none p-4">
-          <div className="flex items-start">
-            <AlertCircle className="w-5 h-5 mt-0.5 mr-3" />
-            <div>
-              <h3 className="text-sm font-medium">
-                No Categories Available
-              </h3>
-              <p className="text-sm mt-1">
-                Please create at least one category before adding products.
-              </p>
-            </div>
-          </div>
+        <div className="border rounded-none p-8 text-center">
+          <AlertCircle className="w-16 h-16 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Product Not Found</h3>
+          <p className="mb-4">The product you're trying to edit doesn't exist.</p>
+          <button
+            onClick={() => router.push('/dashboard/products')}
+            className="px-4 py-2 border rounded-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+          >
+            Back to Products
+          </button>
         </div>
       </div>
     );
@@ -373,17 +399,18 @@ export default function AddProductPage() {
       >
         <div className="flex items-center space-x-3">
           <button
-            onClick={() => router.back()}
+            onClick={() => router.push(`/dashboard/products/${productId}`)}
             className="p-2 rounded-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-4xl font-light tracking-tight">
-              Add New Product
+            <h1 className="text-4xl font-light tracking-tight flex items-center">
+              <Package className="w-8 h-8 mr-3" />
+              Edit Product
             </h1>
             <p className="text-lg mt-2">
-              Create a new product for your store
+              Update product details
             </p>
           </div>
         </div>
@@ -480,7 +507,8 @@ export default function AddProductPage() {
 
         {/* Pricing & Inventory */}
         <div className="rounded-none p-6 border">
-          <h2 className="text-lg font-semibold mb-4">
+          <h2 className="text-lg font-semibold mb-4 flex items-center">
+            <DollarSign className="w-5 h-5 mr-2" />
             Pricing & Inventory
           </h2>
           
@@ -522,7 +550,8 @@ export default function AddProductPage() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="text-sm font-medium mb-2 flex items-center">
+                <Box className="w-4 h-4 mr-2" />
                 Stock Quantity *
               </label>
               <input
@@ -616,7 +645,8 @@ export default function AddProductPage() {
         {/* Specifications */}
         <div className="rounded-none p-6 border">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">
+            <h2 className="text-lg font-semibold flex items-center">
+              <Tag className="w-5 h-5 mr-2" />
               Specifications
             </h2>
             <button
@@ -661,7 +691,7 @@ export default function AddProductPage() {
         <div className="flex justify-end space-x-4 pt-6 border-t">
           <button
             type="button"
-            onClick={() => router.back()}
+            onClick={() => router.push(`/dashboard/products/${productId}`)}
             disabled={submitting}
             className="px-6 py-3 border rounded-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
           >
@@ -673,7 +703,7 @@ export default function AddProductPage() {
             className="flex items-center space-x-2 px-6 py-3 border rounded-none hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <Save className="w-4 h-4" />
-            <span>{submitting ? 'Creating...' : 'Create Product'}</span>
+            <span>{submitting ? 'Updating...' : 'Update Product'}</span>
           </button>
         </div>
       </form>

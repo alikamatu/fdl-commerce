@@ -11,6 +11,7 @@ function AdminHome() {
         <h1 className="text-2xl font-bold">Admin Dashboard</h1>
         <div className="flex items-center space-x-4">
           <span className="text-sm text-gray-600 dark:text-gray-400">
+            Welcome, {user?.displayName}
           </span>
           <button
             onClick={logout}
