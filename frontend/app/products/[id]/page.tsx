@@ -12,6 +12,8 @@ import { ProductLoadingSkeleton } from '@/components/products/ProductLoadingSkel
 import { ProductErrorState } from '@/components/products/ProductErrorState';
 import { Snackbar } from '@/components/Snackbar';
 import { Product } from '@/types/product';
+import { useSimilarProducts } from '@/hooks/useSimilarProducts';
+import { SimilarProducts } from '@/components/products/SimilarProducts';
 
 interface ProductDetailsPageProps {
   params: Promise<{ id: string }>;
@@ -21,12 +23,26 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
   const { id } = use(params);
   const { product, loading, error } = useProduct(id);
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
+const { products: similarProducts, loading: similarLoading, error: similarError } = useSimilarProducts(
+  product
+    ? {
+        categoryId: typeof product.categoryId === 'object' ? product.categoryId._id : product.categoryId,
+        currentProductId: product._id,
+        limit: 4
+      }
+    : { categoryId: '', currentProductId: '', limit: 4 }
+);
 
   const handleAddToCart = (product: Product) => {
     // Implement add to cart logic
     showSnackbar(`Added ${product.title} to cart`, 'success');
     console.log('Add to cart:', product);
   };
+
+  const handleViewDetails = (product: Product) => {
+  // You can implement quick view or navigation here
+  console.log('View details:', product);
+};
 
   const handleRetry = () => {
     window.location.reload();
@@ -173,6 +189,14 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
             </motion.div>
           </motion.div>
         </div>
+
+        {/* Similar Products */}
+        <SimilarProducts
+          products={similarProducts}
+          loading={similarLoading}
+          error={similarError}
+          onViewDetails={handleViewDetails}
+        />
       </div>
 
       {/* Snackbar */}

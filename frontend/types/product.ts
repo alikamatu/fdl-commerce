@@ -20,15 +20,22 @@ export interface Product {
   _id: string;
   sku: string;
   title: string;
+  isDeal: boolean;
   description: string;
   priceCents: number;
+  originalPriceCents?: number;
+  discountPercent?: number;
   currency: string;
   categoryId: Category;
   images: ProductImage[];
   stock: number;
   brand: string;
+  rating?: number;
+  reviewCount?: number;
   specifications: ProductSpecification[];
   isActive: boolean;
+  soldCount: number;
+  dealExpiresAt?: string;
   createdAt: string;
   updatedAt: string;
 }

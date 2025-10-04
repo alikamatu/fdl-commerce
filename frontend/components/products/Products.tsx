@@ -16,14 +16,8 @@ import { ProductsFilter } from './ProductsFilter';
 import { ProductsGrid } from './ProductsGrid';
 import { ProductsPagination } from './ProductsPagination';
 import { ProductQuickView } from './ProductQuickView';
+import { useCategories } from '@/hooks/useCategories';
 
-const MOCK_CATEGORIES = [
-  { _id: '1', name: 'Electronics' },
-  { _id: '2', name: 'Clothing' },
-  { _id: '3', name: 'Home & Garden' },
-  { _id: '4', name: 'Sports' },
-  { _id: '5', name: 'Books' },
-];
 
 export default function Products() {
   const [filters, setFilters] = useState<Filters>({
@@ -32,6 +26,8 @@ export default function Products() {
   });
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [quickViewOpen, setQuickViewOpen] = useState(false);
+  const { categories, loading: categoriesLoading } = useCategories();
+  
 
   const { products, loading, error, pagination, refetch } = useProducts(filters);
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
@@ -72,11 +68,11 @@ export default function Products() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-4xl font-bold text-foreground mb-4"
+            className="text-4xl text-start font-bold text-foreground mb-4"
           >
             Our Products
           </motion.h1>
-          <motion.p
+          {/* <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
@@ -84,15 +80,15 @@ export default function Products() {
           >
             Discover our carefully curated collection of high-quality products 
             designed to meet your needs and exceed your expectations.
-          </motion.p>
+          </motion.p> */}
         </div>
 
-        {/* Filters */}
+        {/* Filters
         <ProductsFilter
           filters={filters}
           onFiltersChange={setFilters}
-          categories={MOCK_CATEGORIES}
-        />
+          categories={categories}
+        /> */}
 
         {/* Products Grid - Removed onAddToCart prop */}
         <ProductsGrid

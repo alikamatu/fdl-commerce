@@ -1,11 +1,20 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { Truck, Shield, RotateCcw } from 'lucide-react';
+import { Truck, Shield, RotateCcw, ArrowRight } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/hooks/useAuth';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
-export const CartSummary: React.FC = () => {
+interface CartSummaryProps {
+  onCheckout?: () => void;
+}
+
+export const CartSummary: React.FC<CartSummaryProps> = ({ onCheckout }) => {
   const { cart } = useCart();
+  const { user } = useAuth();
+  const router = useRouter();
 
   const subtotal = (cart.subtotal / 100).toFixed(2);
   const shipping = (cart.shipping / 100).toFixed(2);
@@ -80,11 +89,22 @@ export const CartSummary: React.FC = () => {
 
         {/* Checkout Button */}
         <button
+          onClick={() => router.push('/checkout')}
           disabled={cart.items.length === 0}
-          className="w-full mt-6 py-4 bg-foreground text-background rounded-lg font-semibold hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="w-full mt-6 py-4 bg-foreground text-background cursor-pointer rounded-lg font-semibold hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
         >
           Proceed to Checkout
+          <ArrowRight size={16} />
         </button>
+
+        {/* Guest Checkout Notice */}
+        {!user && (
+          <div className="mt-4 p-3 bg-foreground/5 rounded-lg">
+            <p className="text-xs text-foreground/60 text-center">
+              You'll be able to create an account or checkout as guest
+            </p>
+          </div>
+        )}
 
         {/* Security Notice */}
         <div className="mt-4 text-center">

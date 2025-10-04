@@ -11,6 +11,12 @@ export class Category {
   @Prop({ required: true })
   name: string;
 
+  @Prop({ default: null })
+  imageUrl: string;
+
+  @Prop({ default: null })
+  imagePublicId: string;
+
   @Prop({ default: true })
   isActive: boolean;
 }

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Filter, X, ChevronDown, ChevronUp, Search } from 'lucide-react';
+import { Filter, X, ChevronDown, ChevronUp, Search, Sliders } from 'lucide-react';
 import { Category } from '@/types/product';
 
 interface ProductFiltersProps {
@@ -23,7 +23,11 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
   onFiltersChange,
   categories,
 }) => {
-  const [expanded, setExpanded] = useState(false);
+  const [expandedSections, setExpandedSections] = useState({
+    category: true,
+    price: true,
+    availability: true
+  });
 
   const handleSearchChange = (value: string) => {
     onFiltersChange({ ...filters, search: value, page: 1 });
@@ -57,6 +61,13 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
     });
   };
 
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
   const hasActiveFilters = 
     filters.search || 
     filters.category || 
@@ -66,40 +77,32 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
     filters.sortBy !== 'newest';
 
   return (
-    <div className="border border-foreground/10 rounded-lg p-6 mb-8 bg-background">
+    <div className="bg-background rounded-lg border border-foreground/10">
       {/* Filter Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <Filter size={20} className="text-foreground/60" />
-          <h3 className="text-lg font-semibold text-foreground">Filters & Sorting</h3>
-          {hasActiveFilters && (
-            <span className="bg-foreground text-background text-xs px-2 py-1 rounded-full font-medium">
-              Active
-            </span>
-          )}
-        </div>
-        
-        <div className="flex items-center gap-2">
+      <div className="p-6 border-b border-foreground/10">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-foreground/5 rounded-lg">
+              <Sliders size={20} className="text-foreground/60" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-foreground">Filters</h3>
+              <p className="text-sm text-foreground/60">Refine your results</p>
+            </div>
+          </div>
+          
           {hasActiveFilters && (
             <button
               onClick={clearFilters}
-              className="flex items-center gap-1 text-sm text-foreground/60 hover:text-foreground transition-colors"
+              className="flex items-center gap-1 text-sm text-foreground/60 hover:text-foreground transition-colors p-2 hover:bg-foreground/5 rounded-md"
             >
               <X size={16} />
-              Clear All
+              Clear
             </button>
           )}
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="p-1 hover:bg-foreground/5 rounded transition-colors"
-          >
-            {expanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-          </button>
         </div>
-      </div>
 
-      {/* Search and Sort - Always Visible */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        {/* Search */}
         <div className="relative">
           <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/40" />
           <input
@@ -107,41 +110,53 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
             placeholder="Search products..."
             value={filters.search || ''}
             onChange={(e) => handleSearchChange(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-foreground/20 rounded-md focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/30 bg-transparent"
+            className="w-full pl-10 pr-4 py-3 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/30 bg-transparent"
           />
         </div>
-
-        <select
-          value={filters.sortBy || 'newest'}
-          onChange={(e) => handleSortChange(e.target.value)}
-          className="px-3 py-2 border border-foreground/20 rounded-md focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/30 bg-transparent"
-        >
-          <option value="newest">Newest First</option>
-          <option value="price-low">Price: Low to High</option>
-          <option value="price-high">Price: High to Low</option>
-          <option value="name">Name: A to Z</option>
-          <option value="stock">In Stock First</option>
-        </select>
       </div>
 
-      {/* Expandable Filters */}
-      <AnimatePresence>
-        {expanded && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden"
+      <div className="p-6 space-y-6">
+        {/* Sorting */}
+        <div>
+          <label className="block text-sm font-semibold text-foreground/80 mb-3">
+            Sort By
+          </label>
+          <select
+            value={filters.sortBy || 'newest'}
+            onChange={(e) => handleSortChange(e.target.value)}
+            className="w-full px-3 py-2 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/30 bg-transparent"
           >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-foreground/10">
-              {/* Category Filter */}
-              <div>
-                <label className="block text-sm font-medium text-foreground/80 mb-3">
-                  Category
-                </label>
-                <div className="space-y-2 max-h-48 overflow-y-auto">
-                  <label className="flex items-center gap-2 text-sm text-foreground/60 hover:text-foreground cursor-pointer">
+            <option value="newest">Newest First</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="name">Name: A to Z</option>
+            <option value="stock">In Stock First</option>
+          </select>
+        </div>
+
+        {/* Category Filter */}
+        <div className="border-t border-foreground/10 pt-6">
+          <button
+            onClick={() => toggleSection('category')}
+            className="flex items-center justify-between w-full mb-3"
+          >
+            <label className="block text-sm font-semibold text-foreground/80">
+              Category
+            </label>
+            {expandedSections.category ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+          
+          <AnimatePresence>
+            {expandedSections.category && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="overflow-hidden"
+              >
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-foreground/5 cursor-pointer transition-colors">
                     <input
                       type="radio"
                       name="category"
@@ -150,12 +165,12 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                       onChange={() => handleCategoryChange('')}
                       className="text-foreground focus:ring-foreground/20"
                     />
-                    <span>All Categories</span>
+                    <span className="text-sm">All Categories</span>
                   </label>
                   {categories.map((category) => (
                     <label
                       key={category._id}
-                      className="flex items-center gap-2 text-sm text-foreground/60 hover:text-foreground cursor-pointer"
+                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-foreground/5 cursor-pointer transition-colors"
                     >
                       <input
                         type="radio"
@@ -165,17 +180,36 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                         onChange={() => handleCategoryChange(category._id)}
                         className="text-foreground focus:ring-foreground/20"
                       />
-                      <span>{category.name}</span>
+                      <span className="text-sm">{category.name}</span>
                     </label>
                   ))}
                 </div>
-              </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
-              {/* Price Range */}
-              <div>
-                <label className="block text-sm font-medium text-foreground/80 mb-3">
-                  Price Range
-                </label>
+        {/* Price Range */}
+        <div className="border-t border-foreground/10 pt-6">
+          <button
+            onClick={() => toggleSection('price')}
+            className="flex items-center justify-between w-full mb-3"
+          >
+            <label className="block text-sm font-semibold text-foreground/80">
+              Price Range
+            </label>
+            {expandedSections.price ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+          
+          <AnimatePresence>
+            {expandedSections.price && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="overflow-hidden"
+              >
                 <div className="space-y-3">
                   <div className="flex gap-2">
                     <input
@@ -188,7 +222,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                           filters.maxPrice
                         )
                       }
-                      className="flex-1 px-3 py-2 border border-foreground/20 rounded-md focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/30 bg-transparent"
+                      className="flex-1 px-3 py-2 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/30 bg-transparent"
                     />
                     <span className="flex items-center text-foreground/40">to</span>
                     <input
@@ -201,19 +235,38 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                           e.target.value ? Number(e.target.value) : undefined
                         )
                       }
-                      className="flex-1 px-3 py-2 border border-foreground/20 rounded-md focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/30 bg-transparent"
+                      className="flex-1 px-3 py-2 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/30 bg-transparent"
                     />
                   </div>
                 </div>
-              </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
-              {/* Stock Status & Quick Filters */}
-              <div>
-                <label className="block text-sm font-medium text-foreground/80 mb-3">
-                  Availability
-                </label>
-                <div className="space-y-3">
-                  <label className="flex items-center gap-2 text-sm text-foreground/60 hover:text-foreground cursor-pointer">
+        {/* Stock Status */}
+        <div className="border-t border-foreground/10 pt-6">
+          <button
+            onClick={() => toggleSection('availability')}
+            className="flex items-center justify-between w-full mb-3"
+          >
+            <label className="block text-sm font-semibold text-foreground/80">
+              Availability
+            </label>
+            {expandedSections.availability ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+          
+          <AnimatePresence>
+            {expandedSections.availability && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="overflow-hidden"
+              >
+                <div className="space-y-2">
+                  <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-foreground/5 cursor-pointer transition-colors">
                     <input
                       type="radio"
                       name="stock"
@@ -222,9 +275,9 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                       onChange={() => handleStockChange(undefined)}
                       className="text-foreground focus:ring-foreground/20"
                     />
-                    <span>All Items</span>
+                    <span className="text-sm">All Items</span>
                   </label>
-                  <label className="flex items-center gap-2 text-sm text-foreground/60 hover:text-foreground cursor-pointer">
+                  <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-foreground/5 cursor-pointer transition-colors">
                     <input
                       type="radio"
                       name="stock"
@@ -233,9 +286,9 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                       onChange={() => handleStockChange(true)}
                       className="text-foreground focus:ring-foreground/20"
                     />
-                    <span>In Stock Only</span>
+                    <span className="text-sm">In Stock Only</span>
                   </label>
-                  <label className="flex items-center gap-2 text-sm text-foreground/60 hover:text-foreground cursor-pointer">
+                  <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-foreground/5 cursor-pointer transition-colors">
                     <input
                       type="radio"
                       name="stock"
@@ -244,14 +297,14 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                       onChange={() => handleStockChange(false)}
                       className="text-foreground focus:ring-foreground/20"
                     />
-                    <span>Out of Stock</span>
+                    <span className="text-sm">Out of Stock</span>
                   </label>
                 </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
     </div>
   );
 };

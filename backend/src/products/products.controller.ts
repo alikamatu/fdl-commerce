@@ -55,39 +55,64 @@ export class ProductsController {
     };
   }
 
-  @Get('products')
-  @ApiOperation({ summary: 'Get all products with pagination and filtering' })
-  @ApiResponse({ status: 200, description: 'Products retrieved successfully' })
-  async findAll(
-    @Query('page') page: string,
-    @Query('limit') limit: string,
-    @Query('category') category: string,
-    @Query('q') search: string,
-    @Query('minPrice') minPrice: string,
-    @Query('maxPrice') maxPrice: string,
-    @Query('inStock') inStock: string,
-  ) {
-    const result = await this.productsService.findAll({
-      page: page ? parseInt(page) : 1,
-      limit: limit ? parseInt(limit) : 10,
-      category,
-      search,
-      minPrice: minPrice ? parseInt(minPrice) : undefined,
-      maxPrice: maxPrice ? parseInt(maxPrice) : undefined,
-      inStock: inStock ? inStock === 'true' : undefined,
-    });
+@Get('products')
+@ApiOperation({ summary: 'Get all products with pagination and filtering' })
+@ApiResponse({ status: 200, description: 'Products retrieved successfully' })
+async findAll(
+  @Query('page') page: string,
+  @Query('limit') limit: string,
+  @Query('category') category: string,
+  @Query('q') search: string,
+  @Query('brand') brand: string,
+  @Query('minPrice') minPrice: string,
+  @Query('maxPrice') maxPrice: string,
+  @Query('inStock') inStock: string,
+) {
+  const result = await this.productsService.findAll({
+    page: page ? parseInt(page) : 1,
+    limit: limit ? parseInt(limit) : 10,
+    category,
+    search,
+    minPrice: minPrice ? parseInt(minPrice) : undefined,
+    maxPrice: maxPrice ? parseInt(maxPrice) : undefined,
+    inStock: inStock ? inStock === 'true' : undefined,
+    brand,
+  });
 
-    // FIX: Return products array directly, not the nested object
-    return {
-      success: true,
-      data: result.products,  // Changed from 'result' to 'result.products'
-      pagination: {
-        total: result.total,
-        page: result.page,
-        totalPages: result.totalPages,
-      },
-    };
-  }
+  // FIX: Return the correct structure
+  return {
+    success: true,
+    data: result.products,  // Make sure this line is correct
+    pagination: {
+      total: result.total,
+      page: result.page,
+      totalPages: result.totalPages,
+    },
+  };
+}
+
+@Get('products/deals')
+@ApiOperation({ summary: 'Get deal products' })
+@ApiResponse({ status: 200, description: 'Deal products retrieved successfully' })
+async findDeals(
+  @Query('page') page: string,
+  @Query('limit') limit: string,
+) {
+  const result = await this.productsService.findDealProducts({
+    page: page ? parseInt(page) : 1,
+    limit: limit ? parseInt(limit) : 10,
+  });
+
+  return {
+    success: true,
+    data: result.products,
+    pagination: {
+      total: result.total,
+      page: result.page,
+      totalPages: result.totalPages,
+    },
+  };
+}
 
   @Get('products/:id')
   @ApiOperation({ summary: 'Get product by ID' })

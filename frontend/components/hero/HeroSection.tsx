@@ -7,7 +7,7 @@ export const HeroSection: React.FC = () => {
   return (
     <div className="w-full">
       <HeroCarousel />
-      {/* <CategoryGrid /> */}
+      <CategoryGrid variant="scroll" />
       <FeaturesSection />
       {/* <RecentlyViewed /> */}
     </div>

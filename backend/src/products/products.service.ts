@@ -34,68 +34,83 @@ export class ProductsService {
   }
 
   async findAll({
-    page = 1,
-    limit = 10,
-    category,
-    search,
-    minPrice,
-    maxPrice,
-    inStock
-  }: {
-    page?: number;
-    limit?: number;
-    category?: string;
-    search?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    inStock?: boolean;
-  } = {}) {
-    const query: any = { isActive: true };
+  page = 1,
+  limit = 10,
+  category,
+  search,
+  brand,
+  minPrice,
+  maxPrice,
+  inStock
+}: {
+  page?: number;
+  limit?: number;
+  category?: string;
+  search?: string;
+  brand?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  inStock?: boolean;
+} = {}) {
+  const query: any = { isActive: true };
 
-    if (category) {
-      query.categoryId = new Types.ObjectId(category);
-    }
-
-    if (search) {
-      query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-        { brand: { $regex: search, $options: 'i' } },
-      ];
-    }
-
-    if (minPrice !== undefined) {
-      query.priceCents = { ...query.priceCents, $gte: minPrice };
-    }
-
-    if (maxPrice !== undefined) {
-      query.priceCents = { ...query.priceCents, $lte: maxPrice };
-    }
-
-    if (inStock !== undefined) {
-      query.stock = inStock ? { $gt: 0 } : { $lte: 0 };
-    }
-
-    const skip = (page - 1) * limit;
-
-    const [products, total] = await Promise.all([
-      this.productModel
-        .find(query)
-        .populate('categoryId', 'name slug')
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .exec(),
-      this.productModel.countDocuments(query),
-    ]);
-
-    return {
-      products,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit),
-    };
+   if (category) {
+    // Try both ObjectId and string comparison
+    query.$or = [
+      { categoryId: category },
+      { categoryId: new Types.ObjectId(category) }
+    ];
   }
+
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: 'i' } },
+      { description: { $regex: search, $options: 'i' } },
+      { brand: { $regex: search, $options: 'i' } },
+    ];
+  }
+
+  if (minPrice !== undefined) {
+    query.priceCents = { ...query.priceCents, $gte: minPrice };
+  }
+
+  if (maxPrice !== undefined) {
+    query.priceCents = { ...query.priceCents, $lte: maxPrice };
+  }
+
+  if (inStock !== undefined) {
+    query.stock = inStock ? { $gt: 0 } : { $lte: 0 };
+  }
+
+    if (brand) {
+    query.brand = { $regex: brand, $options: 'i' };
+  }
+
+  const skip = (page - 1) * limit;
+
+  console.log('Query:', JSON.stringify(query)); // Debug log
+  console.log('Skip:', skip, 'Limit:', limit); // Debug log
+
+  const [products, total] = await Promise.all([
+    this.productModel
+      .find(query)
+      .populate('categoryId', 'name slug imageUrl')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .exec(),
+    this.productModel.countDocuments(query),
+  ]);
+
+  console.log('Found products:', products.length); // Debug log
+
+  return {
+    products,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
+}
 
   async findOne(id: string): Promise<Product> {
     const product = await this.productModel
@@ -152,6 +167,56 @@ export class ProductsService {
     }
 
     return updatedProduct;
+  }
+
+    async findDealProducts({
+    page = 1,
+    limit = 10,
+  }: {
+    page?: number;
+    limit?: number;
+  } = {}) {
+    const query: any = { 
+      isActive: true,
+      isDeal: true,
+      dealExpiresAt: { $gt: new Date() } // Only active deals
+    };
+
+    const skip = (page - 1) * limit;
+
+    const [products, total] = await Promise.all([
+      this.productModel
+        .find(query)
+        .populate('categoryId', 'name slug')
+        .sort({ discountPercent: -1, createdAt: -1 }) // Sort by highest discount first
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      this.productModel.countDocuments(query),
+    ]);
+
+    return {
+      products,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  async getExpiringDeals(limit: number = 10) {
+    return this.productModel
+      .find({
+        isActive: true,
+        isDeal: true,
+        dealExpiresAt: { 
+          $gt: new Date(),
+          $lt: new Date(Date.now() + 24 * 60 * 60 * 1000) // Expiring in next 24 hours
+        }
+      })
+      .populate('categoryId', 'name slug')
+      .sort({ dealExpiresAt: 1, discountPercent: -1 })
+      .limit(limit)
+      .exec();
   }
 
   async remove(id: string): Promise<void> {

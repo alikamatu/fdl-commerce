@@ -8,26 +8,42 @@ interface ProductsGridProps {
   products: Product[];
   loading: boolean;
   onViewDetails: (product: Product) => void;
+  viewMode?: 'grid' | 'list';
 }
 
 export const ProductsGrid: React.FC<ProductsGridProps> = ({
   products,
   loading,
   onViewDetails,
+  viewMode = 'grid',
 }) => {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className={`grid gap-6 ${
+        viewMode === 'grid' 
+          ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
+          : 'grid-cols-1'
+      }`}>
         {[...Array(8)].map((_, index) => (
           <div
             key={index}
-            className="bg-background border border-foreground/10 rounded-lg overflow-hidden animate-pulse"
+            className={`bg-background border border-foreground/10 rounded-lg overflow-hidden animate-pulse ${
+              viewMode === 'list' ? 'flex' : ''
+            }`}
           >
-            <div className="aspect-[4/3] bg-foreground/10" />
-            <div className="p-4 space-y-3">
+            {viewMode === 'list' && (
+              <div className="w-48 h-48 bg-foreground/10 flex-shrink-0" />
+            )}
+            <div className={`p-4 space-y-3 ${viewMode === 'list' ? 'flex-1' : ''}`}>
               <div className="h-4 bg-foreground/10 rounded w-3/4" />
               <div className="h-4 bg-foreground/10 rounded w-1/2" />
               <div className="h-6 bg-foreground/10 rounded w-1/3" />
+              {viewMode === 'list' && (
+                <>
+                  <div className="h-4 bg-foreground/10 rounded w-full" />
+                  <div className="h-4 bg-foreground/10 rounded w-2/3" />
+                </>
+              )}
             </div>
           </div>
         ))}
@@ -49,16 +65,29 @@ export const ProductsGrid: React.FC<ProductsGridProps> = ({
           </svg>
         </div>
         <h3 className="text-lg font-semibold text-foreground mb-2">No products found</h3>
-        <p className="text-foreground/60">
+        <p className="text-foreground/60 mb-6">
           Try adjusting your search filters or browse different categories.
         </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background rounded-lg font-medium hover:bg-foreground/90 transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Reset Filters
+        </button>
       </motion.div>
     );
   }
 
   return (
     <AnimatePresence>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className={`grid gap-6 ${
+        viewMode === 'grid' 
+          ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
+          : 'grid-cols-1'
+      }`}>
         {products.map((product, index) => (
           <motion.div
             key={product._id}

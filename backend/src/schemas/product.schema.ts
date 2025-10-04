@@ -62,6 +62,22 @@ export class Product {
 
   @Prop({ default: true })
   isActive: boolean;
+
+  // New fields for deals and discounts
+  @Prop({ default: null })
+  originalPriceCents: number;
+
+  @Prop({ default: 0 })
+  discountPercent: number;
+
+  @Prop({ default: false })
+  isDeal: boolean;
+
+  @Prop({ default: null })
+  dealExpiresAt: Date;
+
+  @Prop({ default: 0 })
+  soldCount: number;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

@@ -7,32 +7,60 @@ import {
   Param,
   Delete,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiConsumes,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { CategoriesService } from './categories.service';
+import { FileUploadService } from '../file-upload/file-upload.service';
 
 @ApiTags('categories')
 @Controller('api')
 export class CategoriesController {
-  constructor(private readonly categoriesService: CategoriesService) {}
+  constructor(
+    private readonly categoriesService: CategoriesService,
+    private readonly fileUploadService: FileUploadService,
+  ) {}
 
   @Post('admin/categories')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create a new category' })
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Create a new category with optional image' })
   @ApiResponse({ status: 201, description: 'Category created successfully' })
   @ApiResponse({ status: 409, description: 'Category slug already exists' })
-  async create(@Body() body: { name: string; slug: string }) {
-    const category = await this.categoriesService.create(body.name, body.slug);
+  async create(
+    @Body() body: { name: string; slug: string },
+    @UploadedFile() image?: Express.Multer.File,
+  ) {
+    let imageUrl: string | undefined;
+    let imagePublicId: string | undefined;
+
+    if (image) {
+      const uploadResult = await this.fileUploadService.uploadImage(image);
+      imageUrl = uploadResult.url;
+      imagePublicId = uploadResult.publicId;
+    }
+
+    const category = await this.categoriesService.create(
+      body.name,
+      body.slug,
+      imageUrl,
+      imagePublicId,
+    );
+
     return {
       success: true,
       data: category,
@@ -79,15 +107,34 @@ export class CategoriesController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update a category' })
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Update a category with optional image' })
   @ApiResponse({ status: 200, description: 'Category updated successfully' })
   @ApiResponse({ status: 404, description: 'Category not found' })
   @ApiResponse({ status: 409, description: 'Category slug already exists' })
   async update(
     @Param('id') id: string,
     @Body() body: { name: string; slug: string },
+    @UploadedFile() image?: Express.Multer.File,
   ) {
-    const category = await this.categoriesService.update(id, body.name, body.slug);
+    let imageUrl: string | undefined;
+    let imagePublicId: string | undefined;
+
+    if (image) {
+      const uploadResult = await this.fileUploadService.uploadImage(image);
+      imageUrl = uploadResult.url;
+      imagePublicId = uploadResult.publicId;
+    }
+
+    const category = await this.categoriesService.update(
+      id,
+      body.name,
+      body.slug,
+      imageUrl,
+      imagePublicId,
+    );
+
     return {
       success: true,
       data: category,

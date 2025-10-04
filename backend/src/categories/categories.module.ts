@@ -4,6 +4,7 @@ import { CategoriesController } from './categories.controller';
 import { CategoriesService } from './categories.service';
 import { Category, CategorySchema } from '../schemas/category.schema';
 import { AuthModule } from 'src/auth/auth.module';
+import { FileUploadModule } from 'src/file-upload/file-upload.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { AuthModule } from 'src/auth/auth.module';
       { name: Category.name, schema: CategorySchema }
     ]),
     AuthModule, 
+    FileUploadModule,
   ],
   controllers: [CategoriesController],
   providers: [CategoriesService],

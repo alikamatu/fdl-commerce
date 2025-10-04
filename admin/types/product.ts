@@ -2,16 +2,24 @@ export interface Product {
   _id: string;
   sku: string;
   title: string;
+  isDeal: boolean;
   description: string;
   priceCents: number;
+  originalPriceCents?: number;
+  discountPercent?: number;
   currency: string;
-  categoryId: string;
+  categoryId: Category;
   images: ProductImage[];
   stock: number;
   brand: string;
+  rating?: number;
+  reviewCount?: number;
   specifications: ProductSpecification[];
-  createdAt?: Date;
-  updatedAt?: Date;
+  isActive: boolean;
+  soldCount: number;
+  dealExpiresAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ProductImage {
@@ -29,6 +37,7 @@ export interface Category {
   _id: string;
   slug: string;
   name: string;
+  imageUrl?: string;
 }
 
 export interface ApiResponse<T> {

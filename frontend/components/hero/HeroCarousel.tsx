@@ -26,7 +26,7 @@ const defaultSlides: HeroSlide[] = [
   },
   {
     id: '2',
-    image: '/api/placeholder/1200/600',
+    image: '/images/new.jpg',
     title: 'New Arrivals Every Day',
     description: 'Discover the latest additions to our curated collection',
     ctaText: 'Explore New',
@@ -34,7 +34,7 @@ const defaultSlides: HeroSlide[] = [
   },
   {
     id: '3',
-    image: '/api/placeholder/1200/600',
+    image: '/images/deals.jpg',
     title: 'Limited Time Offers',
     description: 'Save big on premium items with exclusive discounts',
     ctaText: 'View Deals',
@@ -42,7 +42,7 @@ const defaultSlides: HeroSlide[] = [
   },
   {
     id: '4',
-    image: '/api/placeholder/1200/600',
+    image: '/images/devices.jpg',
     title: 'Premium Quality Guaranteed',
     description: 'Shop with confidence with our authenticity promise',
     ctaText: 'Learn More',

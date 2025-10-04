@@ -86,59 +86,103 @@ export function useProducts() {
     loadData();
   }, []);
 
-  // Create category
-  const createCategory = async (categoryData: { name: string; slug: string }) => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+const createCategory = async (categoryData: { name: string; slug: string; image?: File }) => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
-    if (!token) {
-      throw new Error('No authentication token found. Please login again.');
+  if (!token) {
+    throw new Error('No authentication token found. Please login again.');
+  }
+
+  const formData = new FormData();
+  formData.append('name', categoryData.name);
+  formData.append('slug', categoryData.slug);
+  if (categoryData.image) {
+    formData.append('image', categoryData.image);
+  }
+
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/categories`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to create category');
+  }
+
+  const data = await response.json();
+  await fetchCategories();
+  return data;
+};
+
+  const uploadCategoryImage = async (file: File): Promise<{ url: string; publicId: string }> => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  
+  if (!token) {
+    throw new Error('No authentication token found. Please login again.');
+  }
+
+  const formData = new FormData();
+  formData.append('image', file);
+
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/upload`, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    if (response.status === 401) {
+      localStorage.removeItem('token');
+      throw new Error('Authentication failed. Please logout and login again.');
     }
+    throw new Error('Upload failed');
+  }
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/categories`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(categoryData),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to create category');
-    }
-
-    const data = await response.json();
-    await fetchCategories();
-    return data;
+  const data = await response.json();
+  return {
+    url: data.data?.url || data.url,
+    publicId: data.data?.publicId || data.publicId
   };
+};
 
-  // Update category
-  const updateCategory = async (id: string, categoryData: { name: string; slug: string }) => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const updateCategory = async (id: string, categoryData: { name: string; slug: string; image?: File }) => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
-    if (!token) {
-      throw new Error('No authentication token found. Please login again.');
-    }
+  if (!token) {
+    throw new Error('No authentication token found. Please login again.');
+  }
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/categories/${id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(categoryData),
-    });
+  const formData = new FormData();
+  formData.append('name', categoryData.name);
+  formData.append('slug', categoryData.slug);
+  if (categoryData.image) {
+    formData.append('image', categoryData.image);
+  }
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to update category');
-    }
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/categories/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+    body: formData,
+  });
 
-    const data = await response.json();
-    await fetchCategories();
-    return data;
-  };
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to update category');
+  }
+
+  const data = await response.json();
+  await fetchCategories();
+  return data;
+};
 
   // Delete category
   const deleteCategory = async (id: string) => {
@@ -263,6 +307,7 @@ export function useProducts() {
     clearError: () => setError(null),
     products,
     createCategory,
+    uploadCategoryImage,
     updateCategory,
     deleteCategory,
     updateProduct,

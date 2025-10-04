@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
-import { FolderPlus, Edit2, Trash2, Save, X, Folder } from 'lucide-react';
+import { FolderPlus, Edit2, Trash2, Save, X, Folder, Image as ImageIcon } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
 import { useAlert } from '@/components/ui/Alert';
 import { Input } from '@/components/ui/Form/Input';
@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/Form/Input';
 interface CategoryFormData {
   name: string;
   slug: string;
+  imageUrl?: string;
 }
 
 function CategoryManagement() {
@@ -22,6 +23,9 @@ function CategoryManagement() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
@@ -31,8 +35,6 @@ function CategoryManagement() {
     setValue,
     watch,
   } = useForm<CategoryFormData>();
-
-  const nameValue = watch('name');
 
   const generateSlug = (name: string) => {
     return name
@@ -47,11 +49,41 @@ function CategoryManagement() {
     setValue('slug', generateSlug(name));
   };
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const clearImage = () => {
+    setSelectedFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const onSubmit = async (data: CategoryFormData) => {
     setSubmitting(true);
     try {
+      const categoryData: any = {
+        name: data.name,
+        slug: data.slug,
+        imageUrl: imagePreview,
+      };
+
+      if (selectedFile) {
+        categoryData.image = selectedFile;
+      }
+
       if (editingId) {
-        await updateCategory(editingId, data);
+        await updateCategory(editingId, categoryData);
         addAlert({
           type: 'success',
           title: 'Success!',
@@ -59,7 +91,7 @@ function CategoryManagement() {
         });
         setEditingId(null);
       } else {
-        await createCategory(data);
+        await createCategory(categoryData);
         addAlert({
           type: 'success',
           title: 'Success!',
@@ -68,6 +100,7 @@ function CategoryManagement() {
         setShowAddForm(false);
       }
       reset();
+      clearImage();
     } catch (error) {
       addAlert({
         type: 'error',
@@ -83,6 +116,9 @@ function CategoryManagement() {
     setEditingId(category._id);
     setValue('name', category.name);
     setValue('slug', category.slug);
+    if (category.imageUrl) {
+      setImagePreview(category.imageUrl);
+    }
     setShowAddForm(false);
   };
 
@@ -109,12 +145,14 @@ function CategoryManagement() {
     setShowAddForm(false);
     setEditingId(null);
     reset();
+    clearImage();
   };
 
   const handleAddNew = () => {
     setShowAddForm(true);
     setEditingId(null);
     reset();
+    clearImage();
   };
 
   if (loading) {
@@ -129,7 +167,6 @@ function CategoryManagement() {
 
   return (
     <div className="p-8 max-w-4xl mx-auto space-y-8">
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -141,7 +178,7 @@ function CategoryManagement() {
             Categories
           </h1>
           <p className="text-lg mt-2">
-            Manage product categories for your store
+            Manage product categories with images
           </p>
         </div>
         {!showAddForm && !editingId && (
@@ -157,7 +194,6 @@ function CategoryManagement() {
         )}
       </motion.div>
 
-      {/* Add/Edit Form */}
       {(showAddForm || editingId) && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -184,6 +220,46 @@ function CategoryManagement() {
               helperText="URL-friendly version (auto-generated)"
             />
 
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">
+                Category Image (Optional)
+              </label>
+              
+              {imagePreview ? (
+                <div className="relative w-full h-48 border rounded-none overflow-hidden">
+                  <img
+                    src={imagePreview}
+                    alt="Category preview"
+                    className="object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={clearImage}
+                    className="absolute top-2 right-2 p-1.5 bg-white dark:bg-gray-800 border rounded-none hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full h-48 border-2 border-dashed rounded-none flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                >
+                  <ImageIcon className="w-12 h-12 mb-2 opacity-50" />
+                  <p className="text-sm opacity-70">Click to upload image</p>
+                  <p className="text-xs opacity-50 mt-1">PNG, JPG up to 5MB</p>
+                </div>
+              )}
+              
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageSelect}
+                className="hidden"
+              />
+            </div>
+
             <div className="flex justify-end space-x-3">
               <button
                 type="button"
@@ -207,7 +283,6 @@ function CategoryManagement() {
         </motion.div>
       )}
 
-      {/* Categories List */}
       <div className="space-y-4">
         {categories.length === 0 ? (
           <motion.div
@@ -216,12 +291,8 @@ function CategoryManagement() {
             className="rounded-none p-12 text-center border-2 border-dashed"
           >
             <Folder className="w-16 h-16 mx-auto mb-4" />
-            <h3 className="text-lg font-medium mb-2">
-              No categories yet
-            </h3>
-            <p className="mb-4">
-              Create your first category to start organizing products
-            </p>
+            <h3 className="text-lg font-medium mb-2">No categories yet</h3>
+            <p className="mb-4">Create your first category</p>
             {!showAddForm && (
               <button
                 onClick={handleAddNew}
@@ -240,20 +311,27 @@ function CategoryManagement() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05 }}
               className={`rounded-none p-6 border transition-all ${
-                editingId === category._id
-                  ? 'border-current'
-                  : 'border'
+                editingId === category._id ? 'border-current' : 'border'
               }`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <div className="p-3 border rounded-none">
-                    <Folder className="w-6 h-6" />
+                  <div className="relative w-16 h-16 border rounded-none overflow-hidden flex-shrink-0">
+                    {category.imageUrl ? (
+                      <img
+                        src={category.imageUrl}
+                        alt={category.name}
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                        <Folder className="w-6 h-6 opacity-50" />
+                      </div>
+                    )}
                   </div>
+                  
                   <div>
-                    <h3 className="text-lg font-semibold">
-                      {category.name}
-                    </h3>
+                    <h3 className="text-lg font-semibold">{category.name}</h3>
                     <p className="text-sm">
                       Slug: <span className="font-mono">{category.slug}</span>
                     </p>
@@ -286,7 +364,6 @@ function CategoryManagement() {
         )}
       </div>
 
-      {/* Back to Products Button */}
       {categories.length > 0 && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -308,7 +385,5 @@ function CategoryManagement() {
 }
 
 export default function CategoryManagementPage() {
-  return (
-      <CategoryManagement />
-  );
+  return <CategoryManagement />;
 }

@@ -1,12 +1,12 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { ShoppingCart, Eye, Star } from 'lucide-react';
+import { ShoppingCart, Eye, Star, Zap, Clock } from 'lucide-react';
 import { Product } from '@/types/product';
 import { useCart } from '@/context/CartContext';
-import { useWishlist } from '@/context/WishlistContext';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface ProductCardProps {
   product: Product;
@@ -19,10 +19,40 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   const { addItem } = useCart();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const router = useRouter();
 
-  const price = (product.priceCents / 100).toFixed(2);
+  const currentPrice = (product.priceCents / 100).toFixed(2);
+  const originalPrice = product.originalPriceCents 
+    ? (product.originalPriceCents / 100).toFixed(2)
+    : null;
+  
+  const discountPercent = product.discountPercent || (originalPrice 
+    ? Math.round(((parseFloat(originalPrice) - parseFloat(currentPrice)) / parseFloat(originalPrice)) * 100)
+    : 0);
+  
   const mainImage = product.images[0]?.url || '/placeholder-product.jpg';
   const isOutOfStock = product.stock === 0;
+
+  // Calculate time left for deal
+  const getTimeLeft = () => {
+    if (!product.dealExpiresAt) return null;
+    
+    const now = new Date();
+    const expiry = new Date(product.dealExpiresAt);
+    const diff = expiry.getTime() - now.getTime();
+    
+    if (diff <= 0) return 'Expired';
+    
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    }
+    return `${minutes}m`;
+  };
+
+  const timeLeft = getTimeLeft();
 
   const handleAddToCart = async () => {
     if (isOutOfStock) return;
@@ -42,7 +72,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
     addItem(cartItem);
     
-    // Add a small delay for better UX
     setTimeout(() => {
       setIsAddingToCart(false);
     }, 500);
@@ -56,6 +85,25 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       transition={{ duration: 0.3 }}
       className="group relative"
     >
+      {/* Discount Badge */}
+      {discountPercent > 0 && (
+        <div className="absolute top-3 left-3 z-10">
+          <div className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+            {discountPercent}% OFF
+          </div>
+        </div>
+      )}
+
+      {/* Hot Deal Badge */}
+      {product.isDeal && (
+        <div className="absolute top-3 right-3 z-10">
+          <div className="bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+            <Zap size={12} />
+            Hot Deal
+          </div>
+        </div>
+      )}
+
       <div className="bg-background border border-foreground/10 rounded-lg overflow-hidden transition-all duration-300 group-hover:shadow-lg group-hover:border-foreground/20 h-full flex flex-col">
         {/* Wishlist Button */}
         <div className="absolute top-3 right-3 z-10">
@@ -77,7 +125,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         {/* Product Image */}
         <div 
           className="relative aspect-[4/3] overflow-hidden cursor-pointer bg-gray-50"
-          onClick={() => onViewDetails(product)}
+          onClick={() => router.push(`/products/${product._id}`)}
         >
           <motion.img
             src={mainImage}
@@ -87,12 +135,28 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             transition={{ duration: 0.3 }}
           />
           <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
+          
+          {/* Time Left Badge */}
+          {timeLeft && (
+            <div className="absolute bottom-2 left-2">
+              <div className="bg-background/90 backdrop-blur-sm text-foreground text-xs px-2 py-1 rounded flex items-center gap-1">
+                <Clock size={10} />
+                <span>{timeLeft}</span>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="p-4 flex-1 flex flex-col">
           {/* Category */}
           <div className="text-xs font-medium text-foreground/60 uppercase tracking-wide mb-1">
-            {product.categoryId?.name}
+            {(() => {
+              const categoryId = product.categoryId;
+              if (typeof categoryId === 'object' && categoryId?.name) {
+                return categoryId.name;
+              }
+              return 'Uncategorized';
+            })()}
           </div>
 
           {/* Product Title */}
@@ -122,10 +186,47 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             <span className="text-xs text-foreground/60 ml-1">(24)</span>
           </div>
 
-          {/* Price */}
-          <div className="text-xl font-bold text-foreground mb-4">
-            ${price}
+          {/* Price Section */}
+          <div className="mb-4">
+            <div className="flex items-baseline gap-2">
+              {/* Current Price */}
+              <span className="text-xl font-bold text-foreground">
+                ${currentPrice}
+              </span>
+              
+              {/* Original Price */}
+              {originalPrice && originalPrice !== currentPrice && (
+                <span className="text-lg text-foreground/40 line-through">
+                  ${originalPrice}
+                </span>
+              )}
+            </div>
+            
+            {/* You Save */}
+            {originalPrice && originalPrice !== currentPrice && (
+              <div className="text-sm text-green-600 font-medium mt-1">
+                Save ${(parseFloat(originalPrice) - parseFloat(currentPrice)).toFixed(2)}
+              </div>
+            )}
           </div>
+
+          {/* Stock Progress Bar for Hot Deals */}
+          {product.isDeal && product.stock > 0 && (
+            <div className="mb-4">
+              <div className="flex justify-between text-xs text-foreground/60 mb-1">
+                <span>Sold: {product.soldCount || 0}</span>
+                <span>Left: {product.stock}</span>
+              </div>
+              <div className="w-full bg-foreground/10 rounded-full h-2">
+                <div 
+                  className="bg-green-500 h-2 rounded-full transition-all duration-500"
+                  style={{ 
+                    width: `${Math.min(100, ((product.soldCount || 0) / ((product.soldCount || 0) + product.stock)) * 100)}%` 
+                  }}
+                />
+              </div>
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className="flex gap-2 mt-auto">
