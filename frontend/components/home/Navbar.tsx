@@ -336,13 +336,13 @@ export default function Navbar() {
                     >
                       Profile
                     </Link> */}
-                    {/* <Link 
+                    <Link 
                       href="/orders" 
                       className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors py-2 px-4 rounded-lg hover:bg-foreground/5"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       My Orders
-                    </Link> */}
+                    </Link>
                     <Link 
                       href="/wishlist" 
                       className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors py-2 px-4 rounded-lg hover:bg-foreground/5"

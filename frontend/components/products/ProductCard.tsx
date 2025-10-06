@@ -104,7 +104,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </div>
       )}
 
-      <div className="bg-background border border-foreground/10 rounded-lg overflow-hidden transition-all duration-300 group-hover:shadow-lg group-hover:border-foreground/20 h-full flex flex-col">
+      <div className="bg-background rounded-lg overflow-hidden transition-all duration-300 group-hover:shadow-lg group-hover:border-foreground/20 h-full flex flex-col">
         {/* Wishlist Button */}
         <div className="absolute top-3 right-3 z-10">
           <WishlistButton 

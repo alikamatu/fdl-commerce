@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { CheckCircle, Package, Truck, Home, Download } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface OrderConfirmationProps {
   order: any;
@@ -12,6 +13,7 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) =
   // Safe check for user ID - handle both guest and authenticated users
   const isGuestUser = !order.userId && (!order.user || !order.user.id);
   const userName = order.user?.name || order.user?.email || 'Guest';
+  const router = useRouter();
 
   return (
     <motion.div
@@ -84,9 +86,9 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) =
           <Home size={16} />
           Continue Shopping
         </Link>
-        <button className="flex items-center justify-center gap-2 px-6 py-3 bg-foreground text-background rounded-lg font-medium hover:bg-foreground/90 transition-colors">
+        <button onClick={() => router.push(`/orders}`)} className="flex items-center justify-center gap-2 px-6 py-3 bg-foreground text-background rounded-lg font-medium hover:bg-foreground/90 transition-colors">
           <Download size={16} />
-          Download Receipt
+          View Order
         </button>
       </div>
 
