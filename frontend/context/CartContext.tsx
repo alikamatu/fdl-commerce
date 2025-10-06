@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = "force-dynamic";
+
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { Cart, CartItem, CartContextType } from '../types/cart';
 
@@ -119,22 +121,25 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [state, dispatch] = useReducer(cartReducer, initialState);
 
   // Load cart from localStorage on mount
-  useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
+useEffect(() => {
+  if (typeof window !== "undefined") {
+    const savedCart = localStorage.getItem("cart");
     if (savedCart) {
       try {
         const cart = JSON.parse(savedCart);
-        dispatch({ type: 'LOAD_CART', payload: cart });
+        dispatch({ type: "LOAD_CART", payload: cart });
       } catch (error) {
-        console.error('Failed to load cart from localStorage:', error);
+        console.error("Failed to load cart from localStorage:", error);
       }
     }
-  }, []);
+  }
+}, []);
 
-  // Save cart to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(state.cart));
-  }, [state.cart]);
+useEffect(() => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem("cart", JSON.stringify(state.cart));
+  }
+}, [state.cart]);
 
   const addItem = (item: Omit<CartItem, 'id' | 'quantity'>) => {
     dispatch({ type: 'ADD_ITEM', payload: item });
