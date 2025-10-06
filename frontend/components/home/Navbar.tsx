@@ -150,6 +150,8 @@ export default function Navbar() {
             {/* Right Section - Actions */}
             <div className="flex items-center space-x-3">
               {/* Mobile Search Button */}
+              <CartIcon />
+              <WishlistIcon />
               <button
                 onClick={() => setIsSearchOpen(true)}
                 className="md:hidden p-2 text-foreground/60 hover:text-foreground transition-colors duration-200 rounded-lg hover:bg-foreground/5"
