@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { motion } from 'framer-motion';
 import { ArrowRight, Image as ImageIcon, Grid3X3 } from 'lucide-react';
 import { useCategories } from '@/hooks/useCategories';

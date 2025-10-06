@@ -1,10 +1,9 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useState, useEffect } from 'react';
 import {
-  Container,
-  Box,
-  Typography,
   Snackbar,
   Alert,
 } from '@mui/material';
@@ -12,11 +11,9 @@ import { motion } from 'framer-motion';
 import { useProducts } from '@/hooks/useProducts';
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { ProductsFilters as Filters, Product } from '@/types/product';
-import { ProductsFilter } from './ProductsFilter';
 import { ProductsGrid } from './ProductsGrid';
 import { ProductsPagination } from './ProductsPagination';
 import { ProductQuickView } from './ProductQuickView';
-import { useCategories } from '@/hooks/useCategories';
 import { useSearchParams } from 'next/navigation'; // Add this import
 
 export default function Products() {
@@ -27,7 +24,6 @@ export default function Products() {
   });
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [quickViewOpen, setQuickViewOpen] = useState(false);
-  const { categories, loading: categoriesLoading } = useCategories();
 
   // Read URL parameters on component mount and when searchParams change
   useEffect(() => {
