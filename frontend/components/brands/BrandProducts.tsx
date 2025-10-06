@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+export const dynamic = "force-dynamic";
+
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useProducts } from '@/hooks/useProducts';
 import { ProductsPagination } from '@/components/products/ProductsPagination';

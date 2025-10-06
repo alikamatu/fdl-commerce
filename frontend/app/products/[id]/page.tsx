@@ -1,6 +1,8 @@
 'use client';
 
-import { use } from 'react';
+export const dynamic = "force-dynamic";
+
+import { use, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Star } from 'lucide-react';
 import { useProduct } from '@/hooks/useProduct';
@@ -17,12 +19,12 @@ import { SimilarProducts } from '@/components/products/SimilarProducts';
 import Link from 'next/link';
 
 interface ProductDetailsPageProps {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }
 
 export default function ProductDetailsPage({ params }: ProductDetailsPageProps) {
-  const { id } = use(params);
-  const { product, loading, error } = useProduct(id);
+  const [productId, setProductId] = useState<string | null>(null);
+  const { product, loading, error } = useProduct(productId ?? "");
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
 const { products: similarProducts, loading: similarLoading, error: similarError } = useSimilarProducts(
   product
@@ -32,7 +34,14 @@ const { products: similarProducts, loading: similarLoading, error: similarError 
         limit: 4
       }
     : { categoryId: '', currentProductId: '', limit: 4 }
+    
 );
+
+
+  useEffect(() => {
+    if (params?.id) setProductId(params.id);
+  }, [params]);
+
 
   const handleAddToCart = (product: Product) => {
     // Implement add to cart logic
