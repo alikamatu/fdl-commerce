@@ -46,7 +46,9 @@ const { products: similarProducts, loading: similarLoading, error: similarError 
 };
 
   const handleRetry = () => {
-    window.location.reload();
+      if (typeof window !== "undefined") {
+      window.location.reload();
+    }
   };
 
   if (loading) {

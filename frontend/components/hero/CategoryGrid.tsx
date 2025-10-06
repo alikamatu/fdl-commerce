@@ -62,7 +62,11 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
             {error}
           </p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => {
+              if (typeof window !== "undefined") {
+                window.location.reload();
+              }
+            }}
             className="px-4 py-2 bg-foreground text-background rounded-lg hover:bg-foreground/90 transition-colors"
           >
             Try Again

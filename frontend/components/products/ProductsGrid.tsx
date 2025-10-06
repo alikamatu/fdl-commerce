@@ -69,7 +69,11 @@ export const ProductsGrid: React.FC<ProductsGridProps> = ({
           Try adjusting your search filters or browse different categories.
         </p>
         <button
-          onClick={() => window.location.reload()}
+          onClick={() => {
+            if (typeof window !== "undefined") {
+              window.location.reload();
+            }
+          }}
           className="inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background rounded-lg font-medium hover:bg-foreground/90 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

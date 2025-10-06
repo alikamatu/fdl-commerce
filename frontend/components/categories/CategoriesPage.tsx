@@ -46,7 +46,11 @@ export const CategoriesPage: React.FC = () => {
             {error}
           </p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => {
+              if (typeof window !== "undefined") {
+                window.location.reload();
+              }
+            }}
             className="px-6 py-3 bg-foreground text-background rounded-lg hover:bg-foreground/90 transition-colors"
           >
             Try Again
