@@ -14,6 +14,7 @@ import { Snackbar } from '@/components/Snackbar';
 import { Product } from '@/types/product';
 import { useSimilarProducts } from '@/hooks/useSimilarProducts';
 import { SimilarProducts } from '@/components/products/SimilarProducts';
+import Link from 'next/link';
 
 interface ProductDetailsPageProps {
   params: Promise<{ id: string }>;
@@ -63,15 +64,15 @@ const { products: similarProducts, loading: similarLoading, error: similarError 
           Product not found
         </h2>
         <p className="text-foreground/60 mb-6">
-          The product you're looking for doesn't exist or has been removed.
+          The product you&apos;re looking for doesn&apos;t exist or has been removed.
         </p>
-        <a
+        <Link
           href="/products"
           className="inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background rounded-lg font-medium hover:bg-foreground/90 transition-colors"
         >
           <ArrowLeft size={16} />
           Back to Products
-        </a>
+        </Link>
       </div>
     );
   }
@@ -85,16 +86,16 @@ const { products: similarProducts, loading: similarLoading, error: similarError 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-foreground/60 mb-8">
-          <a href="/products" className="hover:text-foreground transition-colors">
+          <Link href="/products" className="hover:text-foreground transition-colors">
             Products
-          </a>
+          </Link>
           <span>/</span>
-          <a 
+          <Link 
             href={`/products?category=${product.categoryId._id}`}
             className="hover:text-foreground transition-colors"
           >
             {product.categoryId.name}
-          </a>
+          </Link>
           <span>/</span>
           <span className="text-foreground">{product.title}</span>
         </nav>

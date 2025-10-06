@@ -84,7 +84,7 @@ export const CategoriesPage: React.FC = () => {
             Shop by Category
           </h1>
           <p className="text-lg text-foreground/60 max-w-2xl mx-auto">
-            Explore our carefully curated collections and find exactly what you're looking for
+            Explore our carefully curated collections and find exactly what you&apos;re looking for
           </p>
         </motion.div>
 

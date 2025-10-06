@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Building2, Image as ImageIcon } from 'lucide-react';
 import { useBrands } from '@/hooks/useBrands';
+import Link from 'next/link';
 
 export const BrandsSection: React.FC = () => {
   const { brands, loading, error } = useBrands();
@@ -81,7 +82,7 @@ export const BrandsSection: React.FC = () => {
               viewport={{ once: true }}
               className="group"
             >
-              <a
+              <Link
                 href={`/brands/${brand.slug}`}
                 className="flex flex-col items-center text-center"
               >
@@ -116,7 +117,7 @@ export const BrandsSection: React.FC = () => {
                     {brand.productCount} products
                   </p>
                 )} */}
-              </a>
+              </Link>
             </motion.div>
           ))}
         </div>
@@ -130,13 +131,13 @@ export const BrandsSection: React.FC = () => {
             viewport={{ once: true }}
             className="text-center mt-12"
           >
-            <a
+            <Link
               href="/brands"
               className="inline-flex items-center gap-2 px-6 py-3 border border-foreground/20 rounded-lg font-medium hover:bg-foreground/5 transition-colors"
             >
               View All Brands
               <ArrowRight size={16} />
-            </a>
+            </Link>
           </motion.div>
         )}
       </div>

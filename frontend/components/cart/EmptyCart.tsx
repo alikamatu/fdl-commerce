@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { ShoppingBag, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
 export const EmptyCart: React.FC = () => {
   return (
@@ -29,19 +30,19 @@ export const EmptyCart: React.FC = () => {
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <a
+          <Link
             href="/products"
             className="flex items-center justify-center gap-2 px-6 py-3 bg-foreground text-background rounded-lg font-medium hover:bg-foreground/90 transition-colors"
           >
             Continue Shopping
             <ArrowRight size={16} />
-          </a>
-          <a
+          </Link>
+          <Link
             href="/products?category=trading-cards"
             className="flex items-center justify-center gap-2 px-6 py-3 border border-foreground/20 rounded-lg font-medium hover:bg-foreground/5 transition-colors"
           >
             Browse Trading Cards
-          </a>
+          </Link>
         </div>
 
         {/* Quick Links */}
@@ -49,13 +50,13 @@ export const EmptyCart: React.FC = () => {
           <p className="text-sm text-foreground/60 mb-4">Popular Categories</p>
           <div className="flex flex-wrap justify-center gap-4">
             {['Trading Cards', 'Toys', 'Sports Cards', 'Collectibles'].map((category) => (
-              <a
+              <Link
                 key={category}
                 href={`/products?category=${category.toLowerCase().replace(' ', '-')}`}
                 className="text-sm text-foreground/60 hover:text-foreground transition-colors"
               >
                 {category}
-              </a>
+              </Link>
             ))}
           </div>
         </div>

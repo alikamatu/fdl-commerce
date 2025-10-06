@@ -7,6 +7,7 @@ import { ProductsPagination } from '@/components/products/ProductsPagination';
 import { Building2, Package } from 'lucide-react';
 import { Brand } from '@/types/brand';
 import { BrandProductsGrid } from './BrandProductsGrid';
+import Link from 'next/link';
 
 interface BrandProductsProps {
   brand: Brand;
@@ -20,7 +21,7 @@ export const BrandProducts: React.FC<BrandProductsProps> = ({ brand }) => {
   const { products, loading, pagination } = useProducts({
     page: currentPage,
     limit: 12,
-    brand: brand.name, // Assuming your products have a brand field
+    brand: brand.name, // Assuming your products have Link brand field
   });
 
   const handleViewDetails = (product: any) => {
@@ -111,12 +112,12 @@ export const BrandProducts: React.FC<BrandProductsProps> = ({ brand }) => {
             <p className="text-foreground/60 mb-6">
               No products available from {brand.name} at the moment.
             </p>
-            <a
+            <Link
               href="/products"
               className="inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background rounded-lg font-medium hover:bg-foreground/90 transition-colors"
             >
               Browse All Products
-            </a>
+            </Link>
           </motion.div>
         )}
       </div>

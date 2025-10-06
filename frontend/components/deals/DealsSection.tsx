@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Zap, ArrowRight, Clock } from 'lucide-react';
 import { useDealProducts } from '@/hooks/useDealProducts';
 import { DealCard } from './DealCard';
+import Link from 'next/link';
 
 interface DealsSectionProps {
   title?: string;
@@ -118,13 +119,13 @@ export const DealsSection: React.FC<DealsSectionProps> = ({
           </div>
 
           {showViewAll && (
-            <a
+            <Link
               href="/products?deal=true"
               className="hidden sm:flex items-center gap-2 px-4 py-2 bg-foreground text-background rounded-lg font-medium hover:bg-foreground/90 transition-colors shadow-lg"
             >
               View All Deals
               <ArrowRight size={16} />
-            </a>
+            </Link>
           )}
         </div>
 
@@ -210,13 +211,13 @@ export const DealsSection: React.FC<DealsSectionProps> = ({
         {/* Mobile View All Link */}
         {showViewAll && (
           <div className="sm:hidden text-center mt-6">
-            <a
+            <Link
               href="/products?deal=true"
               className="inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background rounded-lg font-medium hover:bg-foreground/90 transition-colors shadow-lg"
             >
               View All Deals
               <ArrowRight size={16} />
-            </a>
+            </Link>
           </div>
         )}
 

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Image as ImageIcon, Grid3X3 } from 'lucide-react';
 import { useCategories } from '@/hooks/useCategories';
 import { CategoryScroll } from '../categories/CategoryScroll';
+import Link from 'next/link';
 
 interface CategoryGridProps {
   variant?: 'grid' | 'scroll';
@@ -117,7 +118,7 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
               viewport={{ once: true }}
               className="group"
             >
-              <a href={`/products?category=${category._id}`} className="block h-full">
+              <Link href={`/products?category=${category._id}`} className="block h-full">
                 <div className="bg-background rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 h-full flex flex-col">
                   <div className="aspect-[4/3] overflow-hidden relative">
                     {category.imageUrl ? (
@@ -154,7 +155,7 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
                     </p>
                   </div>
                 </div>
-              </a>
+              </Link>
             </motion.div>
           ))}
         </div>
@@ -168,13 +169,13 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
             viewport={{ once: true }}
             className="text-center mt-12"
           >
-            <a
+            <Link
               href="/products"
               className="inline-flex items-center gap-2 px-6 py-3 border border-foreground/20 rounded-lg font-medium hover:bg-foreground/5 transition-colors"
             >
               View All Categories
               <ArrowRight size={16} />
-            </a>
+            </Link>
           </motion.div>
         )}
       </div>

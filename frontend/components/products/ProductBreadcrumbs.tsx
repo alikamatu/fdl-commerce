@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { ChevronRight, Home } from 'lucide-react';
 import { Category } from '@/types/product';
+import Link from 'next/link';
 
 interface ProductBreadcrumbsProps {
   category?: Category;
@@ -20,32 +21,32 @@ export const ProductBreadcrumbs: React.FC<ProductBreadcrumbsProps> = ({
       transition={{ duration: 0.4 }}
       className="flex items-center gap-2 text-sm text-foreground/60 mb-8"
     >
-      <a
+      <Link
         href="/"
         className="flex items-center gap-1 hover:text-foreground transition-colors"
       >
         <Home size={16} />
         <span>Home</span>
-      </a>
+      </Link>
       
       <ChevronRight size={16} />
       
-      <a
+      <Link
         href="/products"
         className="hover:text-foreground transition-colors"
       >
         Products
-      </a>
+      </Link>
 
       {category && (
         <>
           <ChevronRight size={16} />
-          <a
+          <Link
             href={`/products?category=${category._id}`}
             className="hover:text-foreground transition-colors"
           >
             {category.name}
-          </a>
+          </Link>
         </>
       )}
 

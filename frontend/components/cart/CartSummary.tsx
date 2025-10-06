@@ -101,7 +101,7 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ onCheckout }) => {
         {!user && (
           <div className="mt-4 p-3 bg-foreground/5 rounded-lg">
             <p className="text-xs text-foreground/60 text-center">
-              You'll be able to create an account or checkout as guest
+              You&apos;ll be able to create an account or checkout as guest
             </p>
           </div>
         )}
