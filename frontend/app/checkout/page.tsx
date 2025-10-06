@@ -118,12 +118,6 @@ export default function CheckoutPage() {
       <div className="text-center">
         <h1 className="text-2xl font-light text-foreground mb-4">Checkout Page</h1>
         <p className="text-foreground/60 mb-6">This is a placeholder for the checkout process.</p>
-        <Link
-          href="/products"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background rounded-lg font-medium hover:bg-foreground/90 transition-colors"
-        >
-          Continue Shopping
-        </Link>
       </div>
     </div>
   );
