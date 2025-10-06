@@ -1,3 +1,5 @@
+"use client";
+
 import { CheckoutAuth } from "@/components/checkout/CheckoutAuth";
 import { useRouter } from "next/navigation";
 
