@@ -41,11 +41,12 @@ export default function ProductPage() {
     setQuickViewOpen(true);
   };
 
-  const handlePageChange = (page: number) => {
-    updateFilters({ ...filters, page });
-    // Scroll to top when page changes
+const handlePageChange = (page: number) => {
+  updateFilters({ ...filters, page });
+  if (typeof window !== 'undefined') {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  }
+};
 
   const handleCloseQuickView = () => {
     setQuickViewOpen(false);

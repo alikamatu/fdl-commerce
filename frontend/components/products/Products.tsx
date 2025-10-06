@@ -60,7 +60,9 @@ export default function Products() {
   const handlePageChange = (page: number) => {
     setFilters(prev => ({ ...prev, page }));
     // Scroll to top when page changes
+     if (typeof window !== 'undefined') {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   };
 
   const handleCloseQuickView = () => {

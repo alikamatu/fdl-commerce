@@ -94,7 +94,7 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
         await navigator.share({
           title: product.title,
           text: product.description,
-          url: window.location.href,
+          url: (typeof window !== 'undefined') ? window.location.href : '',
         });
         showSnackbar('Product shared successfully', 'success');
       } catch (err) {
@@ -105,7 +105,7 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
     } else {
       // Fallback: copy to clipboard
       try {
-        await navigator.clipboard.writeText(window.location.href);
+        await navigator.clipboard.writeText((typeof window !== 'undefined') ? window.location.href : '');
         showSnackbar('Link copied to clipboard', 'success');
       } catch (err) {
         showSnackbar('Failed to copy link', 'error');

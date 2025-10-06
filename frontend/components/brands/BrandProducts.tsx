@@ -31,7 +31,9 @@ export const BrandProducts: React.FC<BrandProductsProps> = ({ brand }) => {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+     if (typeof window !== 'undefined') {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   };
 
   return (

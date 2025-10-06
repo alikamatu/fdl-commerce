@@ -44,9 +44,9 @@ export default function Navbar() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      const currentPath = window.location.pathname;
-      const currentSearchParams = new URLSearchParams(window.location.search);
-      
+      const currentPath = (typeof window !== 'undefined') ? window.location.pathname : '';
+      const currentSearchParams = new URLSearchParams((typeof window !== 'undefined') ? window.location.search : '');
+
       currentSearchParams.set('search', encodeURIComponent(searchQuery.trim()));
       router.push(`${currentPath}?${currentSearchParams.toString()}`);
       
