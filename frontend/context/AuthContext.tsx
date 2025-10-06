@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = "force-dynamic";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
@@ -24,12 +25,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for stored auth data on mount
-    const savedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
-    
-    if (savedUser && token) {
-      setUser({ ...JSON.parse(savedUser), token });
+    if (typeof window !== "undefined") {
+      const savedUser = localStorage.getItem('user');
+      const token = localStorage.getItem('token');
+      if (savedUser && token) {
+        setUser({ ...JSON.parse(savedUser), token });
+      }
     }
     setLoading(false);
   }, []);
@@ -37,18 +38,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (email: string, password: string) => {
     try {
       setLoading(true);
-      // Replace with your actual API call
       const response = await fetch('http://localhost:1000/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
 
-      if (!response.ok) {
-        throw new Error('Login failed');
-      }
+      if (!response.ok) throw new Error('Login failed');
 
       const data = await response.json();
       const userData: User = {
@@ -59,8 +55,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       };
 
       setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('token', data.token);
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('token', data.token);
+      }
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -72,18 +71,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const register = async (email: string, password: string, name: string) => {
     try {
       setLoading(true);
-      // Replace with your actual API call
       const response = await fetch('http://localhost:1000/api/auth/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, displayName: name }),
       });
 
-      if (!response.ok) {
-        throw new Error('Registration failed');
-      }
+      if (!response.ok) throw new Error('Registration failed');
 
       const data = await response.json();
       const userData: User = {
@@ -94,8 +88,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       };
 
       setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('token', data.token);
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('token', data.token);
+      }
     } catch (error) {
       console.error('Registration error:', error);
       throw error;
@@ -106,8 +103,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    if (typeof window !== "undefined") {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+    }
   };
 
   return (
