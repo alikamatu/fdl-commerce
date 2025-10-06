@@ -9,6 +9,10 @@ interface OrderConfirmationProps {
 }
 
 export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
+  // Safe check for user ID - handle both guest and authenticated users
+  const isGuestUser = !order.userId && (!order.user || !order.user.id);
+  const userName = order.user?.name || order.user?.email || 'Guest';
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
@@ -24,18 +28,20 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) =
       </h1>
       
       <p className="text-foreground/60 mb-6">
-        Thank you for your purchase. Your order has been confirmed and will be shipped soon.
+        Thank you for your purchase, {userName}. Your order has been confirmed and will be shipped soon.
       </p>
 
       <div className="bg-background border border-foreground/10 rounded-lg p-6 mb-8">
         <div className="flex items-center justify-between mb-4">
           <span className="text-foreground/60">Order Number</span>
-          <span className="font-semibold text-foreground">{order.id}</span>
+          <span className="font-semibold text-foreground">
+            {order.orderNumber || order.id}
+          </span>
         </div>
         <div className="flex items-center justify-between mb-4">
           <span className="text-foreground/60">Total Amount</span>
           <span className="font-semibold text-foreground">
-            ${(order.total / 100).toFixed(2)}
+            ${((order.totalCents || order.total) / 100).toFixed(2)}
           </span>
         </div>
         <div className="flex items-center justify-between">
@@ -84,7 +90,8 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) =
         </button>
       </div>
 
-      {!order.user.id && (
+      {/* Show this message only for guest users */}
+      {isGuestUser && (
         <div className="mt-8 p-4 bg-foreground/5 rounded-lg">
           <p className="text-sm text-foreground/60 mb-2">
             Want to track your order and get updates?

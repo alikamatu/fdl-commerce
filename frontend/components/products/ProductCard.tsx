@@ -96,7 +96,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
       {/* Hot Deal Badge */}
       {product.isDeal && (
-        <div className="absolute top-3 right-3 z-10">
+        <div className="hidden md:block absolute top-3 right-3 z-10">
           <div className="bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
             <Zap size={12} />
             Hot Deal
@@ -232,7 +232,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           <div className="flex gap-2 mt-auto">
             <button
               onClick={() => onViewDetails(product)}
-              className="flex items-center justify-center gap-1 flex-1 px-3 py-2 border border-foreground/20 rounded-md text-sm font-medium hover:bg-foreground/5 transition-colors"
+              className="hidden md:flex items-center justify-center gap-1 flex-1 px-3 py-2 border border-foreground/20 rounded-md text-sm font-medium hover:bg-foreground/5 transition-colors"
             >
               <Eye size={16} />
               Details

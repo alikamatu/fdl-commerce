@@ -22,8 +22,8 @@ export const ProductsList: React.FC<ProductsListProps> = ({
     return (
       <div className={`grid gap-6 ${
         viewMode === 'grid' 
-          ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
-          : 'grid-cols-1'
+          ? 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
+          : 'grid-cols-2'
       }`}>
         {[...Array(8)].map((_, index) => (
           <div
@@ -85,7 +85,7 @@ export const ProductsList: React.FC<ProductsListProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
+          className="grid grid-cols-2 lg:grid-cols-3 gap-3"
         >
           {products.map((product, index) => (
             <motion.div

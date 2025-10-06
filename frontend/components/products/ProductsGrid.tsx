@@ -21,8 +21,8 @@ export const ProductsGrid: React.FC<ProductsGridProps> = ({
     return (
       <div className={`grid gap-6 ${
         viewMode === 'grid' 
-          ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
-          : 'grid-cols-1'
+          ? 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
+          : 'grid-cols-2'
       }`}>
         {[...Array(8)].map((_, index) => (
           <div
@@ -85,8 +85,8 @@ export const ProductsGrid: React.FC<ProductsGridProps> = ({
     <AnimatePresence>
       <div className={`grid gap-6 ${
         viewMode === 'grid' 
-          ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
-          : 'grid-cols-1'
+          ? 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
+          : 'grid-cols-2'
       }`}>
         {products.map((product, index) => (
           <motion.div

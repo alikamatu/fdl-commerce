@@ -97,7 +97,7 @@ export const DealsSection: React.FC<DealsSectionProps> = ({
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      <div className="flex max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="md:flex max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col items-start justify-between bg-[url('/images/2151995261.jpg')] bg-cover m-2 rounded-2xl p-6">
           <div className="flex items-center gap-4">

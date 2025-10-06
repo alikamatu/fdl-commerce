@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/context/AuthContext';
 import { CheckoutAuth } from '@/components/checkout/CheckoutAuth';
 import { CheckoutForm } from '@/components/checkout/CheckoutForm';
 import { OrderConfirmation } from '@/components/checkout/OrderConfirmation';
@@ -13,9 +13,16 @@ type CheckoutStep = 'auth' | 'checkout' | 'complete';
 
 export default function CheckoutPage() {
   const { cart } = useCart();
-  const { user } = useAuth();
-  const [step, setStep] = useState<CheckoutStep>(user ? 'checkout' : 'auth');
+  const { user, loading: authLoading } = useAuth();
+  const [step, setStep] = useState<CheckoutStep>('auth');
   const [order, setOrder] = useState<any>(null);
+
+  // Skip auth step if user is already logged in
+  useEffect(() => {
+    if (!authLoading && user) {
+      setStep('checkout');
+    }
+  }, [user, authLoading]);
 
   const handleAuthSuccess = () => {
     setStep('checkout');
@@ -29,6 +36,17 @@ export default function CheckoutPage() {
     setOrder(orderData);
     setStep('complete');
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-foreground/5 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-foreground border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-foreground/60">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (cart.items.length === 0 && step !== 'complete') {
     return (

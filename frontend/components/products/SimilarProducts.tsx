@@ -1,7 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Package } from 'lucide-react';
 import { Product } from '@/types/product';
 import { RecommendedProductCard } from '@/components/products/RecommendedProductCard';
 
@@ -27,7 +26,7 @@ export const SimilarProducts: React.FC<SimilarProductsProps> = ({
         className="border-t border-foreground/10 pt-12 mt-12"
       >
         <h2 className="text-2xl font-light text-foreground mb-8">Similar Products</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {[...Array(4)].map((_, index) => (
             <div
               key={index}
@@ -57,7 +56,7 @@ export const SimilarProducts: React.FC<SimilarProductsProps> = ({
       className="border-t border-foreground/10 pt-12 mt-12"
     >
       <div className="flex items-center justify-between mb-8">
-        <h2 className="text-2xl font-light text-foreground">You May Also Like</h2>
+        <h2 className="text-2xl font-light text-foreground">Similar Products</h2>
         <a
           href={`/products?category=${products[0]?.categoryId?._id || ''}`}
           className="text-sm text-foreground/60 hover:text-foreground transition-colors"
@@ -66,7 +65,7 @@ export const SimilarProducts: React.FC<SimilarProductsProps> = ({
         </a>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         {products.map((product, index) => (
           <motion.div
             key={product._id}

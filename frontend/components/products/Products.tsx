@@ -17,9 +17,10 @@ import { ProductsGrid } from './ProductsGrid';
 import { ProductsPagination } from './ProductsPagination';
 import { ProductQuickView } from './ProductQuickView';
 import { useCategories } from '@/hooks/useCategories';
-
+import { useSearchParams } from 'next/navigation'; // Add this import
 
 export default function Products() {
+  const searchParams = useSearchParams();
   const [filters, setFilters] = useState<Filters>({
     page: 1,
     limit: 12,
@@ -27,7 +28,19 @@ export default function Products() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const { categories, loading: categoriesLoading } = useCategories();
-  
+
+  // Read URL parameters on component mount and when searchParams change
+  useEffect(() => {
+    const search = searchParams.get('search');
+    const category = searchParams.get('category');
+    
+    setFilters(prev => ({
+      ...prev,
+      page: 1, // Reset to first page when search changes
+      search: search || undefined,
+      category: category || undefined,
+    }));
+  }, [searchParams]);
 
   const { products, loading, error, pagination, refetch } = useProducts(filters);
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
@@ -68,49 +81,79 @@ export default function Products() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-4xl text-start font-bold text-foreground mb-4"
+            className="text-2xl text-start font-semibold text-foreground mb-4"
           >
-            Our Products
+            {filters.search ? `Search Results for "${filters.search}"` : 'available Products'}
           </motion.h1>
-          {/* <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-lg text-foreground/60 max-w-2xl mx-auto"
-          >
-            Discover our carefully curated collection of high-quality products 
-            designed to meet your needs and exceed your expectations.
-          </motion.p> */}
+          {filters.search && products.length > 0 && (
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-lg text-foreground/60 text-start"
+            >
+              Found {pagination.total} product{products.length !== 1 ? 's' : ''}
+            </motion.p>
+          )}
         </div>
 
-        {/* Filters
-        <ProductsFilter
+        {/* Filters - Uncomment this section */}
+        {/* <ProductsFilter
           filters={filters}
           onFiltersChange={setFilters}
           categories={categories}
         /> */}
 
-        {/* Products Grid - Removed onAddToCart prop */}
+        {/* Products Grid */}
         <ProductsGrid
           products={products}
           loading={loading}
           onViewDetails={handleViewDetails}
         />
 
-        {/* Pagination */}
-        <ProductsPagination
-          currentPage={pagination.page}
-          totalPages={pagination.totalPages}
-          totalItems={pagination.total}
-          onPageChange={handlePageChange}
-        />
+        {/* Show message when no products found */}
+        {!loading && products.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-12"
+          >
+            <div className="text-foreground/60 text-lg mb-4">
+              {filters.search ? (
+                `No products found for "${filters.search}"`
+              ) : (
+                'No products available'
+              )}
+            </div>
+            {filters.search && (
+              <button
+                onClick={() => {
+                  // Clear search filter
+                  setFilters(prev => ({ ...prev, search: undefined, page: 1 }));
+                }}
+                className="px-6 py-2 bg-foreground text-background rounded-lg hover:bg-foreground/90 transition-colors"
+              >
+                Clear Search
+              </button>
+            )}
+          </motion.div>
+        )}
+
+        {/* Pagination - Only show if there are products */}
+        {products.length > 0 && (
+          <ProductsPagination
+            currentPage={pagination.page}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.total}
+            onPageChange={handlePageChange}
+          />
+        )}
 
         {/* Quick View Dialog */}
         <ProductQuickView
           product={selectedProduct}
           open={quickViewOpen}
           onClose={handleCloseQuickView}
-          // onAddToCart is now handled internally in ProductQuickView
         />
 
         {/* Snackbar */}

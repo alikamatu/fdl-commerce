@@ -14,7 +14,11 @@ import {
   AlertCircle,
   Image as ImageIcon,
   Calendar,
-  RefreshCw
+  RefreshCw,
+  Folder,
+  Star,
+  TrendingUp,
+  Clock
 } from 'lucide-react';
 import { Product } from '@/types/product';
 import { useAlert } from '@/components/ui/Alert';
@@ -96,7 +100,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     return `$${((priceCents || 0) / 100).toFixed(2)}`;
   };
 
-  const formatDate = (dateString?: Date) => {
+  const formatDate = (dateString: string) => {
     if (!dateString) return 'Unknown';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -106,9 +110,20 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   };
 
   const getStockStatus = (stock: number) => {
-    if (stock === 0) return { text: 'Out of Stock', style: 'bg-current' };
-    if (stock <= 10) return { text: 'Low Stock', style: 'bg-current' };
-    return { text: 'In Stock', style: 'bg-current' };
+    if (stock === 0) return { text: 'Out of Stock', style: 'bg-red-100 text-red-800 border-red-200' };
+    if (stock <= 10) return { text: 'Low Stock', style: 'bg-yellow-100 text-yellow-800 border-yellow-200' };
+    return { text: 'In Stock', style: 'bg-green-100 text-green-800 border-green-200' };
+  };
+
+  const getProductStatus = (product: Product) => {
+    if (!product.isActive) return { text: 'Inactive', style: 'bg-gray-100 text-gray-800 border-gray-200' };
+    if (product.isDeal) return { text: 'On Deal', style: 'bg-purple-100 text-purple-800 border-purple-200' };
+    return { text: 'Active', style: 'bg-green-100 text-green-800 border-green-200' };
+  };
+
+  const isDealActive = (dealExpiresAt?: string) => {
+    if (!dealExpiresAt) return false;
+    return new Date(dealExpiresAt) > new Date();
   };
 
   if (loading) {
@@ -169,7 +184,9 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   }
 
   const stockStatus = getStockStatus(product.stock);
-  const mainImage = product.images[activeImageIndex];
+  const productStatus = getProductStatus(product);
+  const mainImage = product.images?.[activeImageIndex];
+  const activeDeal = product.isDeal && isDealActive(product.dealExpiresAt);
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
@@ -272,7 +289,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           </div>
 
           {/* Thumbnail Images */}
-          {product.images.length > 1 && (
+          {product.images && product.images.length > 1 && (
             <div className="grid grid-cols-4 gap-2">
               {product.images.map((image, index) => (
                 <button
@@ -312,12 +329,25 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                 <span className="font-medium">Brand</span>
                 <span>{product.brand}</span>
               </div>
+
+              <div className="flex justify-between items-center">
+                <span className="font-medium flex items-center">
+                  <Folder className="w-4 h-4 mr-2" />
+                  Category
+                </span>
+                <span>{product.categoryId?.name || 'Uncategorized'}</span>
+              </div>
               
               <div className="flex justify-between items-center">
                 <span className="font-medium">Status</span>
-                <span className={`px-3 py-1 text-xs font-medium ${stockStatus.style} text-background`}>
-                  {stockStatus.text}
-                </span>
+                <div className="flex flex-col gap-1 items-end">
+                  <span className={`px-3 py-1 text-xs font-medium border rounded ${stockStatus.style}`}>
+                    {stockStatus.text}
+                  </span>
+                  <span className={`px-3 py-1 text-xs font-medium border rounded ${productStatus.style}`}>
+                    {productStatus.text}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -329,11 +359,23 @@ export default function ProductPage({ params }: { params: { id: string } }) {
               <div className="flex justify-between items-center">
                 <span className="font-medium flex items-center">
                   <DollarSign className="w-4 h-4 mr-2" />
-                  Price
+                  {activeDeal ? 'Sale Price' : 'Price'}
                 </span>
-                <span className="text-2xl font-bold">
-                  {formatPrice(product.priceCents)}
-                </span>
+                <div className="text-right">
+                  <span className="text-2xl font-bold">
+                    {formatPrice(product.priceCents)}
+                  </span>
+                  {activeDeal && product.originalPriceCents && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg text-gray-500 line-through">
+                        {formatPrice(product.originalPriceCents)}
+                      </span>
+                      <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded">
+                        {product.discountPercent}% OFF
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
               
               <div className="flex justify-between items-center">
@@ -341,8 +383,24 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                   <Box className="w-4 h-4 mr-2" />
                   Stock
                 </span>
-                <span className="text-lg">{product.stock} units</span>
+                <div className="text-right">
+                  <span className="text-lg">{product.stock} units</span>
+                  <div className="flex items-center gap-1 text-sm text-gray-600">
+                    <TrendingUp className="w-3 h-3" />
+                    <span>{product.soldCount || 0} sold</span>
+                  </div>
+                </div>
               </div>
+
+              {activeDeal && product.dealExpiresAt && (
+                <div className="flex justify-between items-center">
+                  <span className="font-medium flex items-center">
+                    <Clock className="w-4 h-4 mr-2" />
+                    Deal Expires
+                  </span>
+                  <span className="text-sm">{formatDate(product.dealExpiresAt)}</span>
+                </div>
+              )}
               
               <div className="flex justify-between items-center">
                 <span className="font-medium flex items-center">
@@ -353,6 +411,33 @@ export default function ProductPage({ params }: { params: { id: string } }) {
               </div>
             </div>
           </div>
+
+          {/* Ratings & Reviews */}
+          {(product.rating || product.reviewCount) && (
+            <div className="rounded-none p-6 border">
+              <h2 className="text-lg font-semibold mb-4 flex items-center">
+                <Star className="w-5 h-5 mr-2" />
+                Ratings & Reviews
+              </h2>
+              <div className="space-y-3">
+                {product.rating && (
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">Rating</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg font-semibold">{product.rating}</span>
+                      <Star className="w-4 h-4 fill-current" />
+                    </div>
+                  </div>
+                )}
+                {product.reviewCount && (
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">Reviews</span>
+                    <span>{product.reviewCount} reviews</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Description */}
           <div className="rounded-none p-6 border">

@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import Navbar from "@/components/home/Navbar";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
+import { AuthProvider } from "@/context/AuthContext";
 
 const fontPoppins = Poppins({
   variable: "--font-poppins",
@@ -28,6 +29,7 @@ export default function RootLayout({
         className={`${fontPoppins.variable} antialiased transition-colors duration-500`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <AuthProvider>
           <CartProvider>
             <WishlistProvider>
 
@@ -35,6 +37,7 @@ export default function RootLayout({
           {children}
             </WishlistProvider>
           </CartProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -42,10 +42,10 @@ export function useProducts(filters?: ProductFilters) {
       if (filters?.page) params.append('page', String(filters.page));
       if (filters?.limit) params.append('limit', String(filters.limit));
       if (filters?.category) params.append('category', filters.category);
-      if (filters?.search) params.append('q', filters.search);
       if (filters?.brand) params.append('brand', filters.brand);
       if (filters?.minPrice) params.append('minPrice', String(filters.minPrice));
       if (filters?.maxPrice) params.append('maxPrice', String(filters.maxPrice));
+      if (filters?.search) params.append('q', encodeURIComponent(filters.search));
       if (filters?.inStock !== undefined) params.append('inStock', String(filters.inStock));
 
       console.log('Fetching products with params:', params.toString());

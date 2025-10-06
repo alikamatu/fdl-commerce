@@ -1,18 +1,30 @@
-import { useState, useEffect } from 'react';
+"use client";
 
-export interface User {
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+
+interface User {
   id: string;
   email: string;
   name: string;
   token?: string;
 }
 
-export const useAuth = () => {
+interface AuthContextType {
+  user: User | null;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, name: string) => Promise<void>;
+  logout: () => void;
+  loading: boolean;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in from localStorage
+    // Check for stored auth data on mount
     const savedUser = localStorage.getItem('user');
     const token = localStorage.getItem('token');
     
@@ -24,7 +36,9 @@ export const useAuth = () => {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+      setLoading(true);
+      // Replace with your actual API call
+      const response = await fetch('http://localhost:1000/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -33,13 +47,11 @@ export const useAuth = () => {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Login failed');
+        throw new Error('Login failed');
       }
 
       const data = await response.json();
-      
-      const userData = {
+      const userData: User = {
         id: data.user._id,
         email: data.user.email,
         name: data.user.displayName,
@@ -49,16 +61,19 @@ export const useAuth = () => {
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));
       localStorage.setItem('token', data.token);
-
-      return userData;
     } catch (error) {
-      throw new Error(error instanceof Error ? error.message : 'Login failed');
+      console.error('Login error:', error);
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   const register = async (email: string, password: string, name: string) => {
     try {
-      const response = await fetch('http://localhost:1000/auth/register', {
+      setLoading(true);
+      // Replace with your actual API call
+      const response = await fetch('http://localhost:1000/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -67,13 +82,11 @@ export const useAuth = () => {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Registration failed');
+        throw new Error('Registration failed');
       }
 
       const data = await response.json();
-      
-      const userData = {
+      const userData: User = {
         id: data.user._id,
         email: data.user.email,
         name: data.user.displayName,
@@ -83,10 +96,11 @@ export const useAuth = () => {
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));
       localStorage.setItem('token', data.token);
-
-      return userData;
     } catch (error) {
-      throw new Error(error instanceof Error ? error.message : 'Registration failed');
+      console.error('Registration error:', error);
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -96,11 +110,17 @@ export const useAuth = () => {
     localStorage.removeItem('token');
   };
 
-  return {
-    user,
-    loading,
-    login,
-    register,
-    logout,
-  };
+  return (
+    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };
