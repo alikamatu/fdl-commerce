@@ -87,7 +87,7 @@ export default function Navbar() {
                 href="/" 
                 className="flex items-center space-x-3"
               >
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md">
+                <div className="w-8 h-8 bg-foreground rounded-lg flex items-center justify-center shadow-md">
                   <span className="text-white font-bold text-sm">TS</span>
                 </div>
                 <span className="text-xl font-semibold text-foreground hidden sm:block">
@@ -173,7 +173,7 @@ export default function Navbar() {
                       onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                       className="flex items-center space-x-2 p-2 rounded-lg hover:bg-foreground/5 transition-colors duration-200"
                     >
-                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium shadow-md">
+                      <div className="w-8 h-8 bg-foreground rounded-full flex items-center justify-center text-white text-sm font-medium shadow-md">
                         {user.name.charAt(0).toUpperCase()}
                       </div>
                       <span className="text-sm font-medium text-foreground/80 hidden lg:block">
@@ -192,14 +192,14 @@ export default function Navbar() {
                         
                         {/* User Links */}
                         <div className="py-2">
-                          <Link 
+                          {/* <Link 
                             href="/profile" 
                             className="flex items-center gap-3 px-4 py-2 text-sm text-foreground/80 hover:bg-foreground/5 transition-colors"
                             onClick={() => setIsUserMenuOpen(false)}
                           >
                             <User size={16} className="text-foreground/40" />
                             Profile
-                          </Link>
+                          </Link> */}
                           <Link 
                             href="/orders" 
                             className="flex items-center gap-3 px-4 py-2 text-sm text-foreground/80 hover:bg-foreground/5 transition-colors"
@@ -216,7 +216,7 @@ export default function Navbar() {
                             <Heart size={16} className="text-foreground/40" />
                             Wishlist
                           </Link>
-                          <Link 
+                          {/* <Link 
                             href="/order-history" 
                             className="flex items-center gap-3 px-4 py-2 text-sm text-foreground/80 hover:bg-foreground/5 transition-colors"
                             onClick={() => setIsUserMenuOpen(false)}
@@ -231,7 +231,7 @@ export default function Navbar() {
                           >
                             <Star size={16} className="text-foreground/40" />
                             My Reviews
-                          </Link>
+                          </Link> */}
                         </div>
 
                         <div className="border-t border-foreground/10 my-1" />
@@ -313,7 +313,7 @@ export default function Navbar() {
                     </Link>
                     <Link 
                       href="/register" 
-                      className="text-sm font-medium bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all py-3 px-4 text-center shadow-md"
+                      className="text-sm font-medium bg-foreground/10 transition-all py-3 px-4 text-center shadow-md"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Sign Up
@@ -325,20 +325,20 @@ export default function Navbar() {
                       <p className="text-sm font-medium text-foreground">{user.name}</p>
                       <p className="text-sm text-foreground/60">{user.email}</p>
                     </div>
-                    <Link 
+                    {/* <Link 
                       href="/profile" 
                       className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors py-2 px-4 rounded-lg hover:bg-foreground/5"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Profile
-                    </Link>
-                    <Link 
+                    </Link> */}
+                    {/* <Link 
                       href="/orders" 
                       className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors py-2 px-4 rounded-lg hover:bg-foreground/5"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       My Orders
-                    </Link>
+                    </Link> */}
                     <Link 
                       href="/wishlist" 
                       className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors py-2 px-4 rounded-lg hover:bg-foreground/5"
@@ -346,13 +346,13 @@ export default function Navbar() {
                     >
                       Wishlist
                     </Link>
-                    <Link 
+                    {/* <Link 
                       href="/order-history" 
                       className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors py-2 px-4 rounded-lg hover:bg-foreground/5"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Order History
-                    </Link>
+                    </Link> */}
                     <button
                       onClick={handleLogout}
                       className="text-sm font-medium text-red-600 hover:bg-red-500/10 transition-colors py-2 px-4 rounded-lg text-left mt-2"
