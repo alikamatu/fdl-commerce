@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { CreditCard, Truck, Lock } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
-import { PaystackButton } from 'react-paystack';
+import dynamic from "next/dynamic";
 
 interface CheckoutFormProps {
   user?: any;
@@ -31,6 +31,11 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
     email: user?.email || '',
     phone: '',
   });
+
+  const PaystackButton = dynamic(
+  () => import("react-paystack").then(mod => mod.PaystackButton),
+  { ssr: false }
+);
 
   // Calculate totals
   const subtotalCents = cart.total;
