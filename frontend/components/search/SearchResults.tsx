@@ -23,7 +23,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
     >
       <div>
         <h2 className="text-xl font-semibold text-foreground">
-          Search Results for "{query}"
+          Search Results for &quot;{query}&quot;
         </h2>
         <p className="text-foreground/60 mt-1">
           Found {resultCount} product{resultCount !== 1 ? 's' : ''}

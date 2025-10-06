@@ -26,7 +26,7 @@ export const ProductsPagination: React.FC<ProductsPaginationProps> = ({
     const showPages = 5;
     
     let start = Math.max(1, currentPage - Math.floor(showPages / 2));
-    let end = Math.min(totalPages, start + showPages - 1);
+    const end = Math.min(totalPages, start + showPages - 1);
     
     if (end - start + 1 < showPages) {
       start = Math.max(1, end - showPages + 1);

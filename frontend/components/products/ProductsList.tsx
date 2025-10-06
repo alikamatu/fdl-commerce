@@ -61,7 +61,7 @@ export const ProductsList: React.FC<ProductsListProps> = ({
         </div>
         <h3 className="text-xl font-semibold text-foreground mb-3">No products found</h3>
         <p className="text-foreground/60 max-w-md mx-auto mb-6">
-          Try adjusting your search filters or browse different categories to find what you're looking for.
+          Try adjusting your search filters or browse different categories to find what you&apos;re looking for.
         </p>
         <button
           onClick={() => window.location.reload()}

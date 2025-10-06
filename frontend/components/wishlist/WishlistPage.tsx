@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, ShoppingCart, Trash2, ArrowRight } from 'lucide-react';
 import { useWishlist } from '../../context/WishlistContext';
 import { useCart } from '../../context/CartContext';
+import Link from 'next/link';
 
 export const WishlistPage: React.FC = () => {
   const { wishlist, removeFromWishlist, clearWishlist } = useWishlist();
@@ -44,13 +45,13 @@ export const WishlistPage: React.FC = () => {
           <p className="text-foreground/60 mb-8">
             Start building your collection by adding items you love to your wishlist.
           </p>
-          <a
+          <Link
             href="/products"
             className="inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background rounded-lg font-medium hover:bg-foreground/90 transition-colors"
           >
             Explore Products
             <ArrowRight size={16} />
-          </a>
+          </Link>
         </div>
       </div>
     );
