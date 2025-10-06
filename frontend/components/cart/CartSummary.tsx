@@ -3,8 +3,7 @@
 import { motion } from 'framer-motion';
 import { Truck, Shield, RotateCcw, ArrowRight } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
-import { useAuth } from '@/hooks/useAuth';
-import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
 interface CartSummaryProps {

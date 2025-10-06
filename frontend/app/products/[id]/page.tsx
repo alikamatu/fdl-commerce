@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Star } from 'lucide-react';
 import { useProduct } from '@/hooks/useProduct';

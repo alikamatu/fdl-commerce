@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { LogIn, UserPlus, Mail, Lock, User, ArrowRight } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
+import { LogIn, Mail, Lock, User, ArrowRight } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 interface CheckoutAuthProps {
   onSuccess: () => void;

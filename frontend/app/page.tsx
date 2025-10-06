@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { HeroSection } from "@/components/hero/HeroSection";
 import { RecommendedProducts } from "@/components/products/RecommendedProducts";
 import Products from "@/components/products/Products";
@@ -7,15 +8,23 @@ import { DealsSection } from "@/components/deals/DealsSection";
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center">
-      {/* <HeroSection /> */}
-      <Products />
+      <HeroSection />
+
+      <Suspense fallback={<div className="py-12 text-center">Loading products...</div>}>
+        <Products />
+      </Suspense>
+
       <BrandsSection />
-      <RecommendedProducts 
-        title="Top Laptops"
-        category="68db0caee17cbcad34630451"
-        limit={10}
-        showViewAll={true}
-      />
+
+      <Suspense fallback={<div className="py-12 text-center">Loading recommendations...</div>}>
+        <RecommendedProducts 
+          title="Top Laptops"
+          category="68db0caee17cbcad34630451"
+          limit={10}
+          showViewAll={true}
+        />
+      </Suspense>
+
       <DealsSection 
         title="Today's Hot Deals"
         subtitle="Limited time offers with special discounts"
