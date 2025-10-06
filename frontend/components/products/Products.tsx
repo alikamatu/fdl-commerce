@@ -24,22 +24,15 @@ export default function Products() {
   });
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [quickViewOpen, setQuickViewOpen] = useState(false);
-
-  // Read URL parameters on component mount and when searchParams change
-  useEffect(() => {
-    const search = searchParams.get('search');
-    const category = searchParams.get('category');
-    
-    setFilters(prev => ({
-      ...prev,
-      page: 1, // Reset to first page when search changes
-      search: search || undefined,
-      category: category || undefined,
-    }));
-  }, [searchParams]);
-
   const { products, loading, error, pagination, refetch } = useProducts(filters);
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
+
+
+    useEffect(() => {
+    const search = searchParams.get("search");
+    const category = searchParams.get("category");
+    setFilters((prev) => ({ ...prev, search: search || undefined, category: category || undefined }));
+  }, [searchParams]);
 
   // Handle errors
   useEffect(() => {
