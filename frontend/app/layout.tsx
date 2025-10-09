@@ -38,8 +38,8 @@ export default function RootLayout({
           <AuthProvider>
           <CartProvider>
             <WishlistProvider>
-              <div className="flex w-screen min-h-screen items-center justify-center bg-white font-sans text-black dark:bg-black dark:text-white">
-                <p className="mont text-6xl">Website is under development!!!</p>
+              <div className="flex min-w-screen min-h-screen items-center justify-center bg-white font-sans text-black dark:bg-black dark:text-white">
+                <p className="mont text-4xl">Website is under development!!!</p>
               </div>
             </WishlistProvider>
           </CartProvider>
