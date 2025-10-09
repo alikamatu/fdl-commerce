@@ -22,3 +22,8 @@ body {
   color: var(--foreground);
   font-family: var(--font-poppins);
 }
+
+.mont {
+  font-family: var(--font-mont);
+  font-weight: 400;
+}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Montserrat, Poppins } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import Navbar from "@/components/home/Navbar";
@@ -9,6 +9,12 @@ import { AuthProvider } from "@/context/AuthContext";
 
 const fontPoppins = Poppins({
   variable: "--font-poppins",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const fontMont = Montserrat({
+  variable: "--font-mont",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
@@ -26,15 +32,15 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${fontPoppins.variable} antialiased transition-colors duration-500`}
+        className={`${fontPoppins.variable} ${fontMont.variable} antialiased transition-colors duration-500`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
           <CartProvider>
             <WishlistProvider>
-
-          <Navbar />
-          {children}
+              <div className="flex w-screen min-h-screen items-center justify-center bg-white font-sans text-black dark:bg-black dark:text-white">
+                <p className="mont text-6xl">Website is under development!!!</p>
+              </div>
             </WishlistProvider>
           </CartProvider>
           </AuthProvider>
