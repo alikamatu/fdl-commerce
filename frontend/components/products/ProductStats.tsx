@@ -37,7 +37,7 @@ export const ProductStats: React.FC<ProductStatsProps> = ({
       </div>
 
       {/* View Mode Toggle */}
-      <div className="flex items-center gap-2">
+      {/* <div className="flex items-center gap-2">
         <span className="text-sm text-foreground/60 mr-2">View:</span>
         <div className="flex border border-foreground/20 rounded-md overflow-hidden">
           <button
@@ -61,7 +61,7 @@ export const ProductStats: React.FC<ProductStatsProps> = ({
             <List size={16} />
           </button>
         </div>
-      </div>
+      </div> */}
     </motion.div>
   );
 };

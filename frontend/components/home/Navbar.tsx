@@ -9,14 +9,10 @@ import {
   Search, 
   Menu, 
   X, 
-  User, 
-  ShoppingBag, 
   Heart, 
   LogOut, 
   Settings, 
   Package, 
-  History,
-  Star,
   ChevronDown
 } from "lucide-react";
 import { CartIcon } from "../cart/CartIcon";
@@ -162,13 +158,13 @@ export default function Navbar() {
               {/* Desktop Actions */}
               <div className="hidden md:flex items-center space-x-3">
                 {/* Wishlist */}
-                <WishlistIcon />
+                {/* <WishlistIcon /> */}
 
                 {/* Cart */}
-                <CartIcon />
+                {/* <CartIcon /> */}
 
                 {/* Theme Toggle */}
-                <ThemeToggle />
+                {/* <ThemeToggle /> */}
 
                 {/* User Menu */}
                 {user ? (
@@ -265,15 +261,9 @@ export default function Navbar() {
                   <div className="flex items-center space-x-3">
                     <Link 
                       href="/login" 
-                      className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-foreground/5"
+                      className="text-sm font-medium bg-gray-200 text-foreground/80 hover:text-foreground transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-foreground/5"
                     >
                       Login
-                    </Link>
-                    <Link 
-                      href="/register" 
-                      className="px-4 py-2 text-sm font-medium bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg"
-                    >
-                      Sign Up
                     </Link>
                   </div>
                 )}
@@ -316,7 +306,7 @@ export default function Navbar() {
                       Login
                     </Link>
                     <Link 
-                      href="/register" 
+                      href="/login" 
                       className="text-sm font-medium bg-foreground/10 transition-all py-3 px-4 text-center shadow-md"
                       onClick={() => setIsMenuOpen(false)}
                     >

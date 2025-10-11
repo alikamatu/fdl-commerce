@@ -59,7 +59,7 @@ const handlePageChange = (page: number) => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="min-h-screen bg-foreground/5">
+      <div className="min-h-screen bg-background text-foreground">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Breadcrumbs */}
           <ProductBreadcrumbs 
@@ -89,6 +89,18 @@ const handlePageChange = (page: number) => {
           </div>
 
           <div className="flex flex-col lg:flex-row gap-8">
+
+          {/* Sidebar - Filters */}
+            <div className={`lg:w-80 xl:w-96 flex-shrink-0 ${filtersOpen ? 'block' : 'hidden lg:block'}`}>
+              <div className="sticky top-8">
+                <ProductFilters
+                  filters={filters}
+                  onFiltersChange={updateFilters}
+                  categories={categories}
+                />
+              </div>
+            </div>
+            
             {/* Main Content - Products */}
             <div className="flex-1">
               {/* Header */}
@@ -146,17 +158,6 @@ const handlePageChange = (page: number) => {
                   onPageChange={handlePageChange}
                 />
               )}
-            </div>
-
-            {/* Sidebar - Filters */}
-            <div className={`lg:w-80 xl:w-96 flex-shrink-0 ${filtersOpen ? 'block' : 'hidden lg:block'}`}>
-              <div className="sticky top-8">
-                <ProductFilters
-                  filters={filters}
-                  onFiltersChange={updateFilters}
-                  categories={categories}
-                />
-              </div>
             </div>
           </div>
 
