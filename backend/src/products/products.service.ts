@@ -219,6 +219,42 @@ export class ProductsService {
       .exec();
   }
 
+// products.service.ts - Add this method
+async getSearchSuggestions(query: string, limit: number = 8): Promise<any[]> {
+  if (!query || query.length < 2) {
+    return [];
+  }
+
+  try {
+    const products = await this.productModel
+      .find({
+        isActive: true,
+        $or: [
+          { title: { $regex: query, $options: 'i' } },
+          { brand: { $regex: query, $options: 'i' } },
+          { description: { $regex: query, $options: 'i' } },
+        ],
+      })
+      .select('title brand images priceCents categoryId')
+      .populate('categoryId', 'name')
+      .limit(limit)
+      .exec();
+
+    return products.map(product => ({
+      type: 'product',
+      id: product._id,
+      name: product.title,
+      image: product.images[0]?.url,
+      category: (product.categoryId as any)?.name,
+      priceCents: product.priceCents,
+      brand: product.brand,
+    }));
+  } catch (error) {
+    console.error('Error fetching search suggestions:', error);
+    return [];
+  }
+}
+
   async remove(id: string): Promise<void> {
     const result = await this.productModel.findByIdAndUpdate(
       id,

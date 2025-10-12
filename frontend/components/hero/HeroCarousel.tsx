@@ -18,7 +18,7 @@ export interface HeroSlide {
 const defaultSlides: HeroSlide[] = [
   {
     id: '1',
-    image: '/images/wall.jpg',
+    image: '/images/253832.jpg',
     title: 'Build an Elite Collection',
     description: 'Choose your next adventure from thousands of finds',
     ctaText: 'Shop Now',
@@ -26,7 +26,7 @@ const defaultSlides: HeroSlide[] = [
   },
   {
     id: '2',
-    image: '/images/new.jpg',
+    image: '/images/2149220672.jpg',
     title: 'New Arrivals Every Day',
     description: 'Discover the latest additions to our curated collection',
     ctaText: 'Explore New',
@@ -34,7 +34,7 @@ const defaultSlides: HeroSlide[] = [
   },
   {
     id: '3',
-    image: '/images/deals.jpg',
+    image: '/images/253832.jpg',
     title: 'Limited Time Offers',
     description: 'Save big on premium items with exclusive discounts',
     ctaText: 'View Deals',
@@ -42,7 +42,7 @@ const defaultSlides: HeroSlide[] = [
   },
   {
     id: '4',
-    image: '/images/devices.jpg',
+    image: '/images/2149404179.jpg',
     title: 'Premium Quality Guaranteed',
     description: 'Shop with confidence with our authenticity promise',
     ctaText: 'Learn More',
@@ -87,15 +87,15 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
   };
 
   return (
-    <div className="relative w-full h-[600px] overflow-hidden group">
+    <div className="relative md:rounded-4xl h-[600px] overflow-hidden group md:mt-4">
       {/* Slides */}
       <AnimatePresence mode="wait">
         <motion.div
           key={currentSlide}
-          initial={{ opacity: 0 }}
+          initial={{ opacity: 0.5 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
+          exit={{ opacity: 0.5 }}
+          transition={{ duration: 0.2 }}
           className="absolute inset-0"
         >
           <div
@@ -105,7 +105,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
             }}
           >
             {/* Overlay */}
-            <div className="absolute inset-0 bg-black/30" />
+            <div className="absolute inset-0" />
             
             {/* Content */}
             <div className="relative h-full flex items-center">
@@ -182,7 +182,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
           initial={{ width: '0%' }}
           animate={{ width: '100%' }}
           transition={{ duration: autoPlayInterval / 1000, ease: 'linear' }}
-          className="absolute bottom-0 left-0 h-1 bg-white/80"
+          className="hidden absolute bottom-0 left-0 h-1 bg-white/80"
         />
       )}
     </div>

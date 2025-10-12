@@ -5,7 +5,7 @@ import { RecentlyViewed } from './RecentlyViewed';
 
 export const HeroSection: React.FC = () => {
   return (
-    <div className="w-full">
+    <div className="max-w-7xl m-auto">
       <HeroCarousel />
       <CategoryGrid variant="scroll" />
       <FeaturesSection />

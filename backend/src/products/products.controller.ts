@@ -172,6 +172,24 @@ async findDeals(
       message: 'Product deleted successfully',
     };
   }
+  
+@Get('products/search/suggestions')
+@ApiOperation({ summary: 'Get search suggestions' })
+@ApiResponse({ status: 200, description: 'Search suggestions retrieved successfully' })
+async getSearchSuggestions(
+  @Query('q') query: string,
+  @Query('limit') limit: string,
+) {
+  const suggestions = await this.productsService.getSearchSuggestions(
+    query,
+    limit ? parseInt(limit) : 8,
+  );
+
+  return {
+    success: true,
+    data: suggestions,
+  };
+}
 
   @Post('admin/upload')
   @UseGuards(JwtAuthGuard, RolesGuard)
