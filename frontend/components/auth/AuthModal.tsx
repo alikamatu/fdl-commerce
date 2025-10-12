@@ -310,7 +310,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <div className="mt-6 text-center text-sm text-foreground/60">
                 {activeTab === 'login' ? (
                   <>
-                    Don't have an account?{' '}
+                    Don&apos;t have an account?{' '}
                     <button
                       type="button"
                       onClick={() => switchTab('register')}
