@@ -88,7 +88,7 @@ export const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
       ) : (
         <div className="text-center py-8 text-foreground/60">
           <Search size={32} className="mx-auto mb-2 opacity-50" />
-          <p>No results found for "{searchQuery}"</p>
+          <p>No results found for &quot;{searchQuery}&quot;</p>
           <p className="text-sm mt-1">Try different keywords or browse categories</p>
         </div>
       )}
