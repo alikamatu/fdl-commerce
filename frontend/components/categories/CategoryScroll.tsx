@@ -164,7 +164,7 @@ export const CategoryScroll: React.FC = () => {
                 transition={{ duration: 0.4, delay: index * 0.05 }}
                 viewport={{ once: true }}
                 whileHover={{ scale: 1.05, y: -2 }}
-                className="group flex-shrink-0 w-24 flex flex-col items-center text-center"
+                className="group flex-shrink-0 w-24 md:w-40 flex flex-col items-center text-center"
               >
                 {/* Circle Container */}
                 <div className="relative mb-3">
@@ -172,12 +172,12 @@ export const CategoryScroll: React.FC = () => {
                   <div className="absolute inset-0 rounded-full bg-foreground/5 scale-0 group-hover:scale-110 transition-transform duration-300" />
                   
                   {/* Circle */}
-                  <div className="relative w-20 h-20 rounded-full border-2 border-foreground/10 group-hover:border-foreground/20 transition-all duration-300 overflow-hidden bg-foreground/5">
+                  <div className="relative w-20 h-20 md:w-40 md:h-40 rounded-full border border-foreground/10 group-hover:border-foreground/20 transition-all duration-300 overflow-hidden bg-foreground/5">
                     {category.imageUrl ? (
                       <img
                         src={category.imageUrl}
                         alt={category.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">

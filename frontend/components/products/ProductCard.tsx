@@ -95,14 +95,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       )}
 
       {/* Hot Deal Badge */}
-      {product.isDeal && (
+      {/* {product.isDeal && (
         <div className="hidden md:block absolute top-3 right-3 z-10">
           <div className="bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
             <Zap size={12} />
             Hot Deal
           </div>
         </div>
-      )}
+      )} */}
 
       <div className="bg-background rounded-lg overflow-hidden transition-all duration-300 group-hover:shadow-lg group-hover:border-foreground/20 h-full flex flex-col">
         {/* Wishlist Button */}
@@ -160,19 +160,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </div>
 
           {/* Product Title */}
-          <h3 
+          <h4 
             className="font-semibold text-foreground mb-2 line-clamp-2 cursor-pointer hover:text-foreground/80 transition-colors"
             onClick={() => onViewDetails(product)}
           >
             {product.title}
-          </h3>
+          </h4>
 
           {/* Brand */}
           <div className="text-sm text-foreground/60 mb-3">
             by {product.brand}
           </div>
 
-          {/* Rating */}
+          {/* Rating
           <div className="flex items-center gap-1 mb-3">
             <div className="flex">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -184,30 +184,30 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               ))}
             </div>
             <span className="text-xs text-foreground/60 ml-1">(24)</span>
-          </div>
+          </div> */}
 
           {/* Price Section */}
           <div className="mb-4">
             <div className="flex items-baseline gap-2">
               {/* Current Price */}
-              <span className="text-xl font-bold text-foreground">
+              <span className="text-md font-bold text-foreground">
                 ${currentPrice}
               </span>
               
               {/* Original Price */}
               {originalPrice && originalPrice !== currentPrice && (
-                <span className="text-lg text-foreground/40 line-through">
+                <span className="text-xs text-foreground/40 line-through">
                   ${originalPrice}
                 </span>
               )}
             </div>
             
-            {/* You Save */}
+            {/* You Save
             {originalPrice && originalPrice !== currentPrice && (
               <div className="text-sm text-green-600 font-medium mt-1">
                 Save ${(parseFloat(originalPrice) - parseFloat(currentPrice)).toFixed(2)}
               </div>
-            )}
+            )} */}
           </div>
 
           {/* Stock Progress Bar for Hot Deals */}

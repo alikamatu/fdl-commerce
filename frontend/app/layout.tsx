@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Montserrat, Poppins } from "next/font/google";
+import { Lato, Montserrat, Poppins } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import Navbar from "@/components/home/Navbar";
@@ -19,6 +19,12 @@ const fontMont = Montserrat({
   weight: ["400", "500", "600", "700"],
 });
 
+const fontLato = Lato({
+  variable: "--font-lato",
+  subsets: ["latin"],
+  weight: ["400", "700"],
+});
+
 export const metadata: Metadata = {
   title: "TechStore - Your One-Stop Tech Shop",
   description: "Your one-stop shop for all tech products",
@@ -32,7 +38,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${fontPoppins.variable} ${fontMont.variable} antialiased transition-colors duration-500`}
+        className={`${fontPoppins.variable} ${fontMont.variable} ${fontLato.variable} antialiased transition-colors duration-500`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
