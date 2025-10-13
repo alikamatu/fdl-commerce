@@ -31,6 +31,7 @@ export class OrdersController {
     return this.ordersService.create(createOrderDto);
   }
 
+  // FIXED: Separate authenticated and guest payment confirmation routes
   @UseGuards(JwtAuthGuard)
   @Patch(':id/confirm-payment')
   async confirmPayment(
@@ -46,7 +47,7 @@ export class OrdersController {
     );
   }
 
-  @Patch(':id/confirm-payment')
+  @Patch('guest/:id/confirm-payment')
   async confirmGuestPayment(
     @Param('id') id: string,
     @Body() body: { paymentReference: string; paystackReference: string }
@@ -58,10 +59,15 @@ export class OrdersController {
     );
   }
 
+  // FIXED: Add response structure wrapper
   @UseGuards(JwtAuthGuard)
   @Get()
   async findAll(@Request() req) {
-    return this.ordersService.findAll(req.user._id);
+    const orders = await this.ordersService.findAll(req.user._id);
+    return {
+      success: true,
+      data: orders
+    };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -75,6 +81,13 @@ export class OrdersController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('stats/overview')
+  async getOrderStats(@Request() req) {
+    // Only admin should access this in real app
+    return this.ordersService.getOrderStats();
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findOne(@Param('id') id: string, @Request() req) {
     return this.ordersService.findOne(id, req.user._id);
@@ -85,11 +98,11 @@ export class OrdersController {
     return this.ordersService.findByOrderNumber(orderNumber);
   }
 
+  // FIXED: Add cancel order endpoint
   @UseGuards(JwtAuthGuard)
-  @Get('stats/overview')
-  async getOrderStats(@Request() req) {
-    // Only admin should access this in real app
-    return this.ordersService.getOrderStats();
+  @Post(':id/cancel')
+  async cancelOrder(@Param('id') id: string, @Request() req) {
+    return this.ordersService.updateStatus(id, 'cancelled');
   }
 
   // Paystack webhook endpoint

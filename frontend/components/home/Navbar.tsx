@@ -10,6 +10,7 @@ import { UserMenu } from "./UserMenu";
 import { MobileMenu } from "./MobileMenu";
 import { SearchModal } from "../search/SearchModal";
 import { AuthModal } from "../auth/AuthModal";
+import { DesktopNavigation } from "./DesktopNavigation";
 import { useCategories } from "@/hooks/useCategories";
 import { useAuth } from "@/context/AuthContext";
 import { useSearchSuggestions } from "@/hooks/useSearchSuggestions";
@@ -21,6 +22,7 @@ export default function Navbar() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>('login');
   const [searchQuery, setSearchQuery] = useState("");
+  const [isScrolled, setIsScrolled] = useState(false);
   
   const router = useRouter();
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -28,6 +30,27 @@ export default function Navbar() {
   const { user } = useAuth();
   const { categories, loading: categoriesLoading } = useCategories();
   const { addRecentSearch } = useSearchSuggestions();
+
+  // Handle scroll effect for navbar
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleSearch = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    const searchTerm = searchQuery.trim();
+    
+    if (searchTerm) {
+      addRecentSearch(searchTerm);
+      router.replace(`/products?search=${encodeURIComponent(searchTerm)}`);
+      setSearchQuery("");
+    }
+  }, [searchQuery, router, addRecentSearch]);
 
   const openAuthModal = (tab: 'login' | 'register' = 'login') => {
     setAuthModalTab(tab);
@@ -57,10 +80,14 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="w-full border-b border-foreground/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40 shadow-sm">
+      <nav className={`w-full bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 transition-all duration-300 ${
+        isScrolled 
+          ? 'border-b border-foreground/10 shadow-sm' 
+          : 'border-b border-transparent'
+      }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Left Section */}
+            {/* Left Section - Logo and Navigation */}
             <div className="flex items-center space-x-8">
               <Logo />
               <DesktopNavigation 
@@ -69,11 +96,24 @@ export default function Navbar() {
               />
             </div>
 
-            {/* Right Actions */}
-            <div className="flex items-center space-x-3">
-              <DesktopSearchButton onClick={() => setIsSearchOpen(true)} />
+            {/* Center Section - Search Bar (Google-like) */}
+            <div className="hidden md:flex flex-1 max-w-2xl mx-8">
+              <GoogleLikeSearch 
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                onSearch={handleSearch}
+                onFocus={() => setIsSearchOpen(true)}
+              />
+            </div>
+
+            {/* Right Section - Actions */}
+            <div className="flex items-center space-x-2">
+              {/* Desktop Search Button */}
+              {/* <DesktopSearchButton onClick={() => setIsSearchOpen(true)} /> */}
+              
               <CartIcon />
               <WishlistIcon />
+              
               <MobileSearchButton onClick={() => setIsSearchOpen(true)} />
               
               {/* Auth or User Menu */}
@@ -95,16 +135,16 @@ export default function Navbar() {
               />
             </div>
           </div>
-
-          {/* Mobile Menu */}
-          <MobileMenu 
-            isOpen={isMenuOpen}
-            categories={categories}
-            user={user}
-            onClose={() => setIsMenuOpen(false)}
-            onLoginClick={() => openAuthModal('login')}
-          />
         </div>
+
+        {/* Mobile Menu */}
+        <MobileMenu 
+          isOpen={isMenuOpen}
+          categories={categories}
+          user={user}
+          onClose={() => setIsMenuOpen(false)}
+          onLoginClick={() => openAuthModal('login')}
+        />
       </nav>
 
       {/* Search Modal */}
@@ -127,112 +167,92 @@ export default function Navbar() {
 
 // Sub-components
 const Logo = () => (
-  <Link href="/" className="flex items-center space-x-3">
-    <div className="w-8 h-8 bg-foreground rounded-lg flex items-center justify-center shadow-md">
+  <Link 
+    href="/" 
+    className="flex items-center space-x-3 group"
+  >
+    <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
       <span className="text-white font-bold text-sm">TS</span>
     </div>
-    <span className="text-xl font-semibold text-foreground hidden sm:block">
+    <span className="text-xl font-semibold text-foreground hidden sm:block bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
       TechStore
     </span>
   </Link>
 );
 
-const DesktopNavigation = ({ categories, loading }: { categories: any[], loading: boolean }) => {
-  if (loading || categories.length === 0) return null;
-
-  return (
-    <div className="hidden lg:flex items-center space-x-6">
-      {categories.slice(0, 4).map((category) => (
-        <Link 
-          key={category._id}
-          href={`/products?category=${category._id}`}
-          className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-foreground/5"
-        >
-          {category.name}
-        </Link>
-      ))}
-      {categories.length > 4 && (
-        <div className="relative group">
-          <button className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-foreground/5 flex items-center gap-1">
-            More <ChevronDown size={16} />
-          </button>
-          <div className="absolute top-full left-0 mt-2 w-48 bg-background border border-foreground/10 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-            {categories.slice(4).map((category) => (
-              <Link
-                key={category._id}
-                href={`/products?category=${category._id}`}
-                className="block px-4 py-2 text-sm text-foreground/80 hover:bg-foreground/5 first:rounded-t-lg last:rounded-b-lg"
-              >
-                {category.name}
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-const DesktopSearchBar = ({ 
+const GoogleLikeSearch = ({ 
   searchQuery, 
   setSearchQuery, 
-  onSearch 
+  onSearch,
+  onFocus
 }: { 
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   onSearch: (e: React.FormEvent) => void;
+  onFocus: () => void;
 }) => (
-  <div className="hidden md:flex flex-1 max-w-lg mx-8">
-    <form onSubmit={onSearch} className="relative w-full">
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/40" size={20} />
-        <input
-          type="text"
-          placeholder="Search products, brands, and more..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 border border-foreground/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/30 bg-background text-foreground placeholder-foreground/40 transition-all duration-200"
-        />
+  <form onSubmit={onSearch} className="relative w-full">
+    <div className="relative">
+      <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-foreground/40" size={20} />
+      <input
+        type="text"
+        placeholder="Search products, brands, and categories..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        onFocus={onFocus}
+        className="w-full pl-12 pr-4 py-3 bg-foreground/5 border border-foreground/10 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/30 text-foreground placeholder-foreground/40 transition-all duration-200 hover:bg-foreground/10 focus:bg-background focus:shadow-lg"
+      />
+      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
+        <kbd className="px-1.5 py-0.5 text-xs border border-foreground/20 rounded bg-background text-foreground/60">⌘K</kbd>
       </div>
-    </form>
-  </div>
+    </div>
+  </form>
 );
 
 const DesktopSearchButton = ({ onClick }: { onClick: () => void }) => (
   <button
     onClick={onClick}
-    className="hidden md:flex items-center gap-2 px-4 py-2 text-foreground/60 hover:text-foreground transition-colors duration-200 rounded-lg hover:bg-foreground/5 border border-foreground/20"
+    className="hidden md:flex items-center justify-center w-10 h-10 text-foreground/60 hover:text-foreground hover:bg-foreground/5 rounded-full transition-all duration-200 border border-foreground/10 hover:border-foreground/20"
   >
-    <Search size={18} />
-    <span className="text-sm">Search</span>
+    <Search size={20} />
   </button>
 );
 
 const MobileSearchButton = ({ onClick }: { onClick: () => void }) => (
   <button
     onClick={onClick}
-    className="md:hidden p-2 text-foreground/60 hover:text-foreground transition-colors duration-200 rounded-lg hover:bg-foreground/5"
+    className="md:hidden flex items-center justify-center w-10 h-10 text-foreground/60 hover:text-foreground hover:bg-foreground/5 rounded-full transition-all duration-200"
   >
     <Search size={20} />
   </button>
 );
 
 const AuthButtons = ({ onLoginClick }: { onLoginClick: () => void }) => (
-  <div className="hidden md:flex items-center space-x-3">
+  <div className="hidden md:flex items-center space-x-2">
     <button
       onClick={onLoginClick}
-      className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-foreground/5"
+      className="px-4 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors duration-200 rounded-lg hover:bg-foreground/5"
     >
-      Login
+      Sign in
+    </button>
+    <button
+      onClick={onLoginClick}
+      className="px-4 py-2 text-sm font-medium bg-foreground/5 transition-all duration-200 shadow-lg hover:shadow-xl"
+    >
+      Get Started
     </button>
   </div>
 );
 
 const MobileMenuButton = ({ isOpen, onClick }: { isOpen: boolean; onClick: () => void }) => (
   <button
-    className="lg:hidden p-2 rounded-lg hover:bg-foreground/5 transition-colors duration-200"
+    className="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-foreground/5 transition-colors duration-200"
     onClick={onClick}
   >
-    {isOpen ? <X size={20} /> : <Menu size={20} />}
+    {isOpen ? (
+      <X size={20} className="text-foreground" />
+    ) : (
+      <Menu size={20} className="text-foreground" />
+    )}
   </button>
 );

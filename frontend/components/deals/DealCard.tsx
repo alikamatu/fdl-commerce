@@ -108,7 +108,7 @@ export const DealCard: React.FC<DealCardProps> = ({
       )}
 
       {/* Hot Deal Badge */}
-      <motion.div
+      {/* <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.1 }}
@@ -118,7 +118,7 @@ export const DealCard: React.FC<DealCardProps> = ({
           <Zap size={12} />
           <span>Hot Deal</span>
         </div>
-      </motion.div>
+      </motion.div> */}
 
       {/* Main Card */}
       <div className="bg-white rounded-2xl overflow-hidden transition-all duration-300 group-hover:bg-gray-50 h-full flex flex-col">

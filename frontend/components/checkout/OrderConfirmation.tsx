@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { CheckCircle, Package, Truck, Home, Download } from 'lucide-react';
+import { CheckCircle, Package, Truck, Home, Download, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -86,8 +86,8 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) =
           <Home size={16} />
           Continue Shopping
         </Link>
-        <button onClick={() => router.push(`/orders}`)} className="flex items-center justify-center gap-2 px-6 py-3 bg-foreground text-background rounded-lg font-medium hover:bg-foreground/90 transition-colors">
-          <Download size={16} />
+        <button onClick={() => router.push(`/orders`)} className="flex items-center justify-center gap-2 px-6 py-3 bg-foreground text-background rounded-lg font-medium hover:bg-foreground/90 transition-colors">
+          <Eye size={16} />
           View Order
         </button>
       </div>

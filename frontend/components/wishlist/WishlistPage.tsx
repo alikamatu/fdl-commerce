@@ -32,7 +32,7 @@ export const WishlistPage: React.FC = () => {
 
   if (wishlist.length === 0) {
     return (
-      <div className="min-h-screen bg-foreground/5 py-16">
+      <div className="min-h-screen bg-foreground py-16">
         <div className="max-w-2xl mx-auto text-center">
           <div className="flex justify-center mb-6">
             <div className="p-4 bg-foreground/5 rounded-full">
@@ -58,7 +58,7 @@ export const WishlistPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-foreground/5 py-8">
+    <div className="min-h-screen bg-background py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8">
@@ -99,14 +99,14 @@ export const WishlistPage: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
-                className="bg-background border border-foreground/10 rounded-lg overflow-hidden group"
+                className="bg-background rounded-lg overflow-hidden group"
               >
                 {/* Product Image */}
                 <a href={`/products/${item.productId}`} className="block aspect-square overflow-hidden">
                   <img
                     src={item.image}
                     alt={item.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                   />
                 </a>
 

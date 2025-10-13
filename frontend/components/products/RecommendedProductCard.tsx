@@ -103,7 +103,7 @@ export const RecommendedProductCard: React.FC<RecommendedProductCardProps> = ({
       )}
 
       {/* Hot Deal Badge */}
-      {product.isDeal && (
+      {/* {product.isDeal && (
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -115,7 +115,7 @@ export const RecommendedProductCard: React.FC<RecommendedProductCardProps> = ({
             <span>Deal</span>
           </div>
         </motion.div>
-      )}
+      )} */}
 
       {/* Main Card */}
       <div 
@@ -200,21 +200,21 @@ export const RecommendedProductCard: React.FC<RecommendedProductCardProps> = ({
           </div>
 
           {/* Product Title */}
-          <h3 className="font-semibold  mb-2 line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors">
+          <h4 className="font-semibold  mb-2 line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors">
             {product.title}
-          </h3>
+          </h4>
 
           {/* Price Section */}
           <div className="mt-auto">
             <div className="flex items-baseline gap-2">
               {/* Current Price */}
-              <span className="text-lg font-bold ">
+              <span className="text-md font-bold ">
                 ${currentPrice}
               </span>
               
               {/* Original Price */}
               {originalPrice && originalPrice !== currentPrice && (
-                <span className="text-sm text-gray-400 line-through">
+                <span className="text-xs text-gray-400 line-through">
                   ${originalPrice}
                 </span>
               )}

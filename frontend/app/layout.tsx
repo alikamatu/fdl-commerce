@@ -6,6 +6,7 @@ import Navbar from "@/components/home/Navbar";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { Footer } from "@/components/home/Footer";
 
 const fontPoppins = Poppins({
   variable: "--font-poppins",
@@ -49,6 +50,7 @@ export default function RootLayout({
               </div> */}
               <Navbar />
               <main>{children}</main>
+              <Footer />
             </WishlistProvider>
           </CartProvider>
           </AuthProvider>
