@@ -28,7 +28,7 @@ export const OrdersEmpty: React.FC<OrdersEmptyProps> = ({
         <>
           <h3 className="text-lg font-medium text-foreground mb-2">No orders found</h3>
           <p className="text-foreground/60 mb-6 max-w-md mx-auto">
-            We couldn't find any orders matching your search criteria.
+            We couldn&apos;t find any orders matching your search criteria.
           </p>
           <button
             onClick={onClearFilters}
@@ -42,7 +42,7 @@ export const OrdersEmpty: React.FC<OrdersEmptyProps> = ({
         <>
           <h3 className="text-lg font-medium text-foreground mb-2">No orders yet</h3>
           <p className="text-foreground/60 mb-6 max-w-md mx-auto">
-            You haven't placed any orders yet. Start shopping to see your orders here.
+            You haven&apos;t placed any orders yet. Start shopping to see your orders here.
           </p>
           <button
             onClick={() => window.location.href = '/products'}
