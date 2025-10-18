@@ -87,7 +87,7 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
   };
 
   const handleWhatsAppShare = () => {
-  const phoneNumber = process.env.NEXT_PUBLIC_ADMIN_WHATSAPP_NUMBER || '+233247129636';
+  const phoneNumber = process.env.NEXT_PUBLIC_ADMIN_WHATSAPP_NUMBER || '+233547129636';
   const message = `Hello! I'm interested in buying this product:%0A%0A*${product.title}*%0A*Price:* GH₵ ${price}%0A*SKU:* ${product.sku}%0A*Brand:* ${product.brand}%0A%0ACan you provide more details and assist with purchase?`;
   
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
