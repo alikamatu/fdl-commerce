@@ -27,8 +27,8 @@ const fontLato = Lato({
 });
 
 export const metadata: Metadata = {
-  title: "TechStore - Your One-Stop Tech Shop",
-  description: "Your one-stop shop for all tech products",
+  title: "Forbes Digital Lifeline - Your digital sos.",
+  description: "Your one-stop line for all digital products",
 };
 
 export default function RootLayout({
@@ -39,15 +39,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${fontPoppins.variable} ${fontMont.variable} ${fontLato.variable} antialiased transition-colors duration-500`}
+        className={`${fontPoppins.variable} ${fontMont.variable} ${fontLato.variable} antialiased transition-colors duration-500 overflow-x-hidden`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
           <CartProvider>
             <WishlistProvider>
-              {/* <div className="flex min-w-screen min-h-screen items-center justify-center bg-white font-sans text-black dark:bg-black dark:text-white">
-                <p className="mont text-4xl">Website is under development!!!</p>
-              </div> */}
               <Navbar />
               <main>{children}</main>
               <Footer />

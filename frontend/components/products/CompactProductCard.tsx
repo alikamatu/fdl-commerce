@@ -89,7 +89,7 @@ export const CompactProductCard: React.FC<CompactProductCardProps> = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-lg font-bold text-foreground">
-                ${price}
+                ₵{price}
               </span>
               {isOutOfStock && (
                 <span className="text-xs text-red-500 bg-red-50 px-2 py-1 rounded">

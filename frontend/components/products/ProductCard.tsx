@@ -191,13 +191,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             <div className="flex items-baseline gap-2">
               {/* Current Price */}
               <span className="text-md font-bold text-foreground">
-                ${currentPrice}
+                GH₵ {currentPrice}
               </span>
               
               {/* Original Price */}
               {originalPrice && originalPrice !== currentPrice && (
                 <span className="text-xs text-foreground/40 line-through">
-                  ${originalPrice}
+                  GH₵{originalPrice}
                 </span>
               )}
             </div>

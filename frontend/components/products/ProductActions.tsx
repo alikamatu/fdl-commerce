@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw } from 'lucide-react';
+import { ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw, MessageCircle } from 'lucide-react';
 import { Product } from '@/types/product';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
@@ -86,6 +86,14 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
     }
   };
 
+  const handleWhatsAppShare = () => {
+  const phoneNumber = process.env.NEXT_PUBLIC_ADMIN_WHATSAPP_NUMBER || '0247129636';
+  const message = `Hello! I'm interested in buying this product:%0A%0A*${product.title}*%0A*Price:* GH₵ ${price}%0A*SKU:* ${product.sku}%0A*Brand:* ${product.brand}%0A%0ACan you provide more details and assist with purchase?`;
+  
+  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+  window.open(whatsappUrl, '_blank');
+};
+
   const handleShare = async () => {
     if (isSharing) return;
     
@@ -127,9 +135,9 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
       {/* Price Section with Discount */}
       <div className="space-y-2">
         <div className="flex items-baseline gap-2">
-          <span className="text-3xl font-bold text-foreground">${price}</span>
+          <span className="text-3xl font-bold text-foreground">₵{price}</span>
           {originalPrice && originalPrice !== price && (
-            <span className="text-xl text-foreground/40 line-through">${originalPrice}</span>
+            <span className="text-xl text-foreground/40 line-through">₵{originalPrice}</span>
           )}
           {discountPercent > 0 && (
             <span className="bg-red-500 text-white text-sm font-bold px-2 py-1 rounded">
@@ -139,7 +147,7 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
         </div>
         {originalPrice && originalPrice !== price && (
           <div className="text-green-600 font-medium">
-            You save ${(parseFloat(originalPrice) - parseFloat(price)).toFixed(2)}
+            You save GH₵ {(parseFloat(originalPrice) - parseFloat(price)).toFixed(2)}
           </div>
         )}
         <span className="text-foreground/60 text-sm">{product.currency}</span>
@@ -196,10 +204,19 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
           ) : (
             <>
               <ShoppingCart size={20} />
-              <span>Add to Cart - ${(parseFloat(price) * quantity).toFixed(2)}</span>
+              <span>Add to Cart</span>
+              {/* - GH₵ {(parseFloat(price) * quantity).toFixed(2)} */}
             </>
           )}
         </button>
+
+          <button
+    onClick={handleWhatsAppShare}
+    className="flex items-center justify-center gap-2 flex-1 px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+  >
+    <MessageCircle size={20} />
+    <span>Buy on WhatsApp</span>
+  </button>
         
         <div className="flex gap-2">
           <button
@@ -219,6 +236,13 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
           >
             <Share2 size={20} />
           </button>
+            <button
+              onClick={handleWhatsAppShare}
+              className="p-3 border border-foreground/20 rounded-lg hover:bg-green-50 hover:border-green-300 transition-colors group"
+              title="Contact admin on WhatsApp"
+            >
+              <MessageCircle size={20} className="text-foreground/60 group-hover:text-green-600" />
+            </button>
         </div>
       </div>
 

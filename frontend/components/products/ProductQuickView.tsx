@@ -244,7 +244,7 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({
 
                       {/* Price */}
                       <div className="text-3xl lg:text-4xl font-bold text-foreground">
-                        ${price}
+                        ₵{price}
                       </div>
 
                       {/* Description */}
@@ -283,7 +283,7 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                           <Truck size={18} className="text-foreground/40" />
                           <div>
                             <div className="font-medium text-foreground">Free Shipping</div>
-                            <div>On orders over $50</div>
+                            <div>On orders over ₵500</div>
                           </div>
                         </div>
                         <div className="flex items-center gap-3 text-sm text-foreground/60">
@@ -329,7 +329,7 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                         ) : (
                           <>
                             <ShoppingCart size={20} />
-                            <span>Add to Cart - ${price}</span>
+                            <span>Add to Cart - ₵{price}</span>
                           </>
                         )}
                         

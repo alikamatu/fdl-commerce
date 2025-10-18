@@ -211,13 +211,13 @@ export const DealCard: React.FC<DealCardProps> = ({
             <div className="flex items-baseline gap-2">
               {/* Current Price */}
               <span className="text-2xl font-bold text-gray-900">
-                ${currentPrice}
+                GH₵ {currentPrice}
               </span>
               
               {/* Original Price */}
               {originalPrice && originalPrice !== currentPrice && (
                 <span className="text-lg text-gray-400 line-through">
-                  ${originalPrice}
+                  GH₵{originalPrice}
                 </span>
               )}
             </div>
@@ -225,7 +225,7 @@ export const DealCard: React.FC<DealCardProps> = ({
             {/* You Save */}
             {originalPrice && originalPrice !== currentPrice && (
               <div className="text-sm text-green-600 font-medium mt-1">
-                Save ${(parseFloat(originalPrice) - parseFloat(currentPrice)).toFixed(2)}
+                Save GH₵{(parseFloat(originalPrice) - parseFloat(currentPrice)).toFixed(2)}
               </div>
             )}
           </div>
