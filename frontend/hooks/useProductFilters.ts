@@ -12,6 +12,8 @@ export interface ProductFilters {
   maxPrice?: number;
   inStock?: boolean;
   sortBy?: string;
+  brand?: string;
+  isDeal?: boolean;
 }
 
 export const useProductFilters = () => {
@@ -27,6 +29,8 @@ export const useProductFilters = () => {
     maxPrice: searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined,
     inStock: searchParams.get('inStock') ? searchParams.get('inStock') === 'true' : undefined,
     sortBy: searchParams.get('sortBy') || 'newest',
+    brand: searchParams.get('brand') || undefined,
+    isDeal: searchParams.get('isDeal') ? searchParams.get('isDeal') === 'true' : undefined,
   });
 
   const updateFilters = useCallback((newFilters: ProductFilters) => {

@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Filter, X, ChevronDown, ChevronUp, Search, Sliders } from 'lucide-react';
+import { Filter, X, ChevronDown, ChevronUp, Search, Sliders, Zap } from 'lucide-react';
 import { Category } from '@/types/product';
+import { Brand } from '@/types/brand';
 
 interface ProductFiltersProps {
   filters: {
@@ -13,20 +14,26 @@ interface ProductFiltersProps {
     maxPrice?: number;
     inStock?: boolean;
     sortBy?: string;
+    brand?: string;
+    isDeal?: boolean;
   };
   onFiltersChange: (filters: any) => void;
   categories: Category[];
+  brands: Brand[];
 }
 
 export const ProductFilters: React.FC<ProductFiltersProps> = ({
   filters,
   onFiltersChange,
   categories,
+  brands,
 }) => {
   const [expandedSections, setExpandedSections] = useState({
     category: true,
+    brand: true,
     price: true,
-    availability: true
+    availability: true,
+    deals: true
   });
 
   const handleSearchChange = (value: string) => {
@@ -35,6 +42,10 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
 
   const handleCategoryChange = (categoryId: string) => {
     onFiltersChange({ ...filters, category: categoryId, page: 1 });
+  };
+
+  const handleBrandChange = (brandId: string) => {
+    onFiltersChange({ ...filters, brand: brandId, page: 1 });
   };
 
   const handlePriceChange = (min?: number, max?: number) => {
@@ -48,6 +59,10 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
 
   const handleStockChange = (inStock?: boolean) => {
     onFiltersChange({ ...filters, inStock, page: 1 });
+  };
+
+  const handleDealChange = (isDeal?: boolean) => {
+    onFiltersChange({ ...filters, isDeal, page: 1 });
   };
 
   const handleSortChange = (sortBy: string) => {
@@ -71,9 +86,11 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
   const hasActiveFilters = 
     filters.search || 
     filters.category || 
+    filters.brand ||
     filters.minPrice !== undefined || 
     filters.maxPrice !== undefined || 
     filters.inStock !== undefined ||
+    filters.isDeal !== undefined ||
     filters.sortBy !== 'newest';
 
   return (
@@ -131,6 +148,8 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
             <option value="price-high">Price: High to Low</option>
             <option value="name">Name: A to Z</option>
             <option value="stock">In Stock First</option>
+            <option value="discount">Best Discount</option>
+            <option value="rating">Highest Rated</option>
           </select>
         </div>
 
@@ -189,6 +208,61 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           </AnimatePresence>
         </div>
 
+        {/* Brand Filter */}
+        <div className="border-t border-foreground/10 pt-6">
+          <button
+            onClick={() => toggleSection('brand')}
+            className="flex items-center justify-between w-full mb-3"
+          >
+            <label className="block text-sm font-semibold text-foreground/80">
+              Brand
+            </label>
+            {expandedSections.brand ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+          
+          <AnimatePresence>
+            {expandedSections.brand && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="overflow-hidden"
+              >
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-foreground/5 cursor-pointer transition-colors">
+                    <input
+                      type="radio"
+                      name="brand"
+                      value=""
+                      checked={!filters.brand}
+                      onChange={() => handleBrandChange('')}
+                      className="text-foreground focus:ring-foreground/20"
+                    />
+                    <span className="text-sm">All Brands</span>
+                  </label>
+                  {brands.map((brand) => (
+                    <label
+                      key={brand._id}
+                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-foreground/5 cursor-pointer transition-colors"
+                    >
+                      <input
+                        type="radio"
+                        name="brand"
+                        value={brand._id}
+                        checked={filters.brand === brand._id}
+                        onChange={() => handleBrandChange(brand._id)}
+                        className="text-foreground focus:ring-foreground/20"
+                      />
+                      <span className="text-sm">{brand.name}</span>
+                    </label>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
         {/* Price Range */}
         <div className="border-t border-foreground/10 pt-6">
           <button
@@ -238,6 +312,59 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                       className="flex-1 px-3 py-2 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/30 bg-transparent"
                     />
                   </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Deals Filter */}
+        <div className="border-t border-foreground/10 pt-6">
+          <button
+            onClick={() => toggleSection('deals')}
+            className="flex items-center justify-between w-full mb-3"
+          >
+            <label className="block text-sm font-semibold text-foreground/80">
+              Special Offers
+            </label>
+            {expandedSections.deals ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+          
+          <AnimatePresence>
+            {expandedSections.deals && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="overflow-hidden"
+              >
+                <div className="space-y-2">
+                  <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-foreground/5 cursor-pointer transition-colors">
+                    <input
+                      type="radio"
+                      name="deals"
+                      value=""
+                      checked={filters.isDeal === undefined}
+                      onChange={() => handleDealChange(undefined)}
+                      className="text-foreground focus:ring-foreground/20"
+                    />
+                    <span className="text-sm">All Products</span>
+                  </label>
+                  <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-foreground/5 cursor-pointer transition-colors">
+                    <input
+                      type="radio"
+                      name="deals"
+                      value="true"
+                      checked={filters.isDeal === true}
+                      onChange={() => handleDealChange(true)}
+                      className="text-foreground focus:ring-foreground/20"
+                    />
+                    <span className="text-sm flex items-center gap-2">
+                      <Zap size={14} className="text-amber-500" />
+                      Hot Deals Only
+                    </span>
+                  </label>
                 </div>
               </motion.div>
             )}

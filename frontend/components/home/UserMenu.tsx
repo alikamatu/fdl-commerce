@@ -67,14 +67,14 @@ export const UserMenu = forwardRef<HTMLDivElement, UserMenuProps>(
               
               {/* Menu Items */}
               <div className="p-2">
-                <Link 
+                {/* <Link 
                   href="/profile" 
                   className="flex items-center gap-3 px-3 py-2 text-sm text-foreground/80 hover:bg-foreground/5 rounded-lg transition-colors"
                   onClick={onClose}
                 >
                   <User size={16} className="text-foreground/40" />
                   <span>Profile</span>
-                </Link>
+                </Link> */}
                 <Link 
                   href="/orders" 
                   className="flex items-center gap-3 px-3 py-2 text-sm text-foreground/80 hover:bg-foreground/5 rounded-lg transition-colors"
@@ -95,14 +95,14 @@ export const UserMenu = forwardRef<HTMLDivElement, UserMenuProps>(
 
               <div className="border-t border-foreground/10 my-1" />
               
-              <Link 
+              {/* <Link 
                 href="/settings" 
                 className="flex items-center gap-3 px-3 py-2 text-sm text-foreground/80 hover:bg-foreground/5 rounded-lg transition-colors"
                 onClick={onClose}
               >
                 <Settings size={16} className="text-foreground/40" />
                 <span>Settings</span>
-              </Link>
+              </Link> */}
               
               <div className="border-t border-foreground/10 my-1" />
               

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useProducts } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
+import { useBrands } from '@/hooks/useBrands'; // Add this hook
 import { useProductFilters } from '@/hooks/useProductFilters';
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { Product } from '@/types/product';
@@ -19,6 +20,7 @@ export default function ProductPage() {
   const { filters, updateFilters } = useProductFilters();
   const { products, loading, error, pagination, refetch } = useProducts(filters);
   const { categories, loading: categoriesLoading } = useCategories();
+  const { brands, loading: brandsLoading } = useBrands(); // Fetch brands
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
   
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -28,6 +30,7 @@ export default function ProductPage() {
 
   // Find current category for breadcrumbs
   const currentCategory = categories.find(cat => cat._id === filters.category);
+  const currentBrand = brands.find(brand => brand._id === filters.brand);
 
   // Handle errors
   useEffect(() => {
@@ -41,16 +44,37 @@ export default function ProductPage() {
     setQuickViewOpen(true);
   };
 
-const handlePageChange = (page: number) => {
-  updateFilters({ ...filters, page });
-  if (typeof window !== 'undefined') {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-};
+  const handlePageChange = (page: number) => {
+    updateFilters({ ...filters, page });
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   const handleCloseQuickView = () => {
     setQuickViewOpen(false);
     setSelectedProduct(null);
+  };
+
+  // Generate breadcrumb items based on active filters
+  const getBreadcrumbItems = () => {
+    const items = [];
+    
+    if (filters.search) {
+      items.push(`Search: "${filters.search}"`);
+    } else if (currentBrand && currentCategory) {
+      items.push(currentBrand.name, currentCategory.name);
+    } else if (currentBrand) {
+      items.push(currentBrand.name);
+    } else if (currentCategory) {
+      items.push(currentCategory.name);
+    } else if (filters.isDeal) {
+      items.push('Hot Deals');
+    } else {
+      items.push('All Products');
+    }
+    
+    return items;
   };
 
   return (
@@ -89,14 +113,14 @@ const handlePageChange = (page: number) => {
           </div>
 
           <div className="flex flex-col lg:flex-row gap-8">
-
-          {/* Sidebar - Filters */}
+            {/* Sidebar - Filters */}
             <div className={`lg:w-80 xl:w-96 flex-shrink-0 ${filtersOpen ? 'block' : 'hidden lg:block'}`}>
               <div className="sticky top-8">
                 <ProductFilters
                   filters={filters}
                   onFiltersChange={updateFilters}
                   categories={categories}
+                  brands={brands}
                 />
               </div>
             </div>
@@ -113,8 +137,14 @@ const handlePageChange = (page: number) => {
                 >
                   {filters.search 
                     ? `Search Results for "${filters.search}"`
+                    : currentBrand && currentCategory
+                    ? `${currentBrand.name} - ${currentCategory.name}`
+                    : currentBrand
+                    ? currentBrand.name
                     : currentCategory
                     ? currentCategory.name
+                    : filters.isDeal
+                    ? 'Hot Deals'
                     : 'All Products'
                   }
                 </motion.h1>
@@ -126,8 +156,14 @@ const handlePageChange = (page: number) => {
                 >
                   {filters.search 
                     ? `Found ${pagination.total} products matching your search`
+                    : currentBrand && currentCategory
+                    ? `Explore ${currentBrand.name}'s ${currentCategory.name.toLowerCase()} collection`
+                    : currentBrand
+                    ? `Discover products from ${currentBrand.name}`
                     : currentCategory
                     ? `Explore our curated collection of ${currentCategory.name.toLowerCase()}`
+                    : filters.isDeal
+                    ? `Don't miss out on these amazing deals - ${pagination.total} hot offers available`
                     : 'Discover our carefully curated collection of high-quality products'
                   }
                 </motion.p>

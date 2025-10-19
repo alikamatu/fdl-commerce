@@ -236,13 +236,6 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
           >
             <Share2 size={20} />
           </button>
-            <button
-              onClick={handleWhatsAppShare}
-              className="p-3 border border-foreground/20 rounded-lg hover:bg-green-50 hover:border-green-300 transition-colors group"
-              title="Contact admin on WhatsApp"
-            >
-              <MessageCircle size={20} className="text-foreground/60 group-hover:text-green-600" />
-            </button>
         </div>
       </div>
 
