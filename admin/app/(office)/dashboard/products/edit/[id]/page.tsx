@@ -443,7 +443,7 @@ export default function ProductEditPage() {
           <div className="bg-white rounded-2xl p-8 text-center border border-gray-200 shadow-sm">
             <AlertCircle className="w-16 h-16 mx-auto mb-4 text-red-400" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Product Not Found</h3>
-            <p className="text-gray-600 mb-6">The product you're trying to edit doesn't exist.</p>
+            <p className="text-gray-600 mb-6">The product you&#39;re trying to edit doesn&#39;t exist.</p>
             <button
               onClick={() => router.push('/dashboard/products')}
               className="px-6 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium"

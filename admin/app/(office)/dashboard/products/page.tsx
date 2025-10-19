@@ -329,7 +329,7 @@ export default function ProductsPage() {
                   Products
                 </h1>
                 <p className="text-gray-600 mt-2 text-lg">
-                  Manage your store's product inventory and catalog
+                  Manage your store&#39;s product inventory and catalog
                 </p>
               </div>
             </div>

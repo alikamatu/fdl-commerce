@@ -345,7 +345,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
           <div className="bg-white rounded-2xl p-8 text-center border border-gray-200 shadow-sm">
             <Package className="w-16 h-16 mx-auto mb-4 text-gray-400" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Order Not Found</h3>
-            <p className="text-gray-600 mb-6">The order you're looking for doesn't exist.</p>
+            <p className="text-gray-600 mb-6">The order you&#39;re looking for doesn&#39;t exist.</p>
             <button
               onClick={() => router.push('/dashboard/orders')}
               className="px-6 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium"

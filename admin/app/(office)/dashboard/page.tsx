@@ -238,7 +238,7 @@ export default function AdminHome() {
                 Dashboard
               </h1>
               <p className="text-gray-600 mt-2 text-lg">
-                Welcome back, {user?.displayName || 'Admin'}! Here's what's happening today.
+                Welcome back, {user?.displayName || 'Admin'}! Here&#39;s what&#39;s happening today.
               </p>
             </div>
           </div>

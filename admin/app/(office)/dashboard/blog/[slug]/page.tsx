@@ -357,7 +357,7 @@ export default function BlogPostPage() {
               {error || 'Blog post not found'}
             </h3>
             <p className="text-gray-600 mb-6 max-w-md mx-auto">
-              The blog post you're looking for doesn't exist or you don't have permission to view it.
+              The blog post you&#39;re looking for doesn&#39;t exist or you don&#39;t have permission to view it.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
