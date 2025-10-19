@@ -594,32 +594,6 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                 )}
               </div>
             </div>
-
-            {/* Quick Actions */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-              <div className="grid grid-cols-2 gap-3">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => router.push(`/dashboard/products/edit/${product._id}`)}
-                  className="flex items-center justify-center gap-2 px-4 py-3 bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 transition-all duration-200 font-medium"
-                >
-                  <Edit2 className="w-4 h-4" />
-                  <span className="text-sm">Edit</span>
-                </motion.button>
-                
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => window.open(`/products/${product._id}`, '_blank')}
-                  className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 text-gray-700 rounded-xl hover:bg-gray-100 transition-all duration-200 font-medium"
-                >
-                  <Eye className="w-4 h-4" />
-                  <span className="text-sm">Preview</span>
-                </motion.button>
-              </div>
-            </div>
           </motion.div>
         </div>
       </div>

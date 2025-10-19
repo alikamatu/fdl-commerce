@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { StrikethroughIcon } from 'lucide-react';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -32,10 +33,10 @@ export default function LoginForm() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <div className="mx-auto h-12 w-12 bg-blue-600 rounded-full flex items-center justify-center">
-            <span className="text-2xl">⚡</span>
+            <StrikethroughIcon className="h-6 w-6 text-white" />
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-gray-100">
-            Admin Login
+            Forbes Digital LifeLine
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             Access the admin dashboard
