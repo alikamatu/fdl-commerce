@@ -18,7 +18,14 @@ import {
   User,
   Calendar,
   Download,
-  MoreVertical
+  MoreVertical,
+  ArrowUpRight,
+  ShoppingCart,
+  TrendingUp,
+  MapPin,
+  CreditCard,
+  Info,
+  AlertCircle
 } from 'lucide-react';
 import { useAlert } from '@/components/ui/Alert';
 
@@ -95,7 +102,9 @@ function useOrders() {
       }
 
       const data = await response.json();
-      setOrders(Array.isArray(data) ? data : []);
+      // Handle both response structures
+      const ordersData = data.data || data;
+      setOrders(Array.isArray(ordersData) ? ordersData : []);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to load orders';
       setError(message);
@@ -264,7 +273,7 @@ export default function AdminOrdersPage() {
   };
 
   const formatPrice = (priceCents: number) => {
-    return `$${(priceCents / 100).toFixed(2)}`;
+    return `₵${(priceCents / 100).toFixed(2)}`;
   };
 
   const formatDate = (dateString: string) => {
@@ -288,19 +297,19 @@ export default function AdminOrdersPage() {
   const getStatusColor = (status: Order['status']) => {
     switch (status) {
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        return 'bg-amber-50 text-amber-700 border-amber-200';
       case 'confirmed':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return 'bg-blue-50 text-blue-700 border-blue-200';
       case 'processing':
-        return 'bg-purple-100 text-purple-800 border-purple-200';
+        return 'bg-purple-50 text-purple-700 border-purple-200';
       case 'shipped':
-        return 'bg-indigo-100 text-indigo-800 border-indigo-200';
+        return 'bg-indigo-50 text-indigo-700 border-indigo-200';
       case 'delivered':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-green-50 text-green-700 border-green-200';
       case 'cancelled':
-        return 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-red-50 text-red-700 border-red-200';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-gray-50 text-gray-700 border-gray-200';
     }
   };
 
@@ -368,337 +377,397 @@ export default function AdminOrdersPage() {
     }
   };
 
+  const getStatusCount = (status: Order['status']) => {
+    return orders.filter(order => order.status === status).length;
+  };
+
   if (loading) {
     return (
-      <div className="p-8 max-w-7xl mx-auto">
-        <div className="flex flex-col items-center justify-center h-64 space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-current"></div>
-          <p>Loading orders...</p>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-white to-gray-50/30 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-2 border-blue-500 border-t-transparent"></div>
       </div>
     );
   }
 
   if (error && !orders.length) {
     return (
-      <div className="p-8 max-w-7xl mx-auto">
-        <div className="border rounded-none p-8 text-center">
-          <Package className="w-16 h-16 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Failed to load orders</h3>
-          <p className="mb-4">{error}</p>
-          <button
-            onClick={handleRefresh}
-            className="px-4 py-2 border rounded-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-          >
-            Try Again
-          </button>
+      <div className="min-h-screen bg-gradient-to-br from-white to-gray-50/30 p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-2xl p-8 text-center border border-gray-200 shadow-sm">
+            <AlertCircle className="w-16 h-16 mx-auto mb-4 text-red-400" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Failed to load orders</h3>
+            <p className="text-gray-600 mb-6">{error}</p>
+            <button
+              onClick={handleRefresh}
+              className="px-6 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium"
+            >
+              Try Again
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-      >
-        <div className="flex items-center gap-4">
-          <div>
-            <h1 className="text-4xl font-light tracking-tight flex items-center">
-              <Package className="w-8 h-8 mr-3" />
-              Order Management
-            </h1>
-            <p className="text-lg mt-2">
-              Manage and track customer orders
-            </p>
+    <div className="min-h-screen bg-gradient-to-br from-white to-gray-50/30 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col lg:flex-row lg:items-start justify-between gap-6"
+        >
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-blue-50 rounded-2xl">
+              <Package className="w-7 h-7 text-blue-600" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Order Management
+              </h1>
+              <p className="text-gray-600 mt-2 text-lg">
+                Manage and track customer orders in real-time
+              </p>
+            </div>
           </div>
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleRefresh}
-            disabled={refreshing}
-            className="p-2 rounded-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
-            title="Refresh orders"
-          >
-            <RefreshCw className={`w-5 h-5 ${refreshing ? 'animate-spin' : ''}`} />
-          </motion.button>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={exportOrders}
-            className="flex items-center space-x-2 px-4 py-2 border rounded-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-          >
-            <Download className="w-4 h-4" />
-            <span>Export CSV</span>
-          </motion.button>
-        </div>
-      </motion.div>
+          
+          <div className="flex items-center gap-3">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="p-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-sm disabled:opacity-50"
+              title="Refresh orders"
+            >
+              <RefreshCw className={`w-5 h-5 text-gray-600 ${refreshing ? 'animate-spin' : ''}`} />
+            </motion.button>
 
-      {/* Stats Grid */}
-      {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="rounded-none p-6 border"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">Total Orders</p>
-                <p className="text-3xl font-bold mt-2">{stats.totalOrders}</p>
-                <p className="text-sm text-gray-600 mt-1">
-                  {stats.completedOrders} completed
-                </p>
-              </div>
-              <Package className="w-8 h-8" />
-            </div>
-          </motion.div>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={exportOrders}
+              className="flex items-center space-x-3 px-5 py-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium shadow-sm"
+            >
+              <Download className="w-5 h-5 text-gray-600" />
+              <span>Export CSV</span>
+            </motion.button>
+          </div>
+        </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="rounded-none p-6 border"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">Total Revenue</p>
-                <p className="text-3xl font-bold mt-2">
-                  {formatPrice(stats.totalRevenue)}
-                </p>
-                <p className="text-sm text-gray-600 mt-1">
-                  Last 30 days
-                </p>
-              </div>
-              <DollarSign className="w-8 h-8" />
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="rounded-none p-6 border"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">Average Order</p>
-                <p className="text-3xl font-bold mt-2">
-                  {formatPrice(stats.averageOrderValue)}
-                </p>
-                <p className="text-sm text-gray-600 mt-1">
-                  Per order
-                </p>
-              </div>
-              <Truck className="w-8 h-8" />
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="rounded-none p-6 border"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">Pending Orders</p>
-                <p className="text-3xl font-bold mt-2">{stats.pendingOrders}</p>
-                <p className="text-sm text-gray-600 mt-1">
-                  Need attention
-                </p>
-              </div>
-              <Clock className="w-8 h-8" />
-            </div>
-          </motion.div>
-        </div>
-      )}
-
-      {/* Filters */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-4"
-      >
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" />
-          <input
-            type="text"
-            placeholder="Search by order number, email, or name..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border rounded-none bg-background focus:ring-2 focus:ring-current focus:border-transparent"
-          />
-        </div>
-
-        <div className="relative">
-          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border rounded-none bg-background focus:ring-2 focus:ring-current focus:border-transparent appearance-none cursor-pointer"
-          >
-            <option value="all">All Statuses</option>
-            <option value="pending">Pending</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="processing">Processing</option>
-            <option value="shipped">Shipped</option>
-            <option value="delivered">Delivered</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-        </div>
-
-        <div className="relative">
-          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" />
-          <select
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border rounded-none bg-background focus:ring-2 focus:ring-current focus:border-transparent appearance-none cursor-pointer"
-          >
-            <option value="all">All Time</option>
-            <option value="today">Today</option>
-            <option value="week">Last 7 Days</option>
-            <option value="month">Last 30 Days</option>
-          </select>
-        </div>
-      </motion.div>
-
-      {/* Orders Table */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
-        className="rounded-none border overflow-hidden"
-      >
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b bg-gray-50 dark:bg-gray-800/30">
-                <th className="text-left p-4 font-semibold">Order</th>
-                <th className="text-left p-4 font-semibold">Customer</th>
-                <th className="text-left p-4 font-semibold">Date</th>
-                <th className="text-left p-4 font-semibold">Items</th>
-                <th className="text-left p-4 font-semibold">Total</th>
-                <th className="text-left p-4 font-semibold">Payment</th>
-                <th className="text-left p-4 font-semibold">Status</th>
-                <th className="text-left p-4 font-semibold">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredOrders.map((order, index) => (
-                <motion.tr
-                  key={order._id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.7 + index * 0.05 }}
-                  className="border-b hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors"
-                >
-                  <td className="p-4">
-                    <div>
-                      <p className="font-medium">{order.orderNumber}</p>
-                      <p className="text-sm text-gray-600">{order.paymentMethod}</p>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div>
-                      <p className="font-medium flex items-center">
-                        <User className="w-4 h-4 mr-2" />
-                        {order.shippingAddress.fullName}
-                      </p>
-                      <p className="text-sm text-gray-600">{order.email}</p>
-                      <p className="text-sm text-gray-600">
-                        {order.shippingAddress.city}, {order.shippingAddress.country}
-                      </p>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div>
-                      <p className="font-medium">{formatDate(order.createdAt)}</p>
-                      <p className="text-sm text-gray-600">
-                        {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div>
-                      <p className="font-medium">{order.items.length} items</p>
-                      <p className="text-sm text-gray-600">
-                        {order.items.reduce((sum, item) => sum + item.quantity, 0)} units
-                      </p>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div>
-                      <p className="font-medium">{formatPrice(order.totalCents)}</p>
-                      <p className="text-sm text-gray-600">
-                        Subtotal: {formatPrice(order.subtotalCents)}
-                      </p>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <span className={`px-2 py-1 text-xs font-medium border rounded ${
-                      order.paymentCompleted 
-                        ? 'bg-green-100 text-green-800 border-green-200' 
-                        : 'bg-yellow-100 text-yellow-800 border-yellow-200'
-                    }`}>
-                      {order.paymentCompleted ? 'Paid' : 'Pending'}
+        {/* Stats Grid */}
+        {stats && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Total Orders</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-2">{stats.totalOrders}</p>
+                  <div className="flex items-center gap-2 mt-3 text-sm">
+                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+                      {stats.completedOrders} completed
                     </span>
-                  </td>
-                  <td className="p-4">
-                    <span className={`px-3 py-1 text-xs font-medium border rounded flex items-center gap-1 w-fit ${getStatusColor(order.status)}`}>
-                      {getStatusIcon(order.status)}
-                      {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                    </span>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex items-center space-x-2">
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => router.push(`/dashboard/orders/${order._id}`)}
-                        className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700/20 rounded-none transition-colors"
-                        title="View Details"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </motion.button>
-                      {/* <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => router.push(`/dashboard/orders/edit/${order._id}`)}
-                        className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-none transition-colors"
-                        title="Edit Order"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </motion.button> */}
-                    </div>
-                  </td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </div>
+                </div>
+                <div className="p-3 bg-blue-50 rounded-xl">
+                  <ShoppingCart className="w-6 h-6 text-blue-600" />
+                </div>
+              </div>
+            </motion.div>
 
-        {filteredOrders.length === 0 && (
-          <div className="text-center p-8">
-            <Package className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-            <p className="text-lg font-medium mb-2">No orders found</p>
-            <p className="mb-4">
-              {searchTerm || statusFilter !== 'all' || dateFilter !== 'all'
-                ? 'Try adjusting your search terms or filters'
-                : 'No orders have been placed yet'
-              }
-            </p>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Total Revenue</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-2">
+                    {formatPrice(stats.totalRevenue)}
+                  </p>
+                  <div className="flex items-center gap-2 mt-3 text-sm text-gray-600">
+                    <TrendingUp className="w-4 h-4" />
+                    <span>Last 30 days</span>
+                  </div>
+                </div>
+                <div className="p-3 bg-green-50 rounded-xl">
+                  <span className="text-sm font-medium text-gray-600">GHC</span>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Average Order</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-2">
+                    {formatPrice(stats.averageOrderValue)}
+                  </p>
+                  <div className="flex items-center gap-2 mt-3 text-sm text-gray-600">
+                    <CreditCard className="w-4 h-4" />
+                    <span>Per order</span>
+                  </div>
+                </div>
+                <div className="p-3 bg-purple-50 rounded-xl">
+                  <Truck className="w-6 h-6 text-purple-600" />
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Pending Orders</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-2">{stats.pendingOrders}</p>
+                  <div className="flex items-center gap-2 mt-3 text-sm">
+                    <span className="bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-medium">
+                      Needs attention
+                    </span>
+                  </div>
+                </div>
+                <div className="p-3 bg-amber-50 rounded-xl">
+                  <Clock className="w-6 h-6 text-amber-600" />
+                </div>
+              </div>
+            </motion.div>
           </div>
         )}
-      </motion.div>
+
+        {/* Status Overview */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm"
+        >
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Status Overview</h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'].map((status) => (
+              <div
+                key={status}
+                className={`p-4 rounded-xl border-2 text-center cursor-pointer transition-all duration-200 ${
+                  statusFilter === status 
+                    ? 'border-blue-500 bg-blue-50' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+                onClick={() => setStatusFilter(statusFilter === status ? 'all' : status)}
+              >
+                <div className={`w-8 h-8 mx-auto mb-2 rounded-lg flex items-center justify-center ${
+                  getStatusColor(status as Order['status']).split(' ')[0]
+                }`}>
+                  {getStatusIcon(status as Order['status'])}
+                </div>
+                <p className="text-sm font-medium text-gray-900 capitalize">{status}</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">{getStatusCount(status as Order['status'])}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Filters */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm"
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by order number, email, or name..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
+              />
+            </div>
+
+            <div className="relative">
+              <Filter className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full pl-12 pr-10 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white appearance-none cursor-pointer"
+              >
+                <option value="all">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="processing">Processing</option>
+                <option value="shipped">Shipped</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+
+            <div className="relative">
+              <Calendar className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <select
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className="w-full pl-12 pr-10 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white appearance-none cursor-pointer"
+              >
+                <option value="all">All Time</option>
+                <option value="today">Today</option>
+                <option value="week">Last 7 Days</option>
+                <option value="month">Last 30 Days</option>
+              </select>
+            </div>
+
+            <div className="flex items-center justify-between text-sm text-gray-600 bg-gray-50 rounded-xl p-4">
+              <div className="flex items-center gap-2">
+                <Info className="w-4 h-4" />
+                <span>Showing</span>
+              </div>
+              <span className="font-semibold text-gray-900">
+                {filteredOrders.length} of {orders.length} orders
+              </span>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Orders Table */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7 }}
+          className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden"
+        >
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200 bg-gray-50">
+                  <th className="text-left p-6 font-semibold text-gray-900">Order Details</th>
+                  <th className="text-left p-6 font-semibold text-gray-900">Customer</th>
+                  <th className="text-left p-6 font-semibold text-gray-900">Date & Time</th>
+                  <th className="text-left p-6 font-semibold text-gray-900">Items</th>
+                  <th className="text-left p-6 font-semibold text-gray-900">Total Amount</th>
+                  <th className="text-left p-6 font-semibold text-gray-900">Payment</th>
+                  <th className="text-left p-6 font-semibold text-gray-900">Status</th>
+                  <th className="text-left p-6 font-semibold text-gray-900">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredOrders.map((order, index) => (
+                  <motion.tr
+                    key={order._id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.8 + index * 0.05 }}
+                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200"
+                  >
+                    <td className="p-6">
+                      <div>
+                        <p className="font-semibold text-gray-900">{order.orderNumber}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <CreditCard className="w-3 h-3 text-gray-400" />
+                          <p className="text-sm text-gray-600">{order.paymentMethod}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-6">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <User className="w-4 h-4 text-gray-400" />
+                          <p className="font-medium text-gray-900">{order.shippingAddress.fullName}</p>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-1">{order.email}</p>
+                        <div className="flex items-center gap-1 text-sm text-gray-500">
+                          <MapPin className="w-3 h-3" />
+                          <span>{order.shippingAddress.city}, {order.shippingAddress.country}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-6">
+                      <div>
+                        <p className="font-medium text-gray-900">{formatDate(order.createdAt)}</p>
+                        <p className="text-sm text-gray-600">
+                          {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="p-6">
+                      <div>
+                        <p className="font-medium text-gray-900">{order.items.length} items</p>
+                        <p className="text-sm text-gray-600">
+                          {order.items.reduce((sum, item) => sum + item.quantity, 0)} units total
+                        </p>
+                      </div>
+                    </td>
+                    <td className="p-6">
+                      <div>
+                        <p className="font-semibold text-gray-900">{formatPrice(order.totalCents)}</p>
+                        <p className="text-sm text-gray-600">
+                          Subtotal: {formatPrice(order.subtotalCents)}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="p-6">
+                      <span className={`px-3 py-1.5 text-xs font-semibold border rounded-lg ${
+                        order.paymentCompleted 
+                          ? 'bg-green-50 text-green-700 border-green-200' 
+                          : 'bg-amber-50 text-amber-700 border-amber-200'
+                      }`}>
+                        {order.paymentCompleted ? 'Paid' : 'Pending'}
+                      </span>
+                    </td>
+                    <td className="p-6">
+                      <span className={`px-3 py-1.5 text-xs font-semibold border rounded-lg flex items-center gap-2 w-fit ${getStatusColor(order.status)}`}>
+                        {getStatusIcon(order.status)}
+                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                      </span>
+                    </td>
+                    <td className="p-6">
+                      <div className="flex items-center space-x-2">
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => router.push(`/dashboard/orders/${order._id}`)}
+                          className="p-2.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-all duration-200"
+                          title="View Details"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </motion.button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {filteredOrders.length === 0 && (
+            <div className="text-center p-12">
+              <Package className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No orders found</h3>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                {searchTerm || statusFilter !== 'all' || dateFilter !== 'all'
+                  ? 'Try adjusting your search terms or filters'
+                  : 'No orders have been placed yet. Orders will appear here once customers start purchasing.'
+                }
+              </p>
+            </div>
+          )}
+        </motion.div>
+      </div>
     </div>
   );
 }

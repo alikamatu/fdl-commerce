@@ -10,7 +10,6 @@ import {
   RefreshCw,
   User,
   MapPin,
-  DollarSign,
   Truck,
   CheckCircle,
   Clock,
@@ -22,7 +21,13 @@ import {
   Calendar,
   Download,
   Send,
-  Printer
+  Printer,
+  AlertCircle,
+  Info,
+  ArrowUpRight,
+  Package2,
+  BadgeCheck,
+  FileText
 } from 'lucide-react';
 import { useAlert } from '@/components/ui/Alert';
 
@@ -233,7 +238,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
   };
 
   const formatPrice = (priceCents: number) => {
-    return `$${(priceCents / 100).toFixed(2)}`;
+    return `₵${(priceCents / 100).toFixed(2)}`;
   };
 
   const formatDate = (dateString: string) => {
@@ -249,19 +254,19 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
   const getStatusColor = (status: Order['status']) => {
     switch (status) {
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        return 'bg-amber-50 text-amber-700 border-amber-200';
       case 'confirmed':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return 'bg-blue-50 text-blue-700 border-blue-200';
       case 'processing':
-        return 'bg-purple-100 text-purple-800 border-purple-200';
+        return 'bg-purple-50 text-purple-700 border-purple-200';
       case 'shipped':
-        return 'bg-indigo-100 text-indigo-800 border-indigo-200';
+        return 'bg-indigo-50 text-indigo-700 border-indigo-200';
       case 'delivered':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-green-50 text-green-700 border-green-200';
       case 'cancelled':
-        return 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-red-50 text-red-700 border-red-200';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-gray-50 text-gray-700 border-gray-200';
     }
   };
 
@@ -299,32 +304,51 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
 
   if (loading) {
     return (
-      <div className="p-8 max-w-7xl mx-auto">
-        <div className="flex flex-col items-center justify-center h-64 space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-current"></div>
-          <p>Loading order details...</p>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-white to-gray-50/30 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-2 border-blue-500 border-t-transparent"></div>
       </div>
     );
   }
 
   if (error && !order) {
     return (
-      <div className="p-8 max-w-7xl mx-auto">
-        <div className="border rounded-none p-8 text-center">
-          <Package className="w-16 h-16 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Failed to load order</h3>
-          <p className="mb-4">{error}</p>
-          <div className="flex flex-col sm:flex-row gap-2 justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-white to-gray-50/30 p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-2xl p-8 text-center border border-gray-200 shadow-sm">
+            <AlertCircle className="w-16 h-16 mx-auto mb-4 text-red-400" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Failed to load order</h3>
+            <p className="text-gray-600 mb-6">{error}</p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={refetch}
+                className="px-6 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200 text-gray-700 font-medium"
+              >
+                Try Again
+              </button>
+              <button
+                onClick={() => router.push('/dashboard/orders')}
+                className="px-6 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium"
+              >
+                Back to Orders
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!order) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-white to-gray-50/30 p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-2xl p-8 text-center border border-gray-200 shadow-sm">
+            <Package className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Order Not Found</h3>
+            <p className="text-gray-600 mb-6">The order you're looking for doesn't exist.</p>
             <button
-              onClick={refetch}
-              className="px-4 py-2 border rounded-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-            >
-              Try Again
-            </button>
-            <button
-              onClick={() => router.push('/admin/orders')}
-              className="px-4 py-2 border rounded-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              onClick={() => router.push('/dashboard/orders')}
+              className="px-6 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium"
             >
               Back to Orders
             </button>
@@ -334,368 +358,395 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
     );
   }
 
-  if (!order) {
-    return (
-      <div className="p-8 max-w-7xl mx-auto">
-        <div className="border rounded-none p-8 text-center">
-          <Package className="w-16 h-16 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Order Not Found</h3>
-          <p className="mb-4">The order you're looking for doesn't exist.</p>
-          <button
-            onClick={() => router.push('/admin/orders')}
-            className="px-4 py-2 border rounded-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-          >
-            Back to Orders
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-      >
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => router.push('/admin/orders')}
-            className="p-2 rounded-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <div>
-            <h1 className="text-4xl font-light tracking-tight flex items-center">
-              <Package className="w-8 h-8 mr-3" />
-              Order #{order.orderNumber}
-            </h1>
-            <p className="text-lg mt-2">
-              Order Details & Management
-            </p>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={refetch}
-            className="p-2 rounded-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-            title="Refresh"
-          >
-            <RefreshCw className="w-5 h-5" />
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={downloadInvoice}
-            className="flex items-center space-x-2 px-4 py-2 border rounded-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-          >
-            <Download className="w-4 h-4" />
-            <span>Invoice</span>
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={printOrder}
-            className="flex items-center space-x-2 px-4 py-2 border rounded-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-          >
-            <Printer className="w-4 h-4" />
-            <span>Print</span>
-          </motion.button>
-        </div>
-      </motion.div>
-
-      {/* Error Banner */}
-      {error && (
+    <div className="min-h-screen bg-gradient-to-br from-white to-gray-50/30 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="border rounded-none p-4"
+          className="flex flex-col lg:flex-row lg:items-start justify-between gap-6"
         >
-          <div className="flex items-center">
-            <Clock className="w-5 h-5 mr-3" />
-            <p className="text-sm">{error}</p>
+          <div className="flex items-start gap-4">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => router.push('/dashboard/orders')}
+              className="p-3 bg-white rounded-2xl border border-gray-200 hover:bg-gray-50 transition-all duration-200 shadow-sm mt-1"
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-700" />
+            </motion.button>
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-3 bg-blue-50 rounded-2xl">
+                  <Package className="w-7 h-7 text-blue-600" />
+                </div>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  Order #{order.orderNumber}
+                </h1>
+              </div>
+              <p className="text-gray-600 text-lg">
+                Order details and management
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={refetch}
+              className="p-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-sm"
+              title="Refresh"
+            >
+              <RefreshCw className="w-5 h-5 text-gray-600" />
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={downloadInvoice}
+              className="flex items-center space-x-3 px-5 py-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium shadow-sm"
+            >
+              <Download className="w-5 h-5 text-gray-600" />
+              <span>Invoice</span>
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={printOrder}
+              className="flex items-center space-x-3 px-5 py-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium shadow-sm"
+            >
+              <Printer className="w-5 h-5 text-gray-600" />
+              <span>Print</span>
+            </motion.button>
           </div>
         </motion.div>
-      )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column - Order Details */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Order Items */}
+        {/* Error Banner */}
+        {error && (
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="rounded-none p-6 border"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-red-50 border border-red-200 rounded-2xl p-4"
           >
-            <h2 className="text-lg font-semibold mb-4 flex items-center">
-              <ShoppingCart className="w-5 h-5 mr-2" />
-              Order Items
-            </h2>
-            <div className="space-y-4">
-              {order.items.map((item, index) => (
-                <div key={index} className="flex items-center justify-between border-b pb-4 last:border-b-0">
-                  <div className="flex items-center space-x-4">
-                    {item.imageUrl ? (
-                      <img
-                        src={item.imageUrl}
-                        alt={item.title}
-                        className="w-16 h-16 object-cover rounded-none"
-                      />
-                    ) : (
-                      <div className="w-16 h-16 flex items-center justify-center border rounded-none">
-                        <Package className="w-6 h-6" />
-                      </div>
-                    )}
-                    <div>
-                      <p className="font-medium">{item.title}</p>
-                      <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium">{formatPrice(item.priceCents)}</p>
-                    <p className="text-sm text-gray-600">
-                      Total: {formatPrice(item.priceCents * item.quantity)}
-                    </p>
-                  </div>
-                </div>
-              ))}
+            <div className="flex items-center">
+              <AlertCircle className="w-5 h-5 mr-3 text-red-500" />
+              <p className="text-red-700 text-sm">{error}</p>
             </div>
           </motion.div>
+        )}
 
-          {/* Customer Information */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-            className="rounded-none p-6 border"
-          >
-            <h2 className="text-lg font-semibold mb-4 flex items-center">
-              <User className="w-5 h-5 mr-2" />
-              Customer Information
-            </h2>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="font-medium flex items-center">
-                  <Mail className="w-4 h-4 mr-2" />
-                  Email
-                </span>
-                <span>{order.email}</span>
-              </div>
-              {order.userId && (
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">Account</span>
-                  <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                    Registered User
-                  </span>
-                </div>
-              )}
-            </div>
-          </motion.div>
-
-          {/* Shipping Address */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="rounded-none p-6 border"
-          >
-            <h2 className="text-lg font-semibold mb-4 flex items-center">
-              <MapPin className="w-5 h-5 mr-2" />
-              Shipping Address
-            </h2>
-            <div className="space-y-2">
-              <p className="font-medium">{order.shippingAddress.fullName}</p>
-              <p>{order.shippingAddress.address}</p>
-              <p>
-                {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.postalCode}
-              </p>
-              <p>{order.shippingAddress.country}</p>
-              {order.shippingAddress.phone && (
-                <p className="flex items-center">
-                  <Phone className="w-4 h-4 mr-2" />
-                  {order.shippingAddress.phone}
-                </p>
-              )}
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Right Column - Order Management */}
-        <div className="space-y-6">
-          {/* Order Summary */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="rounded-none p-6 border"
-          >
-            <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span>Subtotal</span>
-                <span>{formatPrice(order.subtotalCents)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Shipping</span>
-                <span>{formatPrice(order.shippingCents)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Tax</span>
-                <span>{formatPrice(order.taxCents)}</span>
-              </div>
-              <div className="flex justify-between border-t pt-3 font-semibold text-lg">
-                <span>Total</span>
-                <span>{formatPrice(order.totalCents)}</span>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Order Status Management */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-            className="rounded-none p-6 border"
-          >
-            <h2 className="text-lg font-semibold mb-4">Order Status</h2>
-            <div className="space-y-4">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+          {/* Left Column - Order Details */}
+          <div className="xl:col-span-2 space-y-6">
+            {/* Order Status Banner */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200"
+            >
               <div className="flex items-center justify-between">
-                <span className="font-medium">Current Status</span>
-                <span className={`px-3 py-1 text-sm font-medium border rounded flex items-center gap-1 ${getStatusColor(order.status)}`}>
-                  {getStatusIcon(order.status)}
+                <div className="flex items-center gap-4">
+                  <div className={`p-3 rounded-xl ${getStatusColor(order.status).split(' ')[0]}`}>
+                    {getStatusIcon(order.status)}
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Order Status</h3>
+                    <p className="text-gray-600">Current status of the order</p>
+                  </div>
+                </div>
+                <span className={`px-4 py-2 text-sm font-semibold border rounded-xl ${getStatusColor(order.status)}`}>
                   {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                 </span>
               </div>
+            </motion.div>
 
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Update Status
-                </label>
-                <select
-                  value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value as Order['status'])}
-                  className="w-full p-2 border rounded-none bg-background focus:ring-2 focus:ring-current focus:border-transparent"
-                >
-                  <option value="pending">Pending</option>
-                  <option value="confirmed">Confirmed</option>
-                  <option value="processing">Processing</option>
-                  <option value="shipped">Shipped</option>
-                  <option value="delivered">Delivered</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
+            {/* Order Items */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-blue-50 rounded-xl">
+                  <ShoppingCart className="w-5 h-5 text-blue-600" />
+                </div>
+                <h2 className="text-xl font-semibold text-gray-900">Order Items</h2>
               </div>
+              <div className="space-y-4">
+                {order.items.map((item, index) => (
+                  <div key={index} className="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors duration-200">
+                    <div className="flex items-center space-x-4">
+                      {item.imageUrl ? (
+                        <img
+                          src={item.imageUrl}
+                          alt={item.title}
+                          className="w-16 h-16 object-cover rounded-xl border border-gray-200"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 flex items-center justify-center border border-gray-200 rounded-xl bg-gray-100">
+                          <Package2 className="w-6 h-6 text-gray-400" />
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-gray-900 line-clamp-1">{item.title}</p>
+                        <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+                        <p className="text-sm text-gray-600">Unit Price: {formatPrice(item.priceCents)}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-gray-900 text-lg">{formatPrice(item.priceCents * item.quantity)}</p>
+                      <p className="text-sm text-gray-600">{item.quantity} × {formatPrice(item.priceCents)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
 
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleStatusUpdate}
-                disabled={updating || selectedStatus === order.status}
-                className="w-full flex items-center justify-center space-x-2 px-4 py-2 border rounded-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
+            {/* Customer & Shipping Information */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Customer Information */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 }}
+                className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6"
               >
-                {updating ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
-                ) : (
-                  <Edit className="w-4 h-4" />
-                )}
-                <span>
-                  {updating ? 'Updating...' : selectedStatus === order.status ? 'No Changes' : 'Update Status'}
-                </span>
-              </motion.button>
-
-              {selectedStatus === 'shipped' && order.status !== 'shipped' && (
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleSendShippingNotification}
-                  disabled={sendingNotification}
-                  className="w-full flex items-center justify-center space-x-2 px-4 py-2 border rounded-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
-                >
-                  {sendingNotification ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
-                  ) : (
-                    <Send className="w-4 h-4" />
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 bg-green-50 rounded-xl">
+                    <User className="w-5 h-5 text-green-600" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-gray-900">Customer Information</h2>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                    <Mail className="w-4 h-4 text-gray-600" />
+                    <div>
+                      <p className="font-medium text-gray-900">Email Address</p>
+                      <p className="text-gray-600">{order.email}</p>
+                    </div>
+                  </div>
+                  {order.userId && (
+                    <div className="flex items-center gap-3 p-3 bg-green-50 rounded-xl">
+                      <BadgeCheck className="w-4 h-4 text-green-600" />
+                      <div>
+                        <p className="font-medium text-gray-900">Account Type</p>
+                        <p className="text-green-700 font-medium">Registered User</p>
+                      </div>
+                    </div>
                   )}
-                  <span>{sendingNotification ? 'Sending...' : 'Notify Customer'}</span>
+                </div>
+              </motion.div>
+
+              {/* Shipping Address */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+                className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6"
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 bg-amber-50 rounded-xl">
+                    <MapPin className="w-5 h-5 text-amber-600" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-gray-900">Shipping Address</h2>
+                </div>
+                <div className="space-y-3">
+                  <p className="font-semibold text-gray-900">{order.shippingAddress.fullName}</p>
+                  <p className="text-gray-600">{order.shippingAddress.address}</p>
+                  <p className="text-gray-600">
+                    {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.postalCode}
+                  </p>
+                  <p className="text-gray-600">{order.shippingAddress.country}</p>
+                  {order.shippingAddress.phone && (
+                    <div className="flex items-center gap-2 pt-3 border-t border-gray-200">
+                      <Phone className="w-4 h-4 text-gray-400" />
+                      <span className="text-gray-600">{order.shippingAddress.phone}</span>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </div>
+          </div>
+
+          {/* Right Column - Order Management */}
+          <div className="space-y-6">
+            {/* Order Summary */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-purple-50 rounded-xl">
+                  <FileText className="w-5 h-5 text-purple-600" />
+                </div>
+                <h2 className="text-xl font-semibold text-gray-900">Order Summary</h2>
+              </div>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-gray-600">Subtotal</span>
+                  <span className="font-medium text-gray-900">{formatPrice(order.subtotalCents)}</span>
+                </div>
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-gray-600">Shipping</span>
+                  <span className="font-medium text-gray-900">{formatPrice(order.shippingCents)}</span>
+                </div>
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-gray-600">Tax</span>
+                  <span className="font-medium text-gray-900">{formatPrice(order.taxCents)}</span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-t border-gray-200 font-semibold text-lg">
+                  <span className="text-gray-900">Total Amount</span>
+                  <span className="text-blue-600">{formatPrice(order.totalCents)}</span>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Order Status Management */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-blue-50 rounded-xl">
+                  <Edit className="w-5 h-5 text-blue-600" />
+                </div>
+                <h2 className="text-xl font-semibold text-gray-900">Update Status</h2>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-3">
+                    Change Order Status
+                  </label>
+                  <select
+                    value={selectedStatus}
+                    onChange={(e) => setSelectedStatus(e.target.value as Order['status'])}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white appearance-none cursor-pointer"
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="processing">Processing</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </div>
+
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleStatusUpdate}
+                  disabled={updating || selectedStatus === order.status}
+                  className="w-full flex items-center justify-center space-x-3 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-sm"
+                >
+                  {updating ? (
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+                  ) : (
+                    <Edit className="w-5 h-5" />
+                  )}
+                  <span>
+                    {updating ? 'Updating...' : selectedStatus === order.status ? 'No Changes' : 'Update Status'}
+                  </span>
                 </motion.button>
-              )}
-            </div>
-          </motion.div>
 
-          {/* Payment Information */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="rounded-none p-6 border"
-          >
-            <h2 className="text-lg font-semibold mb-4 flex items-center">
-              <CreditCard className="w-5 h-5 mr-2" />
-              Payment Information
-            </h2>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="font-medium">Payment Method</span>
-                <span className="capitalize">{order.paymentMethod}</span>
+                {selectedStatus === 'shipped' && order.status !== 'shipped' && (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleSendShippingNotification}
+                    disabled={sendingNotification}
+                    className="w-full flex items-center justify-center space-x-3 px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-sm"
+                  >
+                    {sendingNotification ? (
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+                    ) : (
+                      <Send className="w-5 h-5" />
+                    )}
+                    <span>{sendingNotification ? 'Sending...' : 'Notify Customer'}</span>
+                  </motion.button>
+                )}
               </div>
-              <div className="flex justify-between items-center">
-                <span className="font-medium">Payment Status</span>
-                <span className={`px-2 py-1 text-xs font-medium border rounded ${
-                  order.paymentCompleted 
-                    ? 'bg-green-100 text-green-800 border-green-200' 
-                    : 'bg-yellow-100 text-yellow-800 border-yellow-200'
-                }`}>
-                  {order.paymentCompleted ? 'Paid' : 'Pending'}
-                </span>
-              </div>
-              {order.paymentId && (
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">Payment ID</span>
-                  <span className="text-sm font-mono">{order.paymentId}</span>
-                </div>
-              )}
-            </div>
-          </motion.div>
+            </motion.div>
 
-          {/* Order Timeline */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-            className="rounded-none p-6 border"
-          >
-            <h2 className="text-lg font-semibold mb-4 flex items-center">
-              <Calendar className="w-5 h-5 mr-2" />
-              Order Timeline
-            </h2>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span>Order Placed</span>
-                <span>{formatDate(order.createdAt)}</span>
-              </div>
-              {order.shippedAt && (
-                <div className="flex justify-between">
-                  <span>Shipped</span>
-                  <span>{formatDate(order.shippedAt)}</span>
+            {/* Payment Information */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-green-50 rounded-xl">
+                  <CreditCard className="w-5 h-5 text-green-600" />
                 </div>
-              )}
-              {order.deliveredAt && (
-                <div className="flex justify-between">
-                  <span>Delivered</span>
-                  <span>{formatDate(order.deliveredAt)}</span>
-                </div>
-              )}
-              <div className="flex justify-between">
-                <span>Last Updated</span>
-                <span>{formatDate(order.updatedAt)}</span>
+                <h2 className="text-xl font-semibold text-gray-900">Payment Information</h2>
               </div>
-            </div>
-          </motion.div>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                  <span className="font-medium text-gray-900">Payment Method</span>
+                  <span className="capitalize text-gray-700">{order.paymentMethod}</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                  <span className="font-medium text-gray-900">Payment Status</span>
+                  <span className={`px-3 py-1.5 text-xs font-semibold border rounded-lg ${
+                    order.paymentCompleted 
+                      ? 'bg-green-50 text-green-700 border-green-200' 
+                      : 'bg-amber-50 text-amber-700 border-amber-200'
+                  }`}>
+                    {order.paymentCompleted ? 'Paid' : 'Pending'}
+                  </span>
+                </div>
+                {order.paymentId && (
+                  <div className="p-3 bg-blue-50 rounded-xl">
+                    <p className="text-sm font-medium text-gray-900 mb-1">Payment ID</p>
+                    <p className="text-sm font-mono text-blue-700">{order.paymentId}</p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+
+            {/* Order Timeline */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+              className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-amber-50 rounded-xl">
+                  <Calendar className="w-5 h-5 text-amber-600" />
+                </div>
+                <h2 className="text-xl font-semibold text-gray-900">Order Timeline</h2>
+              </div>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-gray-600">Order Placed</span>
+                  <span className="font-medium text-gray-900">{formatDate(order.createdAt)}</span>
+                </div>
+                {order.shippedAt && (
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-gray-600">Shipped</span>
+                    <span className="font-medium text-gray-900">{formatDate(order.shippedAt)}</span>
+                  </div>
+                )}
+                {order.deliveredAt && (
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-gray-600">Delivered</span>
+                    <span className="font-medium text-gray-900">{formatDate(order.deliveredAt)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center py-2 border-t border-gray-200 pt-3">
+                  <span className="text-gray-600">Last Updated</span>
+                  <span className="font-medium text-gray-900">{formatDate(order.updatedAt)}</span>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </div>
     </div>

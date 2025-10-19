@@ -11,10 +11,15 @@ import {
   X, 
   AlertCircle, 
   Upload,
-  DollarSign,
-  Hash,
   Tag,
-  Calendar
+  Calendar,
+  Plus,
+  Image as ImageIcon,
+  Info,
+  CheckCircle2,
+  Zap,
+  Percent,
+  Layers
 } from 'lucide-react';
 
 // Types
@@ -95,7 +100,7 @@ export default function AddProductPage() {
     trigger,
   } = useForm<ProductFormData>({
     defaultValues: {
-      currency: 'USD',
+      currency: 'GHC',
       isDeal: false,
     },
     mode: 'onBlur'
@@ -431,25 +436,33 @@ export default function AddProductPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-current"></div>
+      <div className="min-h-screen bg-gradient-to-br from-white to-gray-50/30 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-2 border-blue-500 border-t-transparent"></div>
       </div>
     );
   }
 
   if (categories.length === 0) {
     return (
-      <div className="p-8 max-w-4xl mx-auto">
-        <div className="border border-yellow-200 bg-yellow-50 rounded-lg p-4">
-          <div className="flex items-start">
-            <AlertCircle className="w-5 h-5 mt-0.5 mr-3 text-yellow-600" />
-            <div>
-              <h3 className="text-sm font-medium text-yellow-800">
-                No Categories Available
-              </h3>
-              <p className="text-sm mt-1 text-yellow-700">
-                Please create at least one category before adding products.
-              </p>
+      <div className="min-h-screen bg-gradient-to-br from-white to-gray-50/30 p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
+            <div className="flex items-start">
+              <AlertCircle className="w-6 h-6 mt-0.5 mr-3 text-amber-600" />
+              <div>
+                <h3 className="text-lg font-semibold text-amber-800">
+                  No Categories Available
+                </h3>
+                <p className="text-amber-700 mt-1">
+                  Please create at least one category before adding products.
+                </p>
+                <button
+                  onClick={() => router.push('/dashboard/categories')}
+                  className="mt-4 px-4 py-2 bg-amber-600 text-white rounded-xl hover:bg-amber-700 transition-colors font-medium"
+                >
+                  Create Category
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -458,78 +471,168 @@ export default function AddProductPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-white to-gray-50/30 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between mb-8"
+          className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 mb-8"
         >
-          <div className="flex items-center space-x-4">
-            <button
+          <div className="flex items-start gap-4">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => router.back()}
-              className="p-2 rounded-lg hover:bg-white transition-colors duration-200"
+              className="p-3 bg-white rounded-2xl border border-gray-200 hover:bg-gray-50 transition-all duration-200 shadow-sm mt-1"
             >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
+              <ArrowLeft className="w-5 h-5 text-gray-700" />
+            </motion.button>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Add New Product
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Create a new product for your store
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-3 bg-blue-50 rounded-2xl">
+                  <Package className="w-6 h-6 text-blue-600" />
+                </div>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  Add New Product
+                </h1>
+              </div>
+              <p className="text-gray-600 text-lg">
+                Create a new product for your store catalog
               </p>
+            </div>
+          </div>
+
+          {/* Progress Indicator */}
+          <div className="flex items-center gap-4 bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                1
+              </div>
+              <span className="text-sm font-medium text-gray-700">Basic Info</span>
+            </div>
+            <div className="w-8 h-0.5 bg-gray-300"></div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm font-semibold">
+                2
+              </div>
+              <span className="text-sm text-gray-500">Pricing</span>
+            </div>
+            <div className="w-8 h-0.5 bg-gray-300"></div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm font-semibold">
+                3
+              </div>
+              <span className="text-sm text-gray-500">Media</span>
             </div>
           </div>
         </motion.div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Basic Information */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold mb-4 flex items-center">
-              <Package className="w-5 h-5 mr-2" />
-              Basic Information
-            </h2>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-blue-50 rounded-xl">
+                <Package className="w-5 h-5 text-blue-600" />
+              </div>
+              <h2 className="text-xl font-semibold text-gray-900">
+                Basic Information
+              </h2>
+            </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  SKU *
-                </label>
-                <input
-                  {...register('sku', { 
-                    required: 'SKU is required',
-                    minLength: { value: 3, message: 'SKU must be at least 3 characters' },
-                    maxLength: { value: 50, message: 'SKU cannot exceed 50 characters' }
-                  })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="PROD-001"
-                />
-                {errors.sku && (
-                  <p className="text-sm text-red-600 mt-1">{errors.sku.message}</p>
-                )}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-3">
+                    SKU *
+                  </label>
+                  <input
+                    {...register('sku', { 
+                      required: 'SKU is required',
+                      minLength: { value: 3, message: 'SKU must be at least 3 characters' },
+                      maxLength: { value: 50, message: 'SKU cannot exceed 50 characters' }
+                    })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
+                    placeholder="PROD-001"
+                  />
+                  {errors.sku && (
+                    <p className="text-sm text-red-600 mt-2 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.sku.message}
+                    </p>
+                  )}
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-3">
+                    Product Name *
+                  </label>
+                  <input
+                    {...register('title', { 
+                      required: 'Product name is required',
+                      maxLength: { value: 200, message: 'Product name cannot exceed 200 characters' }
+                    })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
+                    placeholder="MacBook Pro 16"
+                  />
+                  {errors.title && (
+                    <p className="text-sm text-red-600 mt-2 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.title.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-3">
+                    Brand *
+                  </label>
+                  <input
+                    {...register('brand', { 
+                      required: 'Brand is required',
+                      maxLength: { value: 100, message: 'Brand name cannot exceed 100 characters' }
+                    })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
+                    placeholder="Apple"
+                  />
+                  {errors.brand && (
+                    <p className="text-sm text-red-600 mt-2 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.brand.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-3">
+                    Category *
+                  </label>
+                  <select
+                    {...register('categoryId', { required: 'Category is required' })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white appearance-none"
+                  >
+                    <option value="">Select a category</option>
+                    {categories.map(cat => (
+                      <option key={cat._id} value={cat._id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.categoryId && (
+                    <p className="text-sm text-red-600 mt-2 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.categoryId.message}
+                    </p>
+                  )}
+                </div>
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Product Name *
-                </label>
-                <input
-                  {...register('title', { 
-                    required: 'Product name is required',
-                    maxLength: { value: 200, message: 'Product name cannot exceed 200 characters' }
-                  })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="MacBook Pro 16"
-                />
-                {errors.title && (
-                  <p className="text-sm text-red-600 mt-1">{errors.title.message}</p>
-                )}
-              </div>
-              
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-900 mb-3">
                   Description *
                 </label>
                 <textarea
@@ -537,103 +640,91 @@ export default function AddProductPage() {
                     required: 'Description is required',
                     maxLength: { value: 2000, message: 'Description cannot exceed 2000 characters' }
                   })}
-                  rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Detailed product description..."
+                  rows={8}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white resize-none"
+                  placeholder="Detailed product description highlighting key features and benefits..."
                 />
                 {errors.description && (
-                  <p className="text-sm text-red-600 mt-1">{errors.description.message}</p>
+                  <p className="text-sm text-red-600 mt-2 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.description.message}
+                  </p>
                 )}
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Brand *
-                </label>
-                <input
-                  {...register('brand', { 
-                    required: 'Brand is required',
-                    maxLength: { value: 100, message: 'Brand name cannot exceed 100 characters' }
-                  })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Apple"
-                />
-                {errors.brand && (
-                  <p className="text-sm text-red-600 mt-1">{errors.brand.message}</p>
-                )}
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Category *
-                </label>
-                <select
-                  {...register('categoryId', { required: 'Category is required' })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">Select a category</option>
-                  {categories.map(cat => (
-                    <option key={cat._id} value={cat._id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
-                {errors.categoryId && (
-                  <p className="text-sm text-red-600 mt-1">{errors.categoryId.message}</p>
-                )}
+                <div className="flex items-center gap-2 mt-3 text-sm text-gray-500">
+                  <Info className="w-4 h-4" />
+                  <span>Describe your product in detail to help customers make informed decisions</span>
+                </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Pricing & Inventory */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold mb-4 flex items-center">
-              <DollarSign className="w-5 h-5 mr-2" />
-              Pricing & Inventory
-            </h2>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-green-50 rounded-xl">
+                <span className='text-green-600 text-xl'>₵</span>
+              </div>
+              <h2 className="text-xl font-semibold text-gray-900">
+                Pricing & Inventory
+              </h2>
+            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-900 mb-3">
                   Price *
                 </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  max="10000"
-                  {...register('price', { 
-                    required: 'Price is required',
-                    min: { value: 0.01, message: 'Price must be greater than 0' },
-                    max: { value: 10000, message: 'Price cannot exceed $10,000' }
-                  })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="1999.99"
-                />
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400">₵</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    max="100000"
+                    {...register('price', { 
+                      required: 'Price is required',
+                      min: { value: 0.01, message: 'Price must be greater than 0' },
+                      max: { value: 100000, message: 'Price cannot exceed ₵100,000' }
+                    })}
+                    className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
+                    placeholder="1999.99"
+                  />
+                </div>
                 {errors.price && (
-                  <p className="text-sm text-red-600 mt-1">{errors.price.message}</p>
+                  <p className="text-sm text-red-600 mt-2 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.price.message}
+                  </p>
                 )}
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-900 mb-3">
                   Currency *
                 </label>
                 <select
                   {...register('currency', { required: 'Currency is required' })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white appearance-none"
                 >
+                  <option value="GHC">GHC (₵)</option>
                   <option value="USD">USD ($)</option>
-                  <option value="EUR">EUR (€)</option>
                   <option value="GBP">GBP (£)</option>
                 </select>
                 {errors.currency && (
-                  <p className="text-sm text-red-600 mt-1">{errors.currency.message}</p>
+                  <p className="text-sm text-red-600 mt-2 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.currency.message}
+                  </p>
                 )}
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-900 mb-3">
                   Stock Quantity *
                 </label>
                 <input
@@ -643,140 +734,192 @@ export default function AddProductPage() {
                     required: 'Stock quantity is required',
                     min: { value: 0, message: 'Stock cannot be negative' }
                   })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
                   placeholder="100"
                 />
                 {errors.stock && (
-                  <p className="text-sm text-red-600 mt-1">{errors.stock.message}</p>
+                  <p className="text-sm text-red-600 mt-2 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.stock.message}
+                  </p>
                 )}
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Deal & Discount */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold mb-4 flex items-center">
-              <Tag className="w-5 h-5 mr-2" />
-              Deal & Discount
-            </h2>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-purple-50 rounded-xl">
+                <Tag className="w-5 h-5 text-purple-600" />
+              </div>
+              <h2 className="text-xl font-semibold text-gray-900">
+                Deal & Discount
+              </h2>
+            </div>
             
-            <div className="space-y-4">
-              <label className="flex items-center space-x-3">
-                <input
-                  type="checkbox"
-                  {...register('isDeal')}
-                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                />
-                <span className="text-sm font-medium text-gray-700">This product is on sale</span>
+            <div className="space-y-6">
+              <label className="flex items-center space-x-4 cursor-pointer group">
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    {...register('isDeal')}
+                    className="w-5 h-5 text-blue-600 rounded-lg focus:ring-blue-500 border-gray-300"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-amber-500" />
+                  <span className="text-lg font-semibold text-gray-900">This product is on sale</span>
+                </div>
               </label>
 
               {watchIsDeal && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Original Price
-                    </label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0.01"
-                      {...register('originalPrice')}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="2499.99"
-                    />
-                    {watchOriginalPrice && watchPrice && calculatedDiscount() > 0 && (
-                      <p className="text-sm text-green-600 mt-1">
-                        Discount: {calculatedDiscount()}%
-                      </p>
-                    )}
-                  </div>
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6 border border-blue-200"
+                >
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <Percent className="w-5 h-5 text-blue-600" />
+                    Sale Configuration
+                  </h3>
                   
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Discount %
-                    </label>
-                    <input
-                      type="number"
-                      step="1"
-                      min="1"
-                      max="99"
-                      {...register('discountPercent')}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="20"
-                    />
-                    {watchDiscountPercent && watchPrice && calculatedOriginalPrice() > 0 && (
-                      <p className="text-sm text-green-600 mt-1">
-                        Original: ${calculatedOriginalPrice().toFixed(2)}
-                      </p>
-                    )}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-900 mb-3">
+                        Original Price
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400">₵</span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0.01"
+                          {...register('originalPrice')}
+                          className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
+                          placeholder="2499.99"
+                        />
+                      </div>
+                      {watchOriginalPrice && watchPrice && calculatedDiscount() > 0 && (
+                        <p className="text-sm text-green-600 mt-2 font-medium">
+                          Discount: {calculatedDiscount()}% OFF
+                        </p>
+                      )}
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-900 mb-3">
+                        Discount %
+                      </label>
+                      <div className="relative">
+                        <Percent className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                          type="number"
+                          step="1"
+                          min="1"
+                          max="99"
+                          {...register('discountPercent')}
+                          className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
+                          placeholder="20"
+                        />
+                      </div>
+                      {watchDiscountPercent && watchPrice && calculatedOriginalPrice() > 0 && (
+                        <p className="text-sm text-green-600 mt-2 font-medium">
+                          Original: ₵{calculatedOriginalPrice().toFixed(2)}
+                        </p>
+                      )}
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        Deal Expires
+                      </label>
+                      <input
+                        type="datetime-local"
+                        {...register('dealExpiresAt')}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
+                      />
+                    </div>
                   </div>
-                  
-                  <div>
-                    <label className="text-sm font-medium text-gray-700 mb-2 flex items-center">
-                      <Calendar className="w-4 h-4 mr-1" />
-                      Deal Expires
-                    </label>
-                    <input
-                      type="datetime-local"
-                      {...register('dealExpiresAt')}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                </div>
+                </motion.div>
               )}
             </div>
-          </div>
+          </motion.div>
 
           {/* Images */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold mb-4">
-              Product Images *
-            </h2>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-amber-50 rounded-xl">
+                <ImageIcon className="w-5 h-5 text-amber-600" />
+              </div>
+              <h2 className="text-xl font-semibold text-gray-900">
+                Product Images *
+              </h2>
+            </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
               {imageFiles.map((imageFile) => (
-                <div key={imageFile.id} className="relative group">
+                <motion.div
+                  key={imageFile.id}
+                  layout
+                  className="relative group aspect-square rounded-xl overflow-hidden border-2 border-gray-200 hover:border-blue-500 transition-all duration-200"
+                >
                   <img
                     src={imageFile.preview}
                     alt={`Preview`}
-                    className="w-full h-24 object-cover rounded-lg border-2 border-gray-200"
+                    className="w-full h-full object-cover"
                   />
                   
                   {/* Status Overlay */}
                   {imageFile.uploading && (
-                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
-                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent"></div>
                     </div>
                   )}
                   
                   {imageFile.uploaded && (
-                    <div className="absolute top-1 left-1 bg-green-500 text-white rounded-full p-1">
-                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
+                    <div className="absolute top-2 left-2 bg-green-500 text-white rounded-full p-1.5 shadow-lg">
+                      <CheckCircle2 className="w-4 h-4" />
                     </div>
                   )}
                   
                   {imageFile.error && (
-                    <div className="absolute inset-0 bg-red-500 bg-opacity-75 flex items-center justify-center rounded-lg">
+                    <div className="absolute inset-0 bg-red-500 bg-opacity-75 flex items-center justify-center">
                       <AlertCircle className="w-6 h-6 text-white" />
                     </div>
                   )}
                   
                   {/* Remove Button */}
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                     type="button"
                     onClick={() => removeImage(imageFile.id)}
-                    className="absolute -top-2 -right-2 p-1 bg-white border border-gray-300 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                    className="absolute top-2 right-2 p-1.5 bg-white border border-gray-300 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-lg hover:bg-red-50 hover:border-red-300"
                   >
-                    <X className="w-3 h-3 text-gray-600" />
-                  </button>
-                </div>
+                    <X className="w-4 h-4 text-gray-600 hover:text-red-600" />
+                  </motion.button>
+                </motion.div>
               ))}
 
               {/* Upload Button */}
               {imageFiles.length < MAX_IMAGES && (
-                <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer transition-colors hover:border-blue-500 hover:bg-blue-50">
+                <motion.label
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex flex-col items-center justify-center aspect-square border-2 border-dashed border-gray-300 rounded-xl cursor-pointer transition-all duration-200 hover:border-blue-500 hover:bg-blue-50 group"
+                >
                   <input
                     type="file"
                     accept="image/jpeg,image/png,image/webp,image/jpg"
@@ -784,83 +927,133 @@ export default function AddProductPage() {
                     onChange={handleImageSelect}
                     className="hidden"
                   />
-                  <Upload className="w-6 h-6 mb-1 text-gray-400" />
-                  <span className="text-sm text-gray-500">Upload</span>
-                </label>
+                  <Upload className="w-8 h-8 mb-2 text-gray-400 group-hover:text-blue-500" />
+                  <span className="text-sm text-gray-500 group-hover:text-blue-600 text-center px-2">
+                    Upload Images
+                  </span>
+                </motion.label>
               )}
             </div>
             
-            <p className="text-sm text-gray-500 mt-4">
-              {imageFiles.length} of {MAX_IMAGES} images selected • Max 5MB per image • JPEG, PNG, WebP
-            </p>
-          </div>
+            <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 rounded-lg p-4">
+              <Info className="w-4 h-4" />
+              <div>
+                <p>
+                  {imageFiles.length} of {MAX_IMAGES} images selected • 
+                  Max 5MB per image • 
+                  Supported formats: JPEG, PNG, WebP
+                </p>
+                <p className="mt-1 text-amber-600 font-medium">
+                  First image will be used as the main product image
+                </p>
+              </div>
+            </div>
+          </motion.div>
 
           {/* Specifications */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold flex items-center">
-                <Hash className="w-5 h-5 mr-2" />
-                Specifications
-              </h2>
-              <button
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-indigo-50 rounded-xl">
+                  <Layers className="w-5 h-5 text-indigo-600" />
+                </div>
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Specifications
+                </h2>
+              </div>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 type="button"
                 onClick={addSpecification}
-                className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex items-center space-x-2 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium"
               >
-                Add Specification
-              </button>
+                <Plus className="w-4 h-4" />
+                <span>Add Specification</span>
+              </motion.button>
             </div>
             
-            <div className="space-y-3">
-              {specifications.map((spec) => (
-                <div key={spec.id} className="flex items-center space-x-3">
-                  <input
-                    placeholder="Key (e.g., Processor)"
-                    value={spec.key}
-                    onChange={(e) => updateSpecification(spec.id, 'key', e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    maxLength={100}
-                  />
-                  <input
-                    placeholder="Value (e.g., Intel Core i9)"
-                    value={spec.value}
-                    onChange={(e) => updateSpecification(spec.id, 'value', e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    maxLength={500}
-                  />
+            <div className="space-y-4">
+              {specifications.map((spec, index) => (
+                <motion.div
+                  key={spec.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl border border-gray-200"
+                >
+                  <div className="flex-1">
+                    <input
+                      placeholder="Key (e.g., Processor)"
+                      value={spec.key}
+                      onChange={(e) => updateSpecification(spec.id, 'key', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
+                      maxLength={100}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <input
+                      placeholder="Value (e.g., Intel Core i9)"
+                      value={spec.value}
+                      onChange={(e) => updateSpecification(spec.id, 'value', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
+                      maxLength={500}
+                    />
+                  </div>
                   {specifications.length > 1 && (
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
                       type="button"
                       onClick={() => removeSpecification(spec.id)}
-                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="p-3 hover:bg-red-50 rounded-lg transition-colors duration-200 text-red-600"
                     >
-                      <X className="w-4 h-4 text-gray-600" />
-                    </button>
+                      <X className="w-4 h-4" />
+                    </motion.button>
                   )}
-                </div>
+                </motion.div>
               ))}
             </div>
-          </div>
+          </motion.div>
 
           {/* Submit Button */}
-          <div className="flex justify-end space-x-4 pt-6">
-            <button
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="flex justify-end space-x-4 pt-6 border-t border-gray-200"
+          >
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               type="button"
               onClick={() => router.back()}
               disabled={submitting}
-              className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+              className="px-8 py-4 border border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium disabled:opacity-50"
             >
               Cancel
-            </button>
-            <button
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               type="submit"
               disabled={submitting || imageFiles.length === 0}
-              className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center space-x-3 px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg"
             >
-              <Save className="w-4 h-4" />
-              <span>{submitting ? 'Creating Product...' : 'Create Product'}</span>
-            </button>
-          </div>
+              {submitting ? (
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              ) : (
+                <Save className="w-5 h-5" />
+              )}
+              <span className="text-lg">
+                {submitting ? 'Creating Product...' : 'Create Product'}
+              </span>
+            </motion.button>
+          </motion.div>
         </form>
       </div>
     </div>

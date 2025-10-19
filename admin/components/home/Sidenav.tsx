@@ -15,7 +15,9 @@ import {
   ArrowLeft,
   AlertCircle,
   TrendingUp,
-  DollarSign
+  DollarSign,
+  NewspaperIcon,
+  StrikethroughIcon
 } from "lucide-react";
 import ThemeToggle from "../ThemeToggle";
 import { cn } from "@/lib/utils";
@@ -62,49 +64,13 @@ export default function Sidenav() {
     },
     {
       name: "Orders",
-      href: "#",
+      href: "/dashboard/orders",
       icon: <ShoppingCart className="w-5 h-5" />,
-      children: [
-        { name: "All Orders", href: "/dashboard/orders" },
-        { name: "Pending", href: "/dashboard/orders?status=pending" },
-        { name: "Paid", href: "/dashboard/orders?status=paid" },
-        { name: "Fulfilled", href: "/dashboard/orders?status=fulfilled" },
-        { name: "Cancelled", href: "/dashboard/orders?status=cancelled" },
-      ],
     },
     {
-      name: "Customers",
-      href: "/dashboard/customers",
-      icon: <Users className="w-5 h-5" />,
-    },
-    {
-      name: "Analytics",
-      href: "/dashboard/analytics",
-      icon: <BarChart3 className="w-5 h-5" />,
-    },
-    {
-      name: "Promotions",
-      href: "/dashboard/promotions",
-      icon: <Tag className="w-5 h-5" />,
-    },
-  ];
-
-  const quickStats: QuickStat[] = [
-    {
-      label: "Pending Orders",
-      value: 12,
-      color: "orange",
-    },
-    {
-      label: "Low Stock",
-      value: 5,
-      color: "red",
-    },
-    {
-      label: "Today's Revenue",
-      value: "$2,847",
-      trend: "up",
-      color: "green",
+      name: "Blog",
+      href: "/dashboard/blog",
+      icon: <NewspaperIcon className="w-5 h-5" />,
     },
   ];
 
@@ -143,7 +109,7 @@ export default function Sidenav() {
       initial={{ x: -100, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="w-64 h-screen mr-64 fixed bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 p-4 flex flex-col z-40"
+      className="w-64 h-screen mr-64 fixed bg-white p-4 flex flex-col z-40"
     >
       {/* Logo */}
       <motion.div 
@@ -151,14 +117,14 @@ export default function Sidenav() {
         whileHover={{ scale: 1.02 }}
       >
         <motion.span 
-          className="text-2xl"
+          className="text-2xl text-black"
           animate={{ rotate: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity, repeatDelay: 5 }}
         >
-          ⚡
+          <StrikethroughIcon className="w-8 h-8 text-black" />
         </motion.span>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-          Admin Panel
+        <h2 className="text-xl font-bold text-white dark:text-black">
+          Forbes DLL
         </h2>
       </motion.div>
 
@@ -177,7 +143,7 @@ export default function Sidenav() {
                     isActive(item.href) || 
                     item.children.some(child => isActive(child.href))
                       ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border hover:border-gray-200 dark:hover:border-gray-700"
+                      : "text-black dark:text-black hover:bg-gray-50 dark:hover:text-white dark:hover:bg-gray-800 hover:border hover:border-gray-200 dark:hover:border-gray-700"
                   )}
                 >
                   <div className="flex items-center space-x-3">
@@ -215,7 +181,7 @@ export default function Sidenav() {
                               "block p-2 pl-8 rounded-lg text-sm transition-all duration-200",
                               isActive(child.href)
                                 ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium shadow-sm"
-                                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                : "text-black dark:text-black hover:text-white dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
                             )}
                           >
                             {child.name}
@@ -237,7 +203,7 @@ export default function Sidenav() {
                     "flex items-center space-x-3 p-3 rounded-lg text-sm font-medium transition-all duration-200",
                     isActive(item.href)
                       ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border hover:border-gray-200 dark:hover:border-gray-700"
+                      : "text-black dark:text-black hover:bg-white dark:hover:text-white dark:hover:bg-gray-800 hover:border hover:border-gray-200 dark:hover:border-gray-700"
                   )}
                 >
                   {item.icon}
@@ -249,43 +215,6 @@ export default function Sidenav() {
         ))}
       </nav>
 
-      {/* Quick Stats */}
-      <motion.div 
-        className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700"
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.2 }}
-      >
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
-          <TrendingUp className="w-4 h-4 mr-2" />
-          Quick Stats
-        </h3>
-        <div className="space-y-3">
-          {quickStats.map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.3 + index * 0.1 }}
-              className="flex items-center justify-between group"
-            >
-              <div className="flex items-center space-x-2">
-                {getStatIcon(stat)}
-                <span className="text-xs text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors">
-                  {stat.label}
-                </span>
-              </div>
-              <span className={cn(
-                "text-sm font-semibold transition-all duration-200 group-hover:scale-110",
-                getStatColor(stat.color)
-              )}>
-                {stat.value}
-              </span>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
-
       {/* Footer Actions */}
       <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
         <div className="flex items-center justify-between">
@@ -293,10 +222,10 @@ export default function Sidenav() {
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link
               href="/"
-              className="flex items-center space-x-2 p-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
+              className="flex items-center space-x-2 p-2 rounded-lg text-sm font-medium text-black dark:text-black hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to Store</span>
+              <ArrowLeft className="w-4 h-4 text-black" />
+              <span>Back to Login</span>
             </Link>
           </motion.div>
         </div>

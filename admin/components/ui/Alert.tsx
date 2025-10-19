@@ -63,10 +63,10 @@ function AlertContainer() {
 
   const getAlertStyles = (type: AlertType) => {
     const styles = {
-      success: 'bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300',
-      error: 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300',
-      warning: 'bg-orange-50 border-orange-200 text-orange-800 dark:bg-orange-900/20 dark:border-orange-800 dark:text-orange-300',
-      info: 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300',
+      success: 'bg-green-900 border-green-200 text-green-800 dark:bg-green-900 dark:border-green-800 dark:text-green-300',
+      error: 'bg-red-900 border-red-200 text-red-800 dark:bg-red-900 dark:border-red-800 dark:text-red-300',
+      warning: 'bg-orange-900 border-orange-200 text-orange-800 dark:bg-orange-900 dark:border-orange-800 dark:text-orange-300',
+      info: 'bg-blue-900 border-blue-200 text-blue-800 dark:bg-blue-900 dark:border-blue-800 dark:text-blue-300',
     };
     return styles[type];
   };

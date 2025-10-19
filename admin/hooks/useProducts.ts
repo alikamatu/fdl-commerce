@@ -227,8 +227,16 @@ const createCategory = async (categoryData: { name: string; slug: string; image?
 
   // Delete product
   const deleteProduct = async (id: string) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`, {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
+    if (!token) {
+      throw new Error('No authentication token found. Please login again.');
+    }
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/products/${id}`, {
       method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
