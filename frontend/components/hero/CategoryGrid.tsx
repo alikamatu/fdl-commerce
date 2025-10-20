@@ -24,7 +24,7 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
   // Original grid layout (kept for backward compatibility)
   if (loading) {
     return (
-      <section className="py-16 bg-foreground/5">
+      <section className="py-16 bg-foreground/5 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <div className="h-8 bg-foreground/10 rounded w-64 mx-auto mb-4 animate-pulse" />
