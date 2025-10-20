@@ -78,7 +78,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
     setDeleting(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/products/${id}`, {
         method: 'DELETE',
       });
 
