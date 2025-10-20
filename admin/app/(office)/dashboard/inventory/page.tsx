@@ -573,7 +573,6 @@ export default function InventoryPage() {
                   <th className="text-left p-6 font-semibold text-gray-900">Status</th>
                   <th className="text-left p-6 font-semibold text-gray-900">Value</th>
                   <th className="text-left p-6 font-semibold text-gray-900">Sold</th>
-                  <th className="text-left p-6 font-semibold text-gray-900">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -671,28 +670,6 @@ export default function InventoryPage() {
                           {product.soldCount > 0 && (
                             <TrendingUp className="w-4 h-4 text-green-600" />
                           )}
-                        </div>
-                      </td>
-                      <td className="p-6">
-                        <div className="flex items-center space-x-2">
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => router.push(`/dashboard/products/${product._id}`)}
-                            className="p-2.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-all duration-200"
-                            title="View Details"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </motion.button>
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => router.push(`/dashboard/products/edit/${product._id}`)}
-                            className="p-2.5 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-all duration-200"
-                            title="Edit Product"
-                          >
-                            <Edit2 className="w-4 h-4" />
-                          </motion.button>
                         </div>
                       </td>
                     </motion.tr>

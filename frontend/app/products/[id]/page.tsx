@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { useEffect, useState } from 'react';
+import { use } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Star } from 'lucide-react';
 import { useProduct } from '@/hooks/useProduct';
@@ -19,29 +19,24 @@ import { SimilarProducts } from '@/components/products/SimilarProducts';
 import Link from 'next/link';
 
 interface ProductDetailsPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default function ProductDetailsPage({ params }: ProductDetailsPageProps) {
-  const [productId, setProductId] = useState<string | null>(null);
-  const { product, loading, error } = useProduct(productId ?? "");
+  // Unwrap the params promise using React.use()
+  const { id } = use(params);
+  const { product, loading, error } = useProduct(id);
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
-const { products: similarProducts, loading: similarLoading, error: similarError } = useSimilarProducts(
-  product
-    ? {
-        categoryId: typeof product.categoryId === 'object' ? product.categoryId._id : product.categoryId,
-        currentProductId: product._id,
-        limit: 4
-      }
-    : { categoryId: '', currentProductId: '', limit: 4 }
-    
-);
-
-
-  useEffect(() => {
-    if (params?.id) setProductId(params.id);
-  }, [params]);
-
+  
+  const { products: similarProducts, loading: similarLoading, error: similarError } = useSimilarProducts(
+    product
+      ? {
+          categoryId: typeof product.categoryId === 'object' ? product.categoryId._id : product.categoryId,
+          currentProductId: product._id,
+          limit: 4
+        }
+      : { categoryId: '', currentProductId: '', limit: 4 }
+  );
 
   const handleAddToCart = (product: Product) => {
     // Implement add to cart logic
@@ -50,12 +45,12 @@ const { products: similarProducts, loading: similarLoading, error: similarError 
   };
 
   const handleViewDetails = (product: Product) => {
-  // You can implement quick view or navigation here
-  console.log('View details:', product);
-};
+    // You can implement quick view or navigation here
+    console.log('View details:', product);
+  };
 
   const handleRetry = () => {
-      if (typeof window !== "undefined") {
+    if (typeof window !== "undefined") {
       window.location.reload();
     }
   };

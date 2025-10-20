@@ -360,7 +360,7 @@ export default function ProductsPage() {
 
           {/* Filters and Search */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               {/* Search */}
               <div className="lg:col-span-2 relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
