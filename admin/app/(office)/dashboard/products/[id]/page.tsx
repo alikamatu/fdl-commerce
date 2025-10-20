@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { use } from 'react'; // Import the use hook
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { 
@@ -28,7 +29,9 @@ import {
 import { Product } from '@/types/product';
 import { useAlert } from '@/components/ui/Alert';
 
-export default function ProductPage({ params }: { params: { id: string } }) {
+export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+  // Unwrap the params promise using React.use()
+  const { id } = use(params);
   const router = useRouter();
   const { addAlert } = useAlert();
   const [product, setProduct] = useState<Product | null>(null);
@@ -40,14 +43,14 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     fetchProduct();
-  }, [params.id]);
+  }, [id]); // Use the unwrapped id in the dependency array
 
   const fetchProduct = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${params.id}`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch product');
@@ -75,7 +78,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
     setDeleting(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${params.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`, {
         method: 'DELETE',
       });
 
