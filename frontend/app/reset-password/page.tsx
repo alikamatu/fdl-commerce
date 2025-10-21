@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { CheckCircle, XCircle, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
-export default function ResetPasswordPage() {
+export default function ResetPasswordContent() {
   const [status, setStatus] = useState<'form' | 'loading' | 'success' | 'error'>('form');
   const [message, setMessage] = useState('');
   const [formData, setFormData] = useState({
