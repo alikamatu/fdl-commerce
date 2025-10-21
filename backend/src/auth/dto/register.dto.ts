@@ -10,5 +10,8 @@ export class RegisterDto {
   password: string;
 
   @IsNotEmpty()
+  role: string;
+
+  @IsNotEmpty()
   displayName: string;
 }

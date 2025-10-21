@@ -54,6 +54,10 @@ export class ShippingAddressDto {
 
   @IsString()
   @IsNotEmpty()
+  phone: string;
+
+  @IsString()
+  @IsNotEmpty()
   zipCode: string;
 
   @IsString()
@@ -83,6 +87,10 @@ export class CreateOrderDto {
   @IsNumber()
   @IsNotEmpty()
   subtotalCents: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  phone: string[];
 
   @IsNumber()
   @IsNotEmpty()

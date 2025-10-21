@@ -33,7 +33,7 @@ export class AuthService {
       email,
       passwordHash,
       displayName,
-      role: 'admin', // Default to admin for this app
+      role: 'user', // Default to user for this app
     });
 
     // Generate token

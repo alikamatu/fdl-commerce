@@ -96,6 +96,21 @@ export class OrdersService {
     }
   }
 
+  async findAll(userId?: string, includeAll: boolean = false) {
+  let query = {};
+  
+  if (!includeAll && userId) {
+    query = { userId: new Types.ObjectId(userId) };
+  }
+  
+  const orders = await this.orderModel
+    .find(query)
+    .sort({ createdAt: -1 })
+    .exec();
+
+  return orders;
+}
+
   async confirmPayment(
     orderId: string,
     paymentReference: string,
@@ -135,20 +150,11 @@ export class OrdersService {
     return order.save();
   }
 
-  async findAll(userId?: string) {
-    const query = userId ? { userId: new Types.ObjectId(userId) } : {};
-    
-    const orders = await this.orderModel
-      .find(query)
-      .sort({ createdAt: -1 })
-      .exec();
-
-    return orders;
-  }
-
-  async findOne(id: string, userId?: string) {
+  async findOne(id: string, userId?: string, isAdmin: boolean = false) {
     const query: any = { _id: id };
-    if (userId) {
+    
+    // Only filter by userId if NOT admin
+    if (!isAdmin && userId) {
       query.userId = new Types.ObjectId(userId);
     }
 
@@ -161,9 +167,26 @@ export class OrdersService {
     return order;
   }
 
-  async findByOrderNumber(orderNumber: string, userId?: string) {
+  async findById(id: string, userId?: string, isAdmin: boolean = false) {
+    const query: any = { _id: id };
+    
+    // Only filter by userId if NOT admin
+    if (!isAdmin && userId) {
+      query.userId = new Types.ObjectId(userId);
+    }
+
+    const order = await this.orderModel.findOne(query).exec();
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    return order;
+  }
+
+  async findByOrderNumber(orderNumber: string, userId?: string, isAdmin: boolean = false) {
     const query: any = { orderNumber };
-    if (userId) {
+    if (!isAdmin && userId) {
       query.userId = new Types.ObjectId(userId);
     }
 
@@ -175,24 +198,6 @@ export class OrdersService {
 
     return order;
   }
-
-  // async updateStatus(id: string, status: string) {
-  //   const order = await this.orderModel.findById(id);
-
-  //   if (!order) {
-  //     throw new NotFoundException('Order not found');
-  //   }
-
-  //   order.status = status;
-
-  //   if (status === 'shipped') {
-  //     order.shippedAt = new Date();
-  //   } else if (status === 'delivered') {
-  //     order.deliveredAt = new Date();
-  //   }
-
-  //   return order.save();
-  // }
 
   async getOrderStats() {
     const stats = await this.orderModel.aggregate([
@@ -215,7 +220,6 @@ export class OrdersService {
     return stats[0] || { totalOrders: 0, totalRevenue: 0, averageOrderValue: 0 };
   }
 
-  // In orders.service.ts - update the updateStatus method to be more robust
 async updateStatus(id: string, status: string): Promise<Order> {
   const order = await this.orderModel.findById(id);
 
@@ -229,6 +233,8 @@ async updateStatus(id: string, status: string): Promise<Order> {
     throw new BadRequestException(`Invalid status: ${status}`);
   }
 
+  console.log(`Updating order ${id} from ${order.status} to ${status}`); // Debug log
+
   order.status = status;
 
   // Update timestamps based on status changes
@@ -238,7 +244,10 @@ async updateStatus(id: string, status: string): Promise<Order> {
     order.deliveredAt = new Date();
   }
 
-  return order.save();
+  const updatedOrder = await order.save();
+  console.log('Order updated successfully:', updatedOrder._id); // Debug log
+  
+  return updatedOrder;
 }
 
   // Webhook handler for Paystack events

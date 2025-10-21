@@ -72,62 +72,82 @@ interface Order {
 }
 
 // Custom hook for order operations
-function useOrder(orderId: string) {
+function useOrder(id: string) {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updating, setUpdating] = useState(false);
 
-  const fetchOrder = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const token = localStorage.getItem('token');
+const fetchOrder = async () => {
+  try {
+    setLoading(true);
+    setError(null);
+    const token = localStorage.getItem('token');
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
+    console.log('Fetching order:', id);
+    console.log('Token exists:', !!token);
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch order');
-      }
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${id}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-      const data = await response.json();
-      setOrder(data);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load order';
-      setError(message);
-    } finally {
-      setLoading(false);
+    console.log('Response status:', response.status);
+    console.log('Response ok:', response.ok);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Error response:', errorText);
+      throw new Error(`Failed to fetch order: ${response.status} ${errorText}`);
     }
-  };
+
+    const data = await response.json();
+    console.log('Order data:', data);
+    setOrder(data);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Failed to load order';
+    console.error('Fetch error:', err);
+    setError(message);
+  } finally {
+    setLoading(false);
+  }
+};
 
 const updateOrderStatus = async (status: Order['status']) => {
   try {
     setUpdating(true);
     const token = localStorage.getItem('token');
     
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/status`, {
+    console.log('Updating order status to:', status); // Debug log
+    
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${id}/status`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ status }), // Make sure the body matches what the backend expects
+      body: JSON.stringify({ status }),
     });
 
+    console.log('Response status:', response.status); // Debug log
+
     if (!response.ok) {
-      throw new Error('Failed to update order status');
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Error response:', errorData);
+      throw new Error(errorData.message || 'Failed to update order status');
     }
 
     const updatedOrder = await response.json();
+    console.log('Updated order:', updatedOrder); // Debug log
+    
     setOrder(updatedOrder);
+    setError(null); // Clear any previous errors
     return true;
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to update order status';
+    console.error('Update error:', err);
     setError(message);
     return false;
   } finally {
@@ -138,7 +158,7 @@ const updateOrderStatus = async (status: Order['status']) => {
   const sendShippingNotification = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/notify-shipping`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${id}/notify-shipping`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -159,10 +179,10 @@ const updateOrderStatus = async (status: Order['status']) => {
   };
 
   useEffect(() => {
-    if (orderId) {
+    if (id) {
       fetchOrder();
     }
-  }, [orderId]);
+  }, [id]);
 
   return {
     order,
@@ -293,15 +313,6 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
     window.print();
   };
 
-  const downloadInvoice = () => {
-    // In a real app, this would generate and download a PDF invoice
-    addAlert({
-      type: 'success',
-      title: 'Invoice Downloaded',
-      message: 'Order invoice has been downloaded'
-    });
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-white to-gray-50/30 flex items-center justify-center">
@@ -400,26 +411,6 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
               title="Refresh"
             >
               <RefreshCw className="w-5 h-5 text-gray-600" />
-            </motion.button>
-
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={downloadInvoice}
-              className="flex items-center space-x-3 px-5 py-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium shadow-sm"
-            >
-              <Download className="w-5 h-5 text-gray-600" />
-              <span>Invoice</span>
-            </motion.button>
-
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={printOrder}
-              className="flex items-center space-x-3 px-5 py-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium shadow-sm"
-            >
-              <Printer className="w-5 h-5 text-gray-600" />
-              <span>Print</span>
             </motion.button>
           </div>
         </motion.div>

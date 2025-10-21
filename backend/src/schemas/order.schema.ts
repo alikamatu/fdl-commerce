@@ -51,6 +51,9 @@ export class ShippingAddress {
 
   @Prop({ required: true, default: 'US' })
   country: string;
+
+  @Prop({ required: true })
+  phone: string;
 }
 
 export const ShippingAddressSchema = SchemaFactory.createForClass(ShippingAddress);
@@ -68,6 +71,9 @@ export class Order {
 
   @Prop({ type: [OrderItemSchema], required: true })
   items: OrderItem[];
+
+  @Prop({ type: [String], required: true })
+  phone: string[];
 
   @Prop({ type: ShippingAddressSchema, required: true })
   shippingAddress: ShippingAddress;

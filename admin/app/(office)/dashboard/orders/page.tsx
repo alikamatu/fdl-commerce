@@ -84,34 +84,40 @@ function useOrders() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchOrders = async () => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem('token');
-      setError(null);
-      
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders`, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch orders');
-      }
-
-      const data = await response.json();
-      // Handle both response structures
-      const ordersData = data.data || data;
-      setOrders(Array.isArray(ordersData) ? ordersData : []);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load orders';
-      setError(message);
-    } finally {
-      setLoading(false);
+const fetchOrders = async () => {
+  try {
+    setLoading(true);
+    const token = localStorage.getItem('token');
+    setError(null);
+    
+    // Use admin endpoint to get ALL orders
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/admin/all`, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch orders');
     }
-  };
+
+    const data = await response.json();
+    
+    if (data.success && data.data) {
+      setOrders(Array.isArray(data.data) ? data.data : []);
+    } else if (Array.isArray(data)) {
+      setOrders(data);
+    } else {
+      setOrders([]);
+    }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Failed to load orders';
+    setError(message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const fetchOrderStats = async () => {
     try {

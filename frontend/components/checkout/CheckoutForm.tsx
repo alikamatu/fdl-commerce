@@ -52,7 +52,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
   const createPendingOrder = async () => {
     const orderData = {
-      email: formData.email || user?.email || 'guest@example.com',
+      email: formData.email || user?.email,
       items: cart.items.map(item => ({
         productId: item.productId,
         title: item.title,
@@ -70,6 +70,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
         state: formData.state,
         zipCode: formData.zipCode,
         country: formData.country,
+        phone: formData.phone,
       },
       paymentMethod: 'paystack',
       subtotalCents,

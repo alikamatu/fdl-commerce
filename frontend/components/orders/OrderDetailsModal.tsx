@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Calendar, DollarSign, MapPin, Truck, Package, CheckCircle } from "lucide-react";
+import { X, Calendar, MapPin, Truck, Package, CheckCircle } from "lucide-react";
 import { Order } from "@/types/order";
 import { getStatusIcon, getStatusColor, formatOrderDate, formatCurrency, canCancelOrder } from "@/utils/orderStatus";
 
@@ -35,7 +35,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/50 min-h-screen"
             onClick={onClose}
           />
 
@@ -130,7 +130,6 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                       {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}
                     </p>
                     <p>{order.shippingAddress.country}</p>
-                    <p>Email: {order.shippingAddress.email}</p>
                     <p>Phone: {order.shippingAddress.phone}</p>
                   </div>
                 </div>

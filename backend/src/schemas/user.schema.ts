@@ -15,7 +15,7 @@ export class User {
   displayName: string;
 
   @Prop({ default: 'user' })
-  role: string; // 'user' or 'admin'
+  role: string;
 
   @Prop({ default: true })
   isActive: boolean;

@@ -26,12 +26,6 @@ export class OrdersController {
     return this.ordersService.create(createOrderDto, req.user._id);
   }
 
-  @Post('guest')
-  async createGuestOrder(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
-  }
-
-  // FIXED: Separate authenticated and guest payment confirmation routes
   @UseGuards(JwtAuthGuard)
   @Patch(':id/confirm-payment')
   async confirmPayment(
@@ -47,23 +41,26 @@ export class OrdersController {
     );
   }
 
-  @Patch('guest/:id/confirm-payment')
-  async confirmGuestPayment(
-    @Param('id') id: string,
-    @Body() body: { paymentReference: string; paystackReference: string }
-  ) {
-    return this.ordersService.confirmPayment(
-      id,
-      body.paymentReference,
-      body.paystackReference
-    );
+  @UseGuards(JwtAuthGuard)
+  @Get('admin/all')
+  async findAllForAdmin(@Request() req) {
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      return { success: false, message: 'Access denied. Admin role required.' };
+    }
+    
+    const orders = await this.ordersService.findAll(undefined, true);
+    return {
+      success: true,
+      data: orders
+    };
   }
 
-  // FIXED: Add response structure wrapper
   @UseGuards(JwtAuthGuard)
   @Get()
   async findAll(@Request() req) {
-    const orders = await this.ordersService.findAll(req.user._id);
+    const isAdmin = req.user.role === 'admin';
+    const orders = await this.ordersService.findAll(req.user._id, isAdmin);
     return {
       success: true,
       data: orders
@@ -77,33 +74,47 @@ export class OrdersController {
     @Body() body: { status: string },
     @Request() req
   ) {
+    // Only admins should be able to update status
+    if (req.user.role !== 'admin') {
+      return { success: false, message: 'Access denied. Admin role required.' };
+    }
+    
     return this.ordersService.updateStatus(id, body.status);
   }
+
 
   @UseGuards(JwtAuthGuard)
   @Get('stats/overview')
   async getOrderStats(@Request() req) {
-    // Only admin should access this in real app
+    // Only admin should access this
+    if (req.user.role !== 'admin') {
+      return { success: false, message: 'Access denied. Admin role required.' };
+    }
+    
     return this.ordersService.getOrderStats();
   }
-
+  
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findOne(@Param('id') id: string, @Request() req) {
-    return this.ordersService.findOne(id, req.user._id);
+    const isAdmin = req.user.role === 'admin';
+    return this.ordersService.findOne(id, req.user._id, isAdmin);
   }
 
   @Get('number/:orderNumber')
-  async findByOrderNumber(@Param('orderNumber') orderNumber: string) {
-    return this.ordersService.findByOrderNumber(orderNumber);
+  async findByOrderNumber(@Param('orderNumber') orderNumber: string, @Request() req) {
+    // This endpoint should probably also check authentication
+    const isAdmin = req.user?.role === 'admin';
+    const userId = req.user?._id;
+    return this.ordersService.findByOrderNumber(orderNumber, userId, isAdmin);
   }
 
-  // FIXED: Add cancel order endpoint
   @UseGuards(JwtAuthGuard)
   @Post(':id/cancel')
   async cancelOrder(@Param('id') id: string, @Request() req) {
     return this.ordersService.updateStatus(id, 'cancelled');
   }
+
 
   // Paystack webhook endpoint
   @Post('webhook/paystack')
