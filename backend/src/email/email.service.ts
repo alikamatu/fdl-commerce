@@ -11,7 +11,7 @@ export class EmailService {
     
     if (!apiKey) {
       this.logger.error('❌ RESEND_API_KEY is not set');
-      throw new Error('RESEND_API_KEY is required');
+      throw new Error('RESEND_API_KEY is required!');
     }
 
     this.resend = new Resend(apiKey);
