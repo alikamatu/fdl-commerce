@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Eye, Download, X, Truck } from "lucide-react";
+import { Eye, Download, X, Truck, MessageCircle } from "lucide-react";
 import { Order } from "@/types/order";
 import { canCancelOrder } from "@/utils/orderStatus";
 
@@ -41,8 +41,41 @@ export const OrderActions: React.FC<OrderActionsProps> = ({
     }
   };
 
+  const handleWhatsAppSupport = () => {
+    // Get admin WhatsApp number from environment variables or use a default
+    const adminWhatsAppNumber = process.env.NEXT_PUBLIC_ADMIN_WHATSAPP_NUMBER || '233547129636';
+    
+    // Create a detailed message about the order
+    const message = `Hello! I need follow-up on my order:\n\n` +
+      `Order #: ${order.orderNumber}\n` +
+      `Status: ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}\n` +
+      `Total: $${(order.totalCents / 100).toFixed(2)}\n` +
+      `Ordered: ${new Date(order.createdAt).toLocaleDateString()}\n\n` +
+      `Items:\n${order.items.map(item => `• ${item.title} (Qty: ${item.quantity})`).join('\n')}\n\n` +
+      `Could you please provide an update on my order?`;
+    
+    // Encode the message for URL
+    const encodedMessage = encodeURIComponent(message);
+    
+    // Create WhatsApp URL
+    const whatsappUrl = `https://wa.me/${adminWhatsAppNumber}?text=${encodedMessage}`;
+    
+    // Open WhatsApp in a new tab
+    window.open(whatsappUrl, '_blank');
+  };
+
   return (
-    <div className="flex items-center space-x-2">
+    <div className="flex items-center space-x-2 flex-wrap gap-2">
+      {/* WhatsApp Support */}
+      <button
+        onClick={handleWhatsAppSupport}
+        className="flex items-center space-x-1 px-3 py-1.5 text-sm border border-green-200 text-green-600 rounded-lg hover:bg-green-50 transition-colors"
+        title="Contact support via WhatsApp"
+      >
+        <MessageCircle size={16} />
+        <span>Message</span>
+      </button>
+
       {/* Track Order */}
       {order.status === 'shipped' && order.trackingNumber && (
         <button
@@ -61,15 +94,6 @@ export const OrderActions: React.FC<OrderActionsProps> = ({
       >
         <Eye size={16} />
         <span>Details</span>
-      </button>
-
-      {/* Download Invoice */}
-      <button
-        onClick={() => alert('Invoice download feature coming soon!')}
-        className="flex items-center space-x-1 px-3 py-1.5 text-sm border border-foreground/20 rounded-lg hover:bg-foreground/5 transition-colors"
-      >
-        <Download size={16} />
-        <span>Invoice</span>
       </button>
 
       {/* Cancel Order */}

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Calendar, MapPin, Truck, Package, CheckCircle } from "lucide-react";
+import { X, Calendar, MapPin, Truck, Package, CheckCircle, MessageCircle } from "lucide-react";
 import { Order } from "@/types/order";
 import { getStatusIcon, getStatusColor, formatOrderDate, formatCurrency, canCancelOrder } from "@/utils/orderStatus";
 
@@ -189,6 +189,28 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
               >
                 Close
               </button>
+
+                  <button
+              onClick={() => {
+                const adminWhatsAppNumber = process.env.NEXT_PUBLIC_ADMIN_WHATSAPP_NUMBER || '1234567890';
+                const message = `Hello! I need follow-up on my order:\n\n` +
+                  `Order #: ${order.orderNumber}\n` +
+                  `Status: ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}\n` +
+                  `Total: $${(order.totalCents / 100).toFixed(2)}\n` +
+                  `Ordered: ${new Date(order.createdAt).toLocaleDateString()}\n` +
+                  `Shipping: ${order.shippingAddress.firstName} ${order.shippingAddress.lastName}, ${order.shippingAddress.city}\n\n` +
+                  `Items:\n${order.items.map(item => `• ${item.title} (Qty: ${item.quantity}) - $${(item.priceCents / 100).toFixed(2)}`).join('\n')}\n\n` +
+                  `Could you please provide an update on my order?`;
+                
+                const encodedMessage = encodeURIComponent(message);
+                const whatsappUrl = `https://wa.me/${adminWhatsAppNumber}?text=${encodedMessage}`;
+                window.open(whatsappUrl, '_blank');
+              }}
+              className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+              <MessageCircle size={16} />
+              <span>Contact Support</span>
+            </button>
               
               {canCancelOrder(order.status) && (
                 <button
