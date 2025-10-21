@@ -2,9 +2,8 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CreditCard, Truck, Lock } from 'lucide-react';
+import { Truck, Lock, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
-import dynamic from "next/dynamic";
 
 interface CheckoutFormProps {
   user?: any;
@@ -32,11 +31,6 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
     phone: '',
   });
 
-  const PaystackButton = dynamic(
-  () => import("react-paystack").then(mod => mod.PaystackButton),
-  { ssr: false }
-);
-
   // Calculate totals
   const subtotalCents = cart.total;
   const shippingCents = 0; // Free shipping
@@ -50,7 +44,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
     }));
   };
 
-  const createPendingOrder = async () => {
+  const createOrder = async () => {
     const orderData = {
       email: formData.email || user?.email,
       items: cart.items.map(item => ({
@@ -72,16 +66,14 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
         country: formData.country,
         phone: formData.phone,
       },
-      paymentMethod: 'paystack',
+      paymentMethod: 'cash_on_delivery',
       subtotalCents,
       shippingCents,
       taxCents,
       totalCents,
     };
 
-    const endpoint = user?.token 
-      ? `${process.env.NEXT_PUBLIC_API_URL}/orders`
-      : `${process.env.NEXT_PUBLIC_API_URL}/orders/guest`;
+    const endpoint = `${process.env.NEXT_PUBLIC_API_URL}/orders`;
     
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
@@ -105,78 +97,20 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
     return await response.json();
   };
 
-  // Paystack configuration
-  const paystackConfig = {
-    reference: new Date().getTime().toString(),
-    email: formData.email || user?.email || '',
-    amount: totalCents, // Paystack expects amount in kobo (pesewas for GHS)
-    publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || '',
-    currency: 'GHS',
-    metadata: {
-      custom_fields: [
-        {
-          display_name: "Customer Name",
-          variable_name: "customer_name",
-          value: `${formData.firstName} ${formData.lastName}`
-        },
-        {
-          display_name: "Phone Number",
-          variable_name: "phone_number",
-          value: formData.phone
-        }
-      ]
-    }
-  };
-
-  const handlePaystackSuccessAction = async (reference: any) => {
+  const handlePlaceOrder = async () => {
     setLoading(true);
     setError('');
 
     try {
-      // Create order with payment reference
-      const order = await createPendingOrder();
-      
-      // Update order with payment confirmation
-      const endpoint = user?.token
-        ? `${process.env.NEXT_PUBLIC_API_URL}/orders/${order._id}/confirm-payment`
-        : `${process.env.NEXT_PUBLIC_API_URL}/orders/${order._id}/confirm-payment`;
-
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-      };
-
-      if (user?.token) {
-        headers['Authorization'] = `Bearer ${user.token}`;
-      }
-
-      await fetch(endpoint, {
-        method: 'PATCH',
-        headers,
-        body: JSON.stringify({
-          paymentReference: reference.reference,
-          paystackReference: reference.trans,
-        }),
-      });
-
+      const order = await createOrder();
       clearCart();
       onOrderComplete(order);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Payment confirmation failed');
-      console.error('Payment confirmation failed:', err);
+      setError(err instanceof Error ? err.message : 'Order creation failed');
+      console.error('Order creation failed:', err);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handlePaystackCloseAction = () => {
-    setError('Payment was cancelled');
-  };
-
-  const componentProps = {
-    ...paystackConfig,
-    text: 'Pay with Paystack',
-    onSuccess: handlePaystackSuccessAction,
-    onClose: handlePaystackCloseAction,
   };
 
   const validateShippingForm = () => {
@@ -191,8 +125,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
   const steps = [
     { number: 1, title: 'Shipping', icon: Truck },
-    { number: 2, title: 'Payment', icon: CreditCard },
-    { number: 3, title: 'Review', icon: Lock },
+    { number: 2, title: 'Review', icon: Lock },
   ];
 
   return (
@@ -374,7 +307,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
         </motion.div>
       )}
 
-      {/* Step 2: Review & Payment */}
+      {/* Step 2: Review & Place Order */}
       {step === 2 && (
         <motion.div
           initial={{ opacity: 0, x: 20 }}
@@ -433,6 +366,14 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
             </p>
           </div>
 
+          {/* Payment Method Notice */}
+          <div className="border border-foreground/10 rounded-lg p-6 bg-foreground/5">
+            <h4 className="font-semibold text-foreground mb-2">Payment Method</h4>
+            <p className="text-foreground/80 text-sm">
+              Cash on Delivery - Pay when your order arrives
+            </p>
+          </div>
+
           <div className="flex justify-between items-center">
             <button
               type="button"
@@ -441,11 +382,23 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
             >
               Back to Shipping
             </button>
-            <PaystackButton
-              {...componentProps}
-              className="px-8 py-3 bg-foreground text-background rounded-lg font-semibold hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            <button
+              onClick={handlePlaceOrder}
               disabled={loading}
-            />
+              className="flex items-center gap-2 px-8 py-3 bg-foreground text-background rounded-lg font-semibold hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {loading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-background border-t-transparent rounded-full animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <ShoppingBag size={16} />
+                  Place Order
+                </>
+              )}
+            </button>
           </div>
         </motion.div>
       )}

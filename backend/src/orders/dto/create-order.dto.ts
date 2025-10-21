@@ -90,10 +90,6 @@ export class CreateOrderDto {
 
   @IsNumber()
   @IsNotEmpty()
-  phone: string[];
-
-  @IsNumber()
-  @IsNotEmpty()
   shippingCents: number;
 
   @IsNumber()

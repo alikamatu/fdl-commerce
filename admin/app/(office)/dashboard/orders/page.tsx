@@ -732,7 +732,7 @@ export default function AdminOrdersPage() {
                           ? 'bg-green-50 text-green-700 border-green-200' 
                           : 'bg-amber-50 text-amber-700 border-amber-200'
                       }`}>
-                        {order.paymentCompleted ? 'Paid' : 'Pending'}
+                        {order.paymentCompleted ? 'Cash' : 'Cash'}
                       </span>
                     </td>
                     <td className="p-6">

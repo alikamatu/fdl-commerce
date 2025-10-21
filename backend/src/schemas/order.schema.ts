@@ -99,8 +99,8 @@ export class Order {
 
   @Prop({ 
     required: true,
-    enum: ['credit_card', 'paypal', 'stripe', 'paystack'],
-    default: 'credit_card'
+    enum: ['credit_card', 'paypal', 'stripe', 'cash_on_delivery'],
+    default: 'cash_on_delivery'
   })
   paymentMethod: string;
 
