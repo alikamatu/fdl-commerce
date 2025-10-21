@@ -1,21 +1,45 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { Transporter } from 'nodemailer';
 
 @Injectable()
 export class EmailService {
   private transporter: Transporter;
+  private readonly logger = new Logger(EmailService.name);
 
   constructor() {
+    // Remove spaces from app password
+    const smtpPass = process.env.SMTP_PASS?.replace(/\s/g, '');
+    
     this.transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: false,
+      secure: false, // true for 465, false for other ports
       auth: {
         user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        pass: smtpPass,
       },
+      // Add timeout settings
+      connectionTimeout: 60000, // 60 seconds
+      greetingTimeout: 30000, // 30 seconds
+      socketTimeout: 60000, // 60 seconds
+      // Add these for better debugging
+      debug: process.env.NODE_ENV !== 'production',
+      logger: process.env.NODE_ENV !== 'production',
     });
+
+    // Verify connection on startup
+    this.verifyConnection();
+  }
+
+  private async verifyConnection() {
+    try {
+      await this.transporter.verify();
+      this.logger.log('✅ SMTP connection verified successfully');
+    } catch (error) {
+      this.logger.error('❌ SMTP connection failed:', error.message);
+      this.logger.error('Check your SMTP credentials and network connectivity');
+    }
   }
 
   async sendVerificationEmail(email: string, token: string, displayName: string) {
@@ -41,7 +65,13 @@ export class EmailService {
       `,
     };
 
-    await this.transporter.sendMail(mailOptions);
+    try {
+      await this.transporter.sendMail(mailOptions);
+      this.logger.log(`✅ Verification email sent to ${email}`);
+    } catch (error) {
+      this.logger.error(`❌ Failed to send verification email to ${email}:`, error.message);
+      throw error;
+    }
   }
 
   async sendPasswordResetEmail(email: string, token: string, displayName: string) {
@@ -69,7 +99,13 @@ export class EmailService {
       `,
     };
 
-    await this.transporter.sendMail(mailOptions);
+    try {
+      await this.transporter.sendMail(mailOptions);
+      this.logger.log(`✅ Password reset email sent to ${email}`);
+    } catch (error) {
+      this.logger.error(`❌ Failed to send password reset email to ${email}:`, error.message);
+      throw error;
+    }
   }
 
   async sendWelcomeEmail(email: string, displayName: string) {
@@ -86,6 +122,12 @@ export class EmailService {
       `,
     };
 
-    await this.transporter.sendMail(mailOptions);
+    try {
+      await this.transporter.sendMail(mailOptions);
+      this.logger.log(`✅ Welcome email sent to ${email}`);
+    } catch (error) {
+      this.logger.error(`❌ Failed to send welcome email to ${email}:`, error.message);
+      throw error;
+    }
   }
 }
