@@ -1,29 +1,30 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Resend } from 'resend';
+import { ConfigService } from '@nestjs/config';
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class EmailService {
-  private resend: Resend;
+  private transporter: nodemailer.Transporter;
   private readonly logger = new Logger(EmailService.name);
 
-  constructor() {
-    const apiKey = process.env.RESEND_API_KEY;
-    
-    if (!apiKey) {
-      this.logger.error('❌ RESEND_API_KEY is not set');
-      throw new Error('RESEND_API_KEY is required!');
-    }
+  constructor(private readonly config: ConfigService) {
+    this.transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: this.config.get('EMAIL_USER'),
+        pass: this.config.get('EMAIL_PASSWORD'),
+      },
+    });
 
-    this.resend = new Resend(apiKey);
-    this.logger.log('✅ Resend email service initialized');
+    this.logger.log('✅ Gmail email service initialized');
   }
 
   async sendVerificationEmail(email: string, token: string, displayName: string) {
-    const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+    const verificationUrl = `${this.config.get('FRONTEND_URL')}/verify-email?token=${token}`;
     
     try {
-      const { data, error } = await this.resend.emails.send({
-        from: process.env.EMAIL_FROM || 'onboarding@resend.dev',
+      await this.transporter.sendMail({
+        from: this.config.get('EMAIL_FROM'),
         to: email,
         subject: 'Verify Your Email Address',
         html: `
@@ -42,25 +43,19 @@ export class EmailService {
         `,
       });
 
-      if (error) {
-        this.logger.error(`❌ Failed to send verification email to ${email}:`, error);
-        throw new Error(error.message);
-      }
-
-      this.logger.log(`✅ Verification email sent to ${email} (ID: ${data?.id})`);
-      return data;
+      this.logger.log(`✅ Verification email sent to ${email}`);
     } catch (error) {
-      this.logger.error(`❌ Error sending verification email:`, error.message);
+      this.logger.error(`❌ Failed to send verification email to ${email}:`, error.message);
       throw error;
     }
   }
 
   async sendPasswordResetEmail(email: string, token: string, displayName: string) {
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+    const resetUrl = `${this.config.get('FRONTEND_URL')}/reset-password?token=${token}`;
     
     try {
-      const { data, error } = await this.resend.emails.send({
-        from: process.env.EMAIL_FROM || 'onboarding@resend.dev',
+      await this.transporter.sendMail({
+        from: this.config.get('EMAIL_FROM'),
         to: email,
         subject: 'Reset Your Password',
         html: `
@@ -81,23 +76,17 @@ export class EmailService {
         `,
       });
 
-      if (error) {
-        this.logger.error(`❌ Failed to send password reset email to ${email}:`, error);
-        throw new Error(error.message);
-      }
-
-      this.logger.log(`✅ Password reset email sent to ${email} (ID: ${data?.id})`);
-      return data;
+      this.logger.log(`✅ Password reset email sent to ${email}`);
     } catch (error) {
-      this.logger.error(`❌ Error sending password reset email:`, error.message);
+      this.logger.error(`❌ Failed to send password reset email to ${email}:`, error.message);
       throw error;
     }
   }
 
   async sendWelcomeEmail(email: string, displayName: string) {
     try {
-      const { data, error } = await this.resend.emails.send({
-        from: process.env.EMAIL_FROM || 'onboarding@resend.dev',
+      await this.transporter.sendMail({
+        from: this.config.get('EMAIL_FROM'),
         to: email,
         subject: 'Welcome to Our App!',
         html: `
@@ -109,15 +98,42 @@ export class EmailService {
         `,
       });
 
-      if (error) {
-        this.logger.error(`❌ Failed to send welcome email to ${email}:`, error);
-        throw new Error(error.message);
-      }
-
-      this.logger.log(`✅ Welcome email sent to ${email} (ID: ${data?.id})`);
-      return data;
+      this.logger.log(`✅ Welcome email sent to ${email}`);
     } catch (error) {
-      this.logger.error(`❌ Error sending welcome email:`, error.message);
+      this.logger.error(`❌ Failed to send welcome email to ${email}:`, error.message);
+      throw error;
+    }
+  }
+
+  async sendVerificationApproval(email: string): Promise<void> {
+    const subject = 'Admin Verification Approved';
+    const html = `<p>Your admin verification request has been approved. You can now access the admin dashboard.</p>`;
+    await this.sendEmail(email, subject, html);
+  }
+
+  async sendVerificationRejection(email: string, reason: string): Promise<void> {
+    const subject = 'Admin Verification Rejected';
+    const html = `<p>Your admin verification request was rejected. Reason: ${reason}</p>`;
+    await this.sendEmail(email, subject, html);
+  }
+
+  async sendNewVerificationRequest(email: string): Promise<void> {
+    const subject = 'New Admin Verification Request';
+    const html = `<p>A new admin verification request needs your review.</p>`;
+    await this.sendEmail(email, subject, html);
+  }
+
+  private async sendEmail(email: string, subject: string, html: string): Promise<void> {
+    try {
+      await this.transporter.sendMail({
+        from: this.config.get('EMAIL_FROM'),
+        to: email,
+        subject,
+        html,
+      });
+      this.logger.log(`✅ Email sent to ${email}: ${subject}`);
+    } catch (error) {
+      this.logger.error(`❌ Failed to send email to ${email}:`, error.message);
       throw error;
     }
   }
