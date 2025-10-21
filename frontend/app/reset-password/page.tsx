@@ -1,12 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { CheckCircle, XCircle, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
-export default function ResetPasswordContent() {
+interface ResetPasswordContentProps {
+  token?: string | null;
+}
+
+export default function ResetPasswordContent({ token }: ResetPasswordContentProps) {
   const [status, setStatus] = useState<'form' | 'loading' | 'success' | 'error'>('form');
   const [message, setMessage] = useState('');
   const [formData, setFormData] = useState({
@@ -18,9 +22,6 @@ export default function ResetPasswordContent() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const token = searchParams.get('token');
-  
   const { resetPassword } = useAuth();
 
   useEffect(() => {
