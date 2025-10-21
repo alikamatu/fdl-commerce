@@ -17,52 +17,59 @@ export class AuthService {
     private emailService: EmailService,
   ) {}
 
-  async register(registerDto: RegisterDto): Promise<{ user: any; token: string }> {
-    const { email, password, displayName } = registerDto;
+// In your register method, wrap email sending in try-catch
+async register(registerDto: RegisterDto): Promise<{ user: any; token: string }> {
+  const { email, password, displayName } = registerDto;
 
-    // Check if user exists
-    const existingUser = await this.userModel.findOne({ email });
-    if (existingUser) {
-      throw new ConflictException('User already exists');
-    }
-
-    // Hash password
-    const saltRounds = 12;
-    const passwordHash = await bcrypt.hash(password, saltRounds);
-
-    // Generate email verification token
-    const emailVerificationToken = crypto.randomBytes(32).toString('hex');
-    const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-
-    // Create user
-    const user = await this.userModel.create({
-      email,
-      passwordHash,
-      displayName,
-      role: 'user',
-      isEmailVerified: false,
-      emailVerificationToken,
-      emailVerificationExpires,
-    });
-
-    // Send verification email
-    await this.emailService.sendVerificationEmail(email, emailVerificationToken, displayName);
-
-    // Generate token (with limited permissions until email is verified)
-    const token = this.jwtService.sign({ 
-      userId: user._id, 
-      email: user.email,
-      role: user.role,
-      isEmailVerified: false
-    });
-
-    // Return user without password
-    const userObj = user.toObject();
-    delete userObj.passwordHash;
-    delete userObj.emailVerificationToken;
-
-    return { user: userObj, token };
+  // Check if user exists
+  const existingUser = await this.userModel.findOne({ email });
+  if (existingUser) {
+    throw new ConflictException('User already exists');
   }
+
+  // Hash password
+  const saltRounds = 12;
+  const passwordHash = await bcrypt.hash(password, saltRounds);
+
+  // Generate email verification token
+  const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+  const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+  // Create user
+  const user = await this.userModel.create({
+    email,
+    passwordHash,
+    displayName,
+    role: 'user',
+    isEmailVerified: false,
+    emailVerificationToken,
+    emailVerificationExpires,
+  });
+
+  // Try to send verification email (non-blocking)
+  try {
+    await this.emailService.sendVerificationEmail(email, emailVerificationToken, displayName);
+  } catch (error) {
+    // Log error but don't fail registration
+    console.error('Failed to send verification email:', error.message);
+    // You could queue this for retry later
+  }
+
+  // Generate token (with limited permissions until email is verified)
+  const token = this.jwtService.sign({ 
+    userId: user._id, 
+    email: user.email,
+    role: user.role,
+    isEmailVerified: false
+  });
+
+  // Return user without password
+  const userObj = user.toObject();
+  delete userObj.passwordHash;
+  delete userObj.emailVerificationToken;
+
+  return { user: userObj, token };
+}
 
   async login(loginDto: LoginDto): Promise<{ user: any; token: string }> {
     const { email, password } = loginDto;
