@@ -74,7 +74,7 @@ export default function Products() {
             transition={{ duration: 0.6 }}
             className="text-2xl text-start font-semibold text-foreground mb-4"
           >
-            {filters.search ? `Search Results for "${filters.search}"` : 'available Products'}
+            {filters.search ? `Search Results for "${filters.search}"` : 'Available Products'}
           </motion.h1>
           {filters.search && products.length > 0 && (
             <motion.p
