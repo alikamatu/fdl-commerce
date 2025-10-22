@@ -173,25 +173,37 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const resetPassword = async (token: string, newPassword: string) => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/reset-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, newPassword }),
-      });
+const resetPassword = async (token: string, newPassword: string) => {
+  try {
+    setLoading(true);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, newPassword }),
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Password reset failed');
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Reset password error:', error);
-      throw error;
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Password reset failed');
     }
-  };
+
+    const data = await response.json();
+    
+    // Clear any existing user data since password was reset
+    setUser(null);
+    if (typeof window !== "undefined") {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Reset password error:', error);
+    throw error;
+  } finally {
+    setLoading(false);
+  }
+};
 
   const changePassword = async (currentPassword: string, newPassword: string) => {
     try {

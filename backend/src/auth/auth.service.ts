@@ -191,9 +191,14 @@ async register(registerDto: RegisterDto): Promise<{ user: any; token: string }> 
     });
 
     if (!user) {
-      throw new BadRequestException('Invalid or expired reset token');
+       console.log('No user found with valid reset token');
+    // Check if token exists but expired
+    const expiredUser = await this.userModel.findOne({ resetPasswordToken: token });
+    if (expiredUser) {
+      console.log('Token exists but expired at:', expiredUser.resetPasswordExpires);
     }
-
+    throw new BadRequestException('Invalid or expired reset token');
+  }
     // Hash new password
     const saltRounds = 12;
     user.passwordHash = await bcrypt.hash(newPassword, saltRounds);

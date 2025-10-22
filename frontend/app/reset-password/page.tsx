@@ -1,16 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { CheckCircle, XCircle, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
-interface ResetPasswordContentProps {
-  token?: string | null;
-}
-
-export default function ResetPasswordContent({ token }: ResetPasswordContentProps) {
+// Separate component that uses useSearchParams
+function ResetPasswordForm() {
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token');
+  
   const [status, setStatus] = useState<'form' | 'loading' | 'success' | 'error'>('form');
   const [message, setMessage] = useState('');
   const [formData, setFormData] = useState({
@@ -25,6 +25,7 @@ export default function ResetPasswordContent({ token }: ResetPasswordContentProp
   const { resetPassword } = useAuth();
 
   useEffect(() => {
+    console.log('Token from URL:', token); // Debug log
     if (!token) {
       setStatus('error');
       setMessage('Invalid or missing reset token. Please request a new password reset link.');
@@ -54,12 +55,17 @@ export default function ResetPasswordContent({ token }: ResetPasswordContentProp
     e.preventDefault();
     
     if (!validateForm()) return;
-    if (!token) return;
+    if (!token) {
+      setStatus('error');
+      setMessage('Reset token is missing');
+      return;
+    }
 
     try {
       setStatus('loading');
       setMessage('Resetting your password...');
       
+      console.log('Sending reset request with token:', token); // Debug log
       await resetPassword(token, formData.password);
       
       setStatus('success');
@@ -71,6 +77,7 @@ export default function ResetPasswordContent({ token }: ResetPasswordContentProp
       }, 3000);
       
     } catch (error: any) {
+      console.error('Reset password error:', error); // Debug log
       setStatus('error');
       setMessage(error.message || 'Failed to reset password. The link may have expired or is invalid.');
     }
@@ -156,7 +163,7 @@ export default function ResetPasswordContent({ token }: ResetPasswordContentProp
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-foreground/80 mb-2">
+                <label htmlFor="password" className="block text-sm font-medium text-foreground/80 mb-2 text-left">
                   New Password
                 </label>
                 <div className="relative">
@@ -185,7 +192,7 @@ export default function ResetPasswordContent({ token }: ResetPasswordContentProp
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground/80 mb-2">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground/80 mb-2 text-left">
                   Confirm Password
                 </label>
                 <div className="relative">
@@ -235,7 +242,7 @@ export default function ResetPasswordContent({ token }: ResetPasswordContentProp
       >
         {/* Logo/Brand */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground">Your App</h1>
+          <h1 className="text-3xl font-bold text-foreground">AllMapHostels</h1>
           <p className="text-foreground/60 mt-2">Reset Password</p>
         </div>
 
@@ -243,18 +250,20 @@ export default function ResetPasswordContent({ token }: ResetPasswordContentProp
         <div className="bg-background rounded-2xl shadow-xl p-8 border border-foreground/10">
           {renderContent()}
         </div>
-
-        {/* Status Message */}
-        {message && status !== 'loading' && status !== 'success' && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-4 p-4 rounded-lg bg-foreground/5 border border-foreground/10"
-          >
-            <p className="text-foreground/80 text-center text-sm">{message}</p>
-          </motion.div>
-        )}
       </motion.div>
     </div>
+  );
+}
+
+// Main page component with Suspense wrapper
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
