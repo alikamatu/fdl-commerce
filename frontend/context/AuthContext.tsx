@@ -101,8 +101,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isEmailVerified: data.user.isEmailVerified,
       };
 
-      setUser(userData);
-
       if (typeof window !== "undefined") {
         localStorage.setItem('user', JSON.stringify(userData));
         localStorage.setItem('token', data.token);
