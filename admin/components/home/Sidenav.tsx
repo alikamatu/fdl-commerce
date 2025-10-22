@@ -8,9 +8,6 @@ import {
   LayoutDashboard, 
   Package, 
   ShoppingCart, 
-  Users, 
-  BarChart3, 
-  Tag,
   ChevronDown,
   ArrowLeft,
   AlertCircle,
@@ -121,7 +118,7 @@ export default function Sidenav() {
           animate={{ rotate: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity, repeatDelay: 5 }}
         >
-          <StrikethroughIcon className="w-8 h-8 text-black" />
+          <img src="/logo/fdll.jpeg" alt="Forbes Logo" className="h-6 w-auto" />
         </motion.span>
         <h2 className="text-xl font-bold text-white dark:text-black">
           Forbes DLL

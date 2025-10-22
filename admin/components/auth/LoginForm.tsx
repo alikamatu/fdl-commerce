@@ -34,6 +34,7 @@ export default function LoginForm() {
         <div>
           <div className="mx-auto h-12 w-12 bg-blue-600 rounded-full flex items-center justify-center">
             <StrikethroughIcon className="h-6 w-6 text-white" />
+            <img src="/logo/fdll.jpeg" alt="Forbes Logo" className="h-6 w-auto" />
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Forbes Digital LifeLine

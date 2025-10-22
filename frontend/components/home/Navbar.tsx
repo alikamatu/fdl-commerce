@@ -172,7 +172,7 @@ const Logo = () => (
     className="flex items-center space-x-3 group"
   >
     <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
-      <span className="text-white font-bold text-sm">FDL</span>
+      <img src='/logo/fdll.jpeg' alt="Logo" className="rounded-lg" />
     </div>
     <span className="text-xl font-semibold text-foreground hidden sm:block bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
       Forbes Digital Lifeline
