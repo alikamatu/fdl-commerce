@@ -56,6 +56,6 @@ export const formatOrderDate = (dateString: string) => {
 export const formatCurrency = (cents: number) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'GHS',
   }).format(cents / 100);
 };

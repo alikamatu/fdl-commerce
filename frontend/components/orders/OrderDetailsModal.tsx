@@ -196,10 +196,10 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                 const message = `Hello! I need follow-up on my order:\n\n` +
                   `Order #: ${order.orderNumber}\n` +
                   `Status: ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}\n` +
-                  `Total: $${(order.totalCents / 100).toFixed(2)}\n` +
+                  `Total: ₵${(order.totalCents / 100).toFixed(2)}\n` +
                   `Ordered: ${new Date(order.createdAt).toLocaleDateString()}\n` +
                   `Shipping: ${order.shippingAddress.firstName} ${order.shippingAddress.lastName}, ${order.shippingAddress.city}\n\n` +
-                  `Items:\n${order.items.map(item => `• ${item.title} (Qty: ${item.quantity}) - $${(item.priceCents / 100).toFixed(2)}`).join('\n')}\n\n` +
+                  `Items:\n${order.items.map(item => `• ${item.title} (Qty: ${item.quantity}) - ₵${(item.priceCents / 100).toFixed(2)}`).join('\n')}\n\n` +
                   `Could you please provide an update on my order?`;
                 
                 const encodedMessage = encodeURIComponent(message);
