@@ -43,7 +43,7 @@ export const TrendingProducts: React.FC<TrendingProductsProps> = ({
                 {product.title}
               </div>
               <div className="text-sm text-foreground/60">
-                {formatPrice(product.priceCents)}
+                GHC {(product.priceCents / 100).toFixed(2)}
               </div>
             </div>
           </motion.button>

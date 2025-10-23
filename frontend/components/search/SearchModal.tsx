@@ -10,7 +10,7 @@ import { SearchSuggestions } from "./SearchSuggestions";
 import { RecentSearches } from "./RecentSearches";
 import { PopularCategories } from "./PopularCategories";
 import { TrendingProducts } from "./TrendingProducts";
-import { QuickActions } from "./QuickActions";
+// import { QuickActions } from "./QuickActions";
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -100,7 +100,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   }, [isOpen]);
 
   const formatPrice = (priceCents: number) => {
-    return `$${(priceCents / 100).toFixed(2)}`;
+    return `GHC ${(priceCents / 100).toFixed(2)}`;
   };
 
   useEffect(() => {
@@ -182,14 +182,6 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                   loading={categoriesLoading}
                   onCategoryClick={handlePopularCategoryClick}
                 />
-
-                <TrendingProducts
-                  trendingProducts={trendingProducts}
-                  onProductClick={(product) => router.replace(`/products/${product._id}`)}
-                  formatPrice={formatPrice}
-                />
-
-                <QuickActions onActionClick={handleQuickActionClick} />
               </>
             )}
           </div>
