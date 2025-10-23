@@ -9,7 +9,7 @@ export class EmailService {
   constructor() {
     const apiKey = process.env.RESEND_API_KEY;
     
-    if (apiKey) {
+    if (!apiKey) {
       this.logger.error('❌ RESEND_API_KEY is not set');
       throw new Error('RESEND_API_KEY is required');
     }
