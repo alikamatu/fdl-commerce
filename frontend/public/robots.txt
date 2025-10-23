@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://forbesdigitals.com
+
+# Sitemaps
+Sitemap: https://forbesdigitals.com/sitemap.xml
