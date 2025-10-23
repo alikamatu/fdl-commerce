@@ -242,7 +242,7 @@ function ResetPasswordForm() {
       >
         {/* Logo/Brand */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground">AllMapHostels</h1>
+          <h1 className="text-2xl font-bold text-foreground">Forbes Digital Lifeline</h1>
           <p className="text-foreground/60 mt-2">Reset Password</p>
         </div>
 

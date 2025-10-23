@@ -166,7 +166,7 @@ export class EmailService {
       const { data, error } = await this.resend.emails.send({
         from: `Forbes Digital Lifeline <${process.env.EMAIL_FROM || 'onboarding@resend.dev'}>`,
         to: email,
-        subject: "Welcome to Forbes Digital Lifeline 🥳",
+        subject: "Welcome to Forbes Digital Lifeline",
         text: `Welcome!, ${displayName}\n\nYour account has been successfully created and verified.\n\nWe're excited to have you with us\n\nBest regards,\nForbes Digital Lifeline Team`,
         html: `
           <DOCTYPE html>
@@ -182,7 +182,7 @@ export class EmailService {
                   <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <tr>
                       <td style="padding: 40px 30px; text-align: center;">
-                        <h1 style="color: #333; font-size: 28px; margin: 0 0 10px 0;">Welcome aboard, ${displayName} 🥳</h1>
+                        <h1 style="color: #333; font-size: 28px; margin: 0 0 10px 0;">Welcome!, ${displayName} 🥳</h1>
                         <p style="color: #555; font-size: 16px; line-height: 1.6; margin: 20px 0;">
                           Your account has been successfully created and verified.
                         </p>
