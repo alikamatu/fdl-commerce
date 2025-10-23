@@ -166,7 +166,7 @@ export class EmailService {
       const { data, error } = await this.resend.emails.send({
         from: `Forbes Digital&apos;s <${process.env.EMAIL_FROM || 'onboarding@resend.dev'}>`,
         to: email,
-        subject: 'Welcome to Forbes Digital&apos;s 🎉',
+        subject: "Welcome to Forbes Digital's 🥳" ,
         text: `Welcome aboard, ${displayName}\n\nYour account has been successfully created and verified.\n\nWe're excited to have you with us\n\nBest regards,\nForbes Digital&apos;s Team`,
         html: `
           <DOCTYPE html>
