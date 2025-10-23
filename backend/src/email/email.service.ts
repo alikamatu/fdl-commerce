@@ -65,7 +65,7 @@ export class EmailService {
                     </tr>
                   </table>
                   <p style="color: #999; font-size: 12px; text-align: center; margin: 20px 0 0 0;">
-                    © ${new Date().getFullYear()} Forbes Digital Lifeline. All rights reserved.
+                    © 2020 - ${new Date().getFullYear()} Forbes Digital Lifeline. All rights reserved.
                   </p>
                 </td>
               </tr>
@@ -138,7 +138,7 @@ export class EmailService {
                     </tr>
                   </table>
                   <p style="color: #999; font-size: 12px; text-align: center; margin: 20px 0 0 0;">
-                    © ${new Date().getFullYear()} Forbes Digital Lifeline. All rights reserved.
+                    © 2020 - ${new Date().getFullYear()} Forbes Digital Lifeline. All rights reserved.
                   </p>
                 </td>
               </tr>
@@ -167,7 +167,7 @@ export class EmailService {
         from: `Forbes Digital Lifeline <${process.env.EMAIL_FROM || 'onboarding@resend.dev'}>`,
         to: email,
         subject: "Welcome to Forbes Digital Lifeline",
-        text: `Welcome!, ${displayName}\n\nYour account has been successfully created and verified.\n\nWe're excited to have you with us\n\nBest regards,\nForbes Digital Lifeline Team`,
+        text: `Welcome! ${displayName}\n\nYour account has been successfully created and verified.\n\nWe're excited to have you with us\n\nBest regards,\nForbes Digital Lifeline Team`,
         html: `
           <DOCTYPE html>
           <html>
@@ -182,12 +182,12 @@ export class EmailService {
                   <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <tr>
                       <td style="padding: 40px 30px; text-align: center;">
-                        <h1 style="color: #333; font-size: 28px; margin: 0 0 10px 0;">Welcome!, ${displayName} 🥳</h1>
+                        <h1 style="color: #333; font-size: 28px; margin: 0 0 10px 0;">Welcome! ${displayName} 🥳</h1>
                         <p style="color: #555; font-size: 16px; line-height: 1.6; margin: 20px 0;">
                           Your account has been successfully created and verified.
                         </p>
                         <p style="color: #555; font-size: 16px; line-height: 1.6; margin: 20px 0;">
-                          We're excited to have you with us at Forbes Digital Lifeline.
+                          We are excited to have you with us at Forbes Digital Lifeline.
                         </p>
                         <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 30px auto;">
                           <tr>
@@ -205,7 +205,7 @@ export class EmailService {
                     </tr>
                   </table>
                   <p style="color: #999; font-size: 12px; text-align: center; margin: 20px 0 0 0;">
-                    © ${new Date().getFullYear()} Forbes Digital Lifeline. All rights reserved.
+                    © 2020 - ${new Date().getFullYear()} Forbes Digital Lifeline. All rights reserved.
                   </p>
                 </td>
               </tr>
