@@ -23,10 +23,10 @@ export class EmailService {
     
     try {
       const { data, error } = await this.resend.emails.send({
-        from: `Forbes Digitals <${process.env.EMAIL_FROM || 'onboarding@resend.dev'}>`,
+        from: `Forbes Digital&apos;s <${process.env.EMAIL_FROM || 'onboarding@resend.dev'}>`,
         to: email,
-        subject: 'Verify Your Email Address - Forbes Digitals',
-        text: `Hello ${displayName},\n\nPlease verify your email address by visiting: ${verificationUrl}\n\nThis link will expire in 24 hours.\n\nBest regards,\nForbes Digitals Team`,
+        subject: "Verify Your Email Address - Forbes Digital's",
+        text: `Hello ${displayName},\n\nPlease verify your email address by visiting: ${verificationUrl}\n\nThis link will expire in 24 hours.\n\nBest regards,\nForbes Digital&apos;s Team`,
         html: `
           <!DOCTYPE html>
           <html>
@@ -43,7 +43,7 @@ export class EmailService {
                       <td style="padding: 40px 30px;">
                         <h1 style="color: #333; font-size: 24px; margin: 0 0 20px 0;">Hello, ${displayName}!</h1>
                         <p style="color: #555; font-size: 16px; line-height: 1.6; margin: 0 0 25px 0;">
-                          Thank you for signing up with Forbes Digitals. Please verify your email address to complete your registration.
+                          Thank you for signing up with Forbes Digital&apos;s. Please verify your email address to complete your registration.
                         </p>
                         <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                           <tr>
@@ -59,13 +59,13 @@ export class EmailService {
                           <a href="${verificationUrl}" style="color: #007bff; word-break: break-all;">${verificationUrl}</a>
                         </p>
                         <p style="color: #999; font-size: 12px; margin: 25px 0 0 0; padding-top: 25px; border-top: 1px solid #eee;">
-                          This link will expire in 24 hours. If you didn't create an account with Forbes Digitals, you can safely ignore this email.
+                          This link will expire in 24 hours. If you didn't create an account with Forbes Digital&apos;s, you can safely ignore this email.
                         </p>
                       </td>
                     </tr>
                   </table>
                   <p style="color: #999; font-size: 12px; text-align: center; margin: 20px 0 0 0;">
-                    © ${new Date().getFullYear()} Forbes Digitals. All rights reserved.
+                    © ${new Date().getFullYear()} Forbes Digital&apos;s. All rights reserved.
                   </p>
                 </td>
               </tr>
@@ -93,10 +93,10 @@ export class EmailService {
     
     try {
       const { data, error } = await this.resend.emails.send({
-        from: `Forbes Digitals <${process.env.EMAIL_FROM || 'onboarding@resend.dev'}>`,
+        from: `Forbes Digital&apos;s <${process.env.EMAIL_FROM || 'onboarding@resend.dev'}>`,
         to: email,
-        subject: 'Reset Your Password - Forbes Digitals',
-        text: `Hello ${displayName},\n\nYou requested to reset your password. Visit this link to proceed: ${resetUrl}\n\nThis link will expire in 1 hour.\n\nIf you didn't request this, please ignore this email.\n\nBest regards,\nForbes Digitals Team`,
+        subject: 'Reset Your Password - Forbes Digital&apos;s',
+        text: `Hello ${displayName},\n\nYou requested to reset your password. Visit this link to proceed: ${resetUrl}\n\nThis link will expire in 1 hour.\n\nIf you didn't request this, please ignore this email.\n\nBest regards,\nForbes Digital&apos;s Team`,
         html: `
           <!DOCTYPE html>
           <html>
@@ -138,7 +138,7 @@ export class EmailService {
                     </tr>
                   </table>
                   <p style="color: #999; font-size: 12px; text-align: center; margin: 20px 0 0 0;">
-                    © ${new Date().getFullYear()} Forbes Digitals. All rights reserved.
+                    © ${new Date().getFullYear()} Forbes Digital&apos;s. All rights reserved.
                   </p>
                 </td>
               </tr>
@@ -164,10 +164,10 @@ export class EmailService {
   async sendWelcomeEmail(email: string, displayName: string) {
     try {
       const { data, error } = await this.resend.emails.send({
-        from: `Forbes Digitals <${process.env.EMAIL_FROM || 'onboarding@resend.dev'}>`,
+        from: `Forbes Digital&apos;s <${process.env.EMAIL_FROM || 'onboarding@resend.dev'}>`,
         to: email,
-        subject: 'Welcome to Forbes Digitals! 🎉',
-        text: `Welcome aboard, ${displayName}!\n\nYour account has been successfully created and verified.\n\nWe're excited to have you with us!\n\nBest regards,\nForbes Digitals Team`,
+        subject: 'Welcome to Forbes Digital&apos;s! 🎉',
+        text: `Welcome aboard, ${displayName}!\n\nYour account has been successfully created and verified.\n\nWe're excited to have you with us!\n\nBest regards,\nForbes Digital&apos;s Team`,
         html: `
           <!DOCTYPE html>
           <html>
@@ -187,7 +187,7 @@ export class EmailService {
                           Your account has been successfully created and verified.
                         </p>
                         <p style="color: #555; font-size: 16px; line-height: 1.6; margin: 20px 0;">
-                          We're excited to have you with us at Forbes Digitals!
+                          We're excited to have you with us at Forbes Digital&apos;s!
                         </p>
                         <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 30px auto;">
                           <tr>
@@ -205,7 +205,7 @@ export class EmailService {
                     </tr>
                   </table>
                   <p style="color: #999; font-size: 12px; text-align: center; margin: 20px 0 0 0;">
-                    © ${new Date().getFullYear()} Forbes Digitals. All rights reserved.
+                    © ${new Date().getFullYear()} Forbes Digital&apos;s. All rights reserved.
                   </p>
                 </td>
               </tr>
