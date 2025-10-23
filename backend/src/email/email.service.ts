@@ -9,7 +9,7 @@ export class EmailService {
   constructor() {
     const apiKey = process.env.RESEND_API_KEY;
     
-    if (!apiKey) {
+    if (apiKey) {
       this.logger.error('❌ RESEND_API_KEY is not set');
       throw new Error('RESEND_API_KEY is required');
     }
@@ -28,7 +28,7 @@ export class EmailService {
         subject: "Verify Your Email Address - Forbes Digital's",
         text: `Hello ${displayName},\n\nPlease verify your email address by visiting: ${verificationUrl}\n\nThis link will expire in 24 hours.\n\nBest regards,\nForbes Digital&apos;s Team`,
         html: `
-          <!DOCTYPE html>
+          <DOCTYPE html>
           <html>
           <head>
             <meta charset="UTF-8">
@@ -41,7 +41,7 @@ export class EmailService {
                   <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <tr>
                       <td style="padding: 40px 30px;">
-                        <h1 style="color: #333; font-size: 24px; margin: 0 0 20px 0;">Hello, ${displayName}!</h1>
+                        <h1 style="color: #333; font-size: 24px; margin: 0 0 20px 0;">Hello, ${displayName}</h1>
                         <p style="color: #555; font-size: 16px; line-height: 1.6; margin: 0 0 25px 0;">
                           Thank you for signing up with Forbes Digital&apos;s. Please verify your email address to complete your registration.
                         </p>
@@ -65,7 +65,7 @@ export class EmailService {
                     </tr>
                   </table>
                   <p style="color: #999; font-size: 12px; text-align: center; margin: 20px 0 0 0;">
-                    © ${new Date().getFullYear()} Forbes Digital&apos;s. All rights reserved.
+                    © ${new Date().getFullYear()} Forbes Digital&apos;s Lifeline. All rights reserved.
                   </p>
                 </td>
               </tr>
@@ -98,7 +98,7 @@ export class EmailService {
         subject: 'Reset Your Password - Forbes Digital&apos;s',
         text: `Hello ${displayName},\n\nYou requested to reset your password. Visit this link to proceed: ${resetUrl}\n\nThis link will expire in 1 hour.\n\nIf you didn't request this, please ignore this email.\n\nBest regards,\nForbes Digital&apos;s Team`,
         html: `
-          <!DOCTYPE html>
+          <DOCTYPE html>
           <html>
           <head>
             <meta charset="UTF-8">
@@ -138,7 +138,7 @@ export class EmailService {
                     </tr>
                   </table>
                   <p style="color: #999; font-size: 12px; text-align: center; margin: 20px 0 0 0;">
-                    © ${new Date().getFullYear()} Forbes Digital&apos;s. All rights reserved.
+                    © ${new Date().getFullYear()} Forbes Digital&apos;s Lifeline. All rights reserved.
                   </p>
                 </td>
               </tr>
@@ -166,10 +166,10 @@ export class EmailService {
       const { data, error } = await this.resend.emails.send({
         from: `Forbes Digital&apos;s <${process.env.EMAIL_FROM || 'onboarding@resend.dev'}>`,
         to: email,
-        subject: 'Welcome to Forbes Digital&apos;s! 🎉',
-        text: `Welcome aboard, ${displayName}!\n\nYour account has been successfully created and verified.\n\nWe're excited to have you with us!\n\nBest regards,\nForbes Digital&apos;s Team`,
+        subject: 'Welcome to Forbes Digital&apos;s 🎉',
+        text: `Welcome aboard, ${displayName}\n\nYour account has been successfully created and verified.\n\nWe're excited to have you with us\n\nBest regards,\nForbes Digital&apos;s Team`,
         html: `
-          <!DOCTYPE html>
+          <DOCTYPE html>
           <html>
           <head>
             <meta charset="UTF-8">
@@ -182,12 +182,12 @@ export class EmailService {
                   <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <tr>
                       <td style="padding: 40px 30px; text-align: center;">
-                        <h1 style="color: #333; font-size: 28px; margin: 0 0 10px 0;">Welcome aboard, ${displayName}! 🎉</h1>
+                        <h1 style="color: #333; font-size: 28px; margin: 0 0 10px 0;">Welcome aboard, ${displayName} 🥳</h1>
                         <p style="color: #555; font-size: 16px; line-height: 1.6; margin: 20px 0;">
                           Your account has been successfully created and verified.
                         </p>
                         <p style="color: #555; font-size: 16px; line-height: 1.6; margin: 20px 0;">
-                          We're excited to have you with us at Forbes Digital&apos;s!
+                          We're excited to have you with us at Forbes Digital&apos;s
                         </p>
                         <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 30px auto;">
                           <tr>
@@ -205,7 +205,7 @@ export class EmailService {
                     </tr>
                   </table>
                   <p style="color: #999; font-size: 12px; text-align: center; margin: 20px 0 0 0;">
-                    © ${new Date().getFullYear()} Forbes Digital&apos;s. All rights reserved.
+                    © ${new Date().getFullYear()} Forbes Digital&apos;s Lifeline. All rights reserved.
                   </p>
                 </td>
               </tr>
