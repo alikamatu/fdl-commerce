@@ -32,10 +32,10 @@ export const WishlistPage: React.FC = () => {
 
   if (wishlist.length === 0) {
     return (
-      <div className="min-h-screen bg-foreground py-16">
+      <div className="min-h-screen bg-backgroun py-16">
         <div className="max-w-2xl mx-auto text-center">
           <div className="flex justify-center mb-6">
-            <div className="p-4 bg-foreground/5 rounded-full">
+            <div className="p-4 bg-background rounded-full">
               <Heart size={48} className="text-foreground/40" />
             </div>
           </div>

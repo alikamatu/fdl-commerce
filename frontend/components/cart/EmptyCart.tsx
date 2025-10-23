@@ -37,28 +37,6 @@ export const EmptyCart: React.FC = () => {
             Continue Shopping
             <ArrowRight size={16} />
           </Link>
-          <Link
-            href="/products?category=trading-cards"
-            className="flex items-center justify-center gap-2 px-6 py-3 border border-foreground/20 rounded-lg font-medium hover:bg-foreground/5 transition-colors"
-          >
-            Browse Trading Cards
-          </Link>
-        </div>
-
-        {/* Quick Links */}
-        <div className="mt-8 pt-8 border-t border-foreground/10">
-          <p className="text-sm text-foreground/60 mb-4">Popular Categories</p>
-          <div className="flex flex-wrap justify-center gap-4">
-            {['Trading Cards', 'Toys', 'Sports Cards', 'Collectibles'].map((category) => (
-              <Link
-                key={category}
-                href={`/products?category=${category.toLowerCase().replace(' ', '-')}`}
-                className="text-sm text-foreground/60 hover:text-foreground transition-colors"
-              >
-                {category}
-              </Link>
-            ))}
-          </div>
         </div>
       </div>
     </motion.div>
