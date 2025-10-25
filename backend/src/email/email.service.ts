@@ -59,7 +59,7 @@ export class EmailService {
                           <a href="${verificationUrl}" style="color: #007bff; word-break: break-all;">${verificationUrl}</a>
                         </p>
                         <p style="color: #999; font-size: 12px; margin: 25px 0 0 0; padding-top: 25px; border-top: 1px solid #eee;">
-                          This link will expire in 24 hours. If you didn't create an account with Forbes Digital Lifeline, you can safely ignore this email.
+                          This link will expire in 24 hours. If you did not create an account with Forbes Digital Lifeline, you can safely ignore this email.
                         </p>
                       </td>
                     </tr>
@@ -96,7 +96,7 @@ export class EmailService {
         from: `Forbes Digital Lifeline <${process.env.EMAIL_FROM || 'onboarding@resend.dev'}>`,
         to: email,
         subject: 'Reset Your Password - Forbes Digital Lifeline',
-        text: `Hello ${displayName},\n\nYou requested to reset your password. Visit this link to proceed: ${resetUrl}\n\nThis link will expire in 1 hour.\n\nIf you didn't request this, please ignore this email.\n\nBest regards,\nForbes Digital Lifeline Team`,
+        text: `Hello ${displayName},\n\nYou requested to reset your password. Visit this link to proceed: ${resetUrl}\n\nThis link will expire in 1 hour.\n\nIf you did not request this, please ignore this email.\n\nBest regards,\nForbes Digital Lifeline Team`,
         html: `
           <DOCTYPE html>
           <html>
@@ -132,7 +132,7 @@ export class EmailService {
                           <a href="${resetUrl}" style="color: #dc3545; word-break: break-all;">${resetUrl}</a>
                         </p>
                         <p style="color: #999; font-size: 12px; margin: 25px 0 0 0; padding-top: 25px; border-top: 1px solid #eee;">
-                          This link will expire in 1 hour. If you didn't request a password reset, you can safely ignore this email. Your password will remain unchanged.
+                          This link will expire in 1 hour. If you did not request a password reset, you can safely ignore this email. Your password will remain unchanged.
                         </p>
                       </td>
                     </tr>

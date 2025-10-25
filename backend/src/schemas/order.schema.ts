@@ -46,7 +46,7 @@ export class ShippingAddress {
   @Prop({ required: true })
   state: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   zipCode: string;
 
   @Prop({ required: true, default: 'US' })

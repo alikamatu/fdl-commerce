@@ -1,17 +1,28 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { StrikethroughIcon } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, user, isAdmin } = useAuth();
   const router = useRouter();
+
+  // Redirect if user is already logged in and is admin
+  useEffect(() => {
+    if (user && isAdmin) {
+      router.push('/dashboard');
+    } else if (user && !isAdmin) {
+      setTimeout(() => {
+        setError('Access denied. Admin privileges required.');
+      }, 1000);
+    }
+  }, [user, isAdmin, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,9 +31,32 @@ export default function LoginForm() {
 
     try {
       await login(email, password);
-      router.push('/dashboard');
+      
+      // Check if user has admin role after login
+      const token = localStorage.getItem('token');
+      if (token) {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1000';
+        const response = await fetch(`${API_URL}/auth/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        
+        if (response.ok) {
+          const userData = await response.json();
+          if (userData.role !== 'admin') {
+            throw new Error('Access denied. Admin privileges required.');
+          }
+          // If admin, redirect to dashboard
+          router.push('/dashboard');
+        }
+      }
     } catch (err: any) {
       setError(err.message);
+      // Logout if user doesn't have admin privileges
+      if (err.message.includes('Access denied')) {
+        localStorage.removeItem('token');
+      }
     } finally {
       setLoading(false);
     }
@@ -39,14 +73,21 @@ export default function LoginForm() {
             Forbes Digital LifeLine
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Access the admin dashboard
+            Admin Dashboard Access
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <motion.div 
+            className={`bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded ${
+                error.includes('Access denied') ? 'bg-red-100 border-red-400 text-red-700' : ''
+              }`}
+              initial={{ opacity: 0, transition: { duration: 5.3 } }}
+              animate={{ opacity: 1, transition: { duration: 1.7 } }}
+              exit={{ opacity: 0 }}
+            >
               {error}
-            </div>
+            </motion.div>
           )}
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
@@ -91,6 +132,10 @@ export default function LoginForm() {
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
+          </div>
+          
+          <div className="text-center text-sm text-gray-500">
+            <p>Only users with admin role can access this dashboard.</p>
           </div>
         </form>
       </div>

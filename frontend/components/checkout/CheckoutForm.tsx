@@ -115,7 +115,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
   const validateShippingForm = () => {
     if (!formData.firstName || !formData.lastName || !formData.address || 
-        !formData.city || !formData.state || !formData.zipCode || 
+        !formData.city || !formData.state || 
         !formData.email || !formData.phone) {
       setError('Please fill in all required fields');
       return false;

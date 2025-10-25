@@ -57,7 +57,7 @@ export class ShippingAddressDto {
   phone: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   zipCode: string;
 
   @IsString()

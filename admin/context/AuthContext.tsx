@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface User {
@@ -7,6 +8,7 @@ interface User {
   email: string;
   displayName: string;
   role: string;
+  isEmailVerified: boolean;
 }
 
 interface AuthContextType {
@@ -15,6 +17,7 @@ interface AuthContextType {
   register: (email: string, password: string, displayName: string) => Promise<void>;
   logout: () => void;
   loading: boolean;
+  isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,16 +28,22 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1000';
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     checkAuth();
   }, []);
 
+  useEffect(() => {
+    // Update isAdmin whenever user changes
+    setIsAdmin(user?.role === 'admin');
+  }, [user]);
+
   const checkAuth = async () => {
     try {
       const token = localStorage.getItem('token');
       if (token) {
-        // FIXED: Changed from localhost:3001 to use API_URL
         const response = await fetch(`${API_URL}/auth/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -45,14 +54,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const userData = await response.json();
           setUser(userData);
         } else if (response.status === 401) {
-          // Only clear token if auth profile endpoint specifically says unauthorized
           console.warn('Auth token invalid, clearing...');
           localStorage.removeItem('token');
         }
       }
     } catch (error) {
       console.error('Auth check failed:', error);
-      // Don't clear token on network errors
     } finally {
       setLoading(false);
     }
@@ -98,11 +105,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     localStorage.removeItem('token');
+    router.push('/');
     setUser(null);
+    setIsAdmin(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, loading, isAdmin }}>
       {children}
     </AuthContext.Provider>
   );

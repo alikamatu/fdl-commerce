@@ -73,10 +73,10 @@ export const CartItem: React.FC<CartItemProps> = ({ item }) => {
 
           {/* Price */}
           <div className="text-right">
-            <p className="text-lg font-semibold text-foreground">${price}</p>
+            <p className="text-lg font-semibold text-foreground">GH₵ {price}</p>
             {item.quantity > 1 && (
               <p className="text-sm text-foreground/60">
-                ${total} total
+                GH₵ {total} total
               </p>
             )}
           </div>

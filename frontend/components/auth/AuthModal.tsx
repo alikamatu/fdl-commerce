@@ -31,6 +31,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   
   const { 
     login, 
@@ -47,6 +48,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       setFormData({ name: '', email: '', password: '', confirmPassword: '', resetToken: '' });
       setErrors({});
       setSuccessMessage('');
+      setAcceptedTerms(false);
     }
   }, [isOpen, defaultTab]);
 
@@ -78,6 +80,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         newErrors.confirmPassword = 'Please confirm your password';
       } else if (formData.password !== formData.confirmPassword) {
         newErrors.confirmPassword = 'Passwords do not match';
+      }
+
+      // Terms validation for registration
+      if (!acceptedTerms) {
+        newErrors.terms = 'You must accept the terms and conditions';
       }
     }
 
@@ -135,6 +142,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       if (currentView !== 'success') {
         setFormData({ name: '', email: '', password: '', confirmPassword: '', resetToken: '' });
         setErrors({});
+        setAcceptedTerms(false);
       }
     } catch (error: any) {
       // Handle specific error messages from the backend
@@ -174,6 +182,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setCurrentView(view);
     setErrors({});
     setSuccessMessage('');
+    setAcceptedTerms(false);
   };
 
   // Close modal on escape key
@@ -200,6 +209,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
     return (
       <div className="px-8 pt-8">
+        {/* Logo */}
+        <div className="flex items-center justify-center mb-6 gap-3">
+          <img src='/logo/fdll.jpeg' alt="Logo" className="rounded-lg w-10 h-10 object-contain" />
+          <span className="text-xl font-semibold text-foreground hidden sm:block bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
+            Forbes Digital Lifeline
+          </span>
+        </div>
+
         {/* Back button for non-main views */}
         {(currentView === 'forgot-password' || currentView === 'reset-password' || currentView === 'success') && (
           <button
@@ -375,7 +392,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
       {/* Confirm Password (Register and Reset-password) */}
       {(currentView === 'register' || currentView === 'reset-password') && (
-        <div className="mb-6">
+        <div className="mb-4">
           <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground/80 mb-2">
             Confirm Password
           </label>
@@ -405,10 +422,43 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
       )}
 
+      {/* Terms Acceptance (Register only) */}
+      {currentView === 'register' && (
+        <div className="mb-6">
+          <div className="flex items-start gap-3">
+            <input
+              id="terms"
+              type="checkbox"
+              checked={acceptedTerms}
+              onChange={(e) => {
+                setAcceptedTerms(e.target.checked);
+                if (errors.terms) {
+                  setErrors(prev => ({ ...prev, terms: '' }));
+                }
+              }}
+              className="mt-1 w-4 h-4 text-foreground border-foreground/20 rounded focus:ring-foreground/20 focus:ring-2"
+            />
+            <label htmlFor="terms" className="text-sm text-foreground/80 leading-tight">
+              I agree to the{' '}
+              <a href="/terms" target="_blank" className="text-blue-700 hover:underline font-medium">
+                Terms and Conditions
+              </a>{' '}
+              and{' '}
+              <a href="/privacy" target="_blank" className="text-blue-700 hover:underline font-medium">
+                Privacy Policy
+              </a>
+            </label>
+          </div>
+          {errors.terms && (
+            <p className="mt-1 text-sm text-red-500">{errors.terms}</p>
+          )}
+        </div>
+      )}
+
       {/* Submit Button */}
       <button
         type="submit"
-        disabled={isLoading || authLoading}
+        disabled={isLoading || authLoading || (currentView === 'register' && !acceptedTerms)}
         className="w-full bg-foreground text-background py-3 px-4 rounded-lg font-medium hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
       >
         {(isLoading || authLoading) && (
@@ -442,7 +492,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <button
               type="button"
               onClick={() => switchView('register')}
-              className="text-foreground hover:underline font-medium"
+              className="text-blue-700 hover:underline font-medium"
             >
               Sign up
             </button>
@@ -455,9 +505,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <button
               type="button"
               onClick={() => switchView('login')}
-              className="text-foreground hover:underline font-medium"
+              className="text-blue-700 hover:underline font-medium"
             >
-              Sign in
+              Continue
             </button>
           </div>
         )}
@@ -488,7 +538,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60"
             onClick={onClose}
           />
 

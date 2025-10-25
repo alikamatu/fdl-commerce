@@ -14,10 +14,12 @@ import {
   TrendingUp,
   DollarSign,
   NewspaperIcon,
-  StrikethroughIcon
+  StrikethroughIcon,
+  LogOut
 } from "lucide-react";
 import ThemeToggle from "../ThemeToggle";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
 
 interface NavItem {
   name: string;
@@ -39,6 +41,7 @@ export default function Sidenav() {
     products: true,
     orders: true,
   });
+  const { logout } = useAuth();
 
   const isActive = (path: string) => pathname === path;
 
@@ -215,7 +218,9 @@ export default function Sidenav() {
       {/* Footer Actions */}
       <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
         <div className="flex items-center justify-between">
-          <ThemeToggle />
+          <span onClick={logout} className="bg-red-700 text-white p-2 rounded-lg flex items-center space-x-2 cursor-pointer">
+          <LogOut size={15} />
+          </span>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link
               href="/"

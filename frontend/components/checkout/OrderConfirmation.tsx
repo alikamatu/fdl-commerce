@@ -145,21 +145,6 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) =
         )}
       </div>
 
-      {/* Show this message only for guest users */}
-      {isGuestUser && (
-        <div className="mt-8 p-4 bg-foreground/5 rounded-lg">
-          <p className="text-sm text-foreground/60 mb-2">
-            Want to track your order and view order history?
-          </p>
-          <Link
-            href="/register"
-            className="text-sm font-medium text-foreground hover:underline"
-          >
-            Create an account to manage your orders
-          </Link>
-        </div>
-      )}
-
       {/* Order confirmation email notice
       <div className="mt-6 p-3 bg-green-50 border border-green-200 rounded-lg">
         <p className="text-sm text-green-800">

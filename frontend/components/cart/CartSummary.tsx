@@ -36,52 +36,17 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ onCheckout }) => {
           Order Summary
         </h2>
 
-        {/* Free Shipping Progress */}
-        {!isEligibleForFreeShipping && cart.subtotal > 0 && (
-          <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-            <div className="flex items-center gap-2 text-amber-800 text-sm mb-2">
-              <Truck size={16} />
-              <span>Add ₵{freeShippingRemaining} for free delivery</span>
-            </div>
-            <div className="w-full bg-amber-200 rounded-full h-2">
-              <div 
-                className="bg-amber-500 h-2 rounded-full transition-all duration-500"
-                style={{ width: `${(cart.subtotal / 50000) * 100}%` }}
-              />
-            </div>
-          </div>
-        )}
-
-        {isEligibleForFreeShipping && (
-          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-            <div className="flex items-center gap-2 text-green-800 text-sm">
-              <Truck size={16} />
-              <span>You qualify for free delivery</span>
-            </div>
-          </div>
-        )}
-
         {/* Price Breakdown */}
         <div className="space-y-3">
           <div className="flex justify-between text-foreground/80">
             <span>Subtotal ({cart.itemCount} items)</span>
-            <span>₵{subtotal}</span>
-          </div>
-
-          <div className="flex justify-between text-foreground/80">
-            <span>Shipping</span>
-            <span>{cart.shipping === 0 ? 'Free' : `₵${shipping}`}</span>
-          </div>
-
-          <div className="flex justify-between text-foreground/80">
-            <span>Taxes</span>
-            <span>₵{taxes}</span>
+            <span>GH₵ {subtotal}</span>
           </div>
 
           <div className="border-t border-foreground/10 pt-3">
             <div className="flex justify-between text-lg font-semibold text-foreground">
               <span>Total</span>
-              <span>₵{total}</span>
+              <span>GH₵ {total}</span>
             </div>
           </div>
         </div>
@@ -100,7 +65,7 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ onCheckout }) => {
         {!user && (
           <div className="mt-4 p-3 bg-foreground/5 rounded-lg">
             <p className="text-xs text-foreground/60 text-center">
-              You&apos;ll be able to create an account or checkout as guest
+              You&apos;ll be able to create an account or checkout
             </p>
           </div>
         )}
@@ -114,25 +79,6 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ onCheckout }) => {
           <p className="text-xs text-foreground/40">
             Your payment information is encrypted and secure
           </p>
-        </div>
-      </div>
-
-      {/* Trust Features */}
-      <div className="border border-foreground/10 rounded-lg p-6 bg-background">
-        <h3 className="font-semibold text-foreground mb-4">Benefits</h3>
-        <div className="space-y-3">
-          <div className="flex items-center gap-3 text-sm text-foreground/60">
-            <Shield size={16} className="flex-shrink-0" />
-            <span>Authenticity guaranteed on all items</span>
-          </div>
-          <div className="flex items-center gap-3 text-sm text-foreground/60">
-            <RotateCcw size={16} className="flex-shrink-0" />
-            <span>30-day hassle-free returns</span>
-          </div>
-          <div className="flex items-center gap-3 text-sm text-foreground/60">
-            <Truck size={16} className="flex-shrink-0" />
-            <span>Fast and secure delivery</span>
-          </div>
         </div>
       </div>
     </motion.div>

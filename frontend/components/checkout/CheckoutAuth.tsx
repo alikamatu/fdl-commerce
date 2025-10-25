@@ -162,18 +162,6 @@ export const CheckoutAuth: React.FC<CheckoutAuthProps> = ({
           {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
         </button>
       </div>
-
-      <div className="mt-8 pt-6 border-t border-foreground/10">
-        <button
-          onClick={onContinueAsGuest}
-          className="w-full py-3 border border-foreground/20 rounded-lg font-medium hover:bg-foreground/5 transition-colors"
-        >
-          Continue as guest
-        </button>
-        <p className="text-xs text-foreground/40 text-center mt-2">
-          You can create an account later to track your order
-        </p>
-      </div>
     </motion.div>
   );
 };

@@ -28,7 +28,7 @@ export const Footer = () => {
             className="flex items-center gap-2 hover:text-foreground transition-colors group"
           >
             <Instagram size={18} className="group-hover:scale-110 transition-transform duration-200" />
-            <span className="font-medium">@anointingforbes</span>
+            <span className="font-medium hover:text-blue-700">@anointingforbes</span>
           </Link>
 
           {/* Snapchat (custom SVG icon) */}
@@ -48,7 +48,7 @@ export const Footer = () => {
             >
               <path d="M256 32c-52.3 0-96 43.7-96 96v16c0 17.7-14.3 32-32 32-17.7 0-32 14.3-32 32v40c0 17.7 14.3 32 32 32h5.4c2.3 16.6 8.1 32.3 17 45.7-10.1 3.9-22.5 8.3-34.5 11.2-19.8 4.7-32.9 16.6-33.9 30.7-.8 11.4 7 21.3 17.2 23.6 15.2 3.5 30.5 6.2 45.7 8.2 1.1 17.7 15.7 32 33.7 32h192c18 0 32.6-14.3 33.7-32 15.2-2 30.5-4.7 45.7-8.2 10.2-2.3 18-12.2 17.2-23.6-1-14.1-14.1-26-33.9-30.7-12-2.9-24.4-7.3-34.5-11.2 8.9-13.4 14.7-29.1 17-45.7H400c17.7 0 32-14.3 32-32v-40c0-17.7-14.3-32-32-32-17.7 0-32-14.3-32-32v-16c0-52.3-43.7-96-96-96z" />
             </svg>
-            <span className="font-medium">@anointingforbes</span>
+            <span className="font-medium hover:text-blue-700">@anointingforbes</span>
           </Link>
         </motion.div>
 
@@ -68,14 +68,14 @@ export const Footer = () => {
 
           <p className="text-sm">
             © 2020 - {year}{" "}
-            <span className="font-semibold text-foreground">Forbes Digitals</span>. All rights reserved.
+            <span className="font-semibold text-foreground">Forbes Digitals Lifeline</span>. All rights reserved.
           </p>
 
           <div className="flex items-center gap-4">
-            <Link href="/privacy" className="hover:text-foreground transition-colors">
+            <Link href="/privacy" className="hover:text-blue-700 transition-colors">
               Privacy
             </Link>
-            <Link href="/terms" className="hover:text-foreground transition-colors">
+            <Link href="/terms" className="hover:text-blue-700 transition-colors">
               Terms
             </Link>
           </div>
