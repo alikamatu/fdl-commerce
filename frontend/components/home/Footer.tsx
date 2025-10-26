@@ -67,7 +67,7 @@ export const Footer = () => {
           </p>
 
           <p className="text-sm">
-            © 2020 - {year}{" "}
+            © 2020-{year}{" "}
             <span className="font-semibold text-foreground">Forbes Digitals Lifeline</span>. All rights reserved.
           </p>
 

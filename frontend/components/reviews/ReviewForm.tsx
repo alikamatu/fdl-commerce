@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Star, X, Upload, Image as ImageIcon } from 'lucide-react';
+import { Star, X } from 'lucide-react';
 
 interface ReviewFormProps {
   product: {
@@ -32,68 +32,70 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
   const [hoverRating, setHoverRating] = useState(0);
   const [title, setTitle] = useState('');
   const [comment, setComment] = useState('');
-  const [images, setImages] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-// In your ReviewForm component, add better validation
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setErrors({});
+  // Calculate word count
+  const wordCount = comment.trim() ? comment.trim().split(/\s+/).length : 0;
+  const minWords = 25;
+  const isCommentValid = wordCount >= minWords;
 
-  // Validation
-  const newErrors: Record<string, string> = {};
-  if (rating === 0) newErrors.rating = 'Please select a rating';
-  if (!title.trim()) newErrors.title = 'Title is required';
-  if (!comment.trim()) newErrors.comment = 'Comment is required';
-  
-  // Validate orderId
-  if (!orderId || orderId.trim() === '') {
-    newErrors.submit = 'Unable to submit review. Please ensure you have purchased this product.';
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrors({});
 
-  if (Object.keys(newErrors).length > 0) {
-    setErrors(newErrors);
-    return;
-  }
-
-  setIsSubmitting(true);
-  
-  try {
-    const success = await onSubmit({
-      productId: product.id,
-      orderId: orderId.trim(),
-      rating,
-      title: title.trim(),
-      comment: comment.trim(),
-      images: images.length > 0 ? images : undefined,
-    });
-
-    if (!success) {
-      setErrors({ submit: 'Failed to submit review. Please try again.' });
+    // Validation
+    const newErrors: Record<string, string> = {};
+    if (rating === 0) newErrors.rating = 'Please select a rating';
+    if (!title.trim()) newErrors.title = 'Title is required';
+    if (!comment.trim()) newErrors.comment = 'Review text is required';
+    
+    // Validate word count
+    if (!isCommentValid) {
+      newErrors.comment = `Please write at least ${minWords} words. Currently ${wordCount} words.`;
     }
-  } catch (error) {
-    setErrors({ submit: 'An error occurred while submitting your review.' });
-  } finally {
-    setIsSubmitting(false);
-  }
-};
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-
-    // In a real app, you would upload to cloud storage and get URLs
-    // For now, we'll use object URLs (not suitable for production)
-    const newImages: string[] = [];
-    for (let i = 0; i < Math.min(files.length, 5 - images.length); i++) {
-      newImages.push(URL.createObjectURL(files[i]));
+    
+    // Validate orderId
+    if (!orderId || orderId.trim() === '') {
+      newErrors.submit = 'Unable to submit review. Please ensure you have purchased this product.';
     }
-    setImages(prev => [...prev, ...newImages]);
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      const success = await onSubmit({
+        productId: product.id,
+        orderId: orderId.trim(),
+        rating,
+        title: title.trim(),
+        comment: comment.trim(),
+      });
+
+      if (!success) {
+        setErrors({ submit: 'Failed to submit review. Please try again.' });
+      }
+    } catch (error) {
+      setErrors({ submit: 'An error occurred while submitting your review.' });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const removeImage = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
+  const getWordCountColor = () => {
+    if (wordCount === 0) return 'text-foreground/60';
+    if (wordCount < minWords) return 'text-amber-600';
+    return 'text-green-600';
+  };
+
+  const getWordCountMessage = () => {
+    if (wordCount === 0) return `Minimum ${minWords} words required`;
+    if (wordCount < minWords) return `${minWords - wordCount} more words needed`;
+    return 'Great! Your review meets the length requirement';
   };
 
   return (
@@ -175,7 +177,8 @@ const handleSubmit = async (e: React.FormEvent) => {
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Summarize your experience"
+              placeholder="Summarize your experience in a few words"
+              maxLength={100}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/20 ${
                 errors.title ? 'border-red-500' : 'border-foreground/20'
               }`}
@@ -183,68 +186,67 @@ const handleSubmit = async (e: React.FormEvent) => {
             {errors.title && (
               <p className="mt-1 text-sm text-red-500">{errors.title}</p>
             )}
+            <div className="flex justify-between mt-1">
+              <span className="text-xs text-foreground/60">
+                Brief summary of your experience
+              </span>
+              <span className="text-xs text-foreground/60">
+                {title.length}/100
+              </span>
+            </div>
           </div>
 
           {/* Comment */}
           <div>
-            <label htmlFor="comment" className="block text-sm font-medium mb-2">
-              Your Review *
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label htmlFor="comment" className="block text-sm font-medium">
+                Detailed Review *
+              </label>
+              <div className={`text-xs font-medium ${getWordCountColor()}`}>
+                {wordCount} / {minWords} words
+              </div>
+            </div>
             <textarea
               id="comment"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Share details of your experience with this product..."
-              rows={6}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/20 ${
-                errors.comment ? 'border-red-500' : 'border-foreground/20'
+              placeholder={`Please share your detailed experience with this product. Write at least ${minWords} words to help other customers make informed decisions.
+
+• How does the product perform?
+• What do you like about it?
+• Any issues or suggestions?
+• Would you recommend it to others?`}
+              rows={8}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/20 resize-none ${
+                errors.comment ? 'border-red-500' : 
+                !isCommentValid && comment.trim() ? 'border-amber-300' : 'border-foreground/20'
               }`}
             />
-            {errors.comment && (
+            {errors.comment ? (
               <p className="mt-1 text-sm text-red-500">{errors.comment}</p>
+            ) : (
+              <div className="flex justify-between mt-1">
+                <span className={`text-xs ${getWordCountColor()}`}>
+                  {getWordCountMessage()}
+                </span>
+                <span className="text-xs text-foreground/60">
+                  Minimum {minWords} words required
+                </span>
+              </div>
             )}
           </div>
 
-          {/* Image Upload */}
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Add Photos (Optional)
-            </label>
-            <div className="space-y-3">
-              <div className="flex flex-wrap gap-3">
-                {images.map((image, index) => (
-                  <div key={index} className="relative">
-                    <img
-                      src={image}
-                      alt={`Review ${index + 1}`}
-                      className="w-20 h-20 object-cover rounded-lg"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
-                    >
-                      <X size={14} />
-                    </button>
-                  </div>
-                ))}
-                {images.length < 5 && (
-                  <label className="w-20 h-20 border-2 border-dashed border-foreground/20 rounded-lg flex items-center justify-center cursor-pointer hover:border-foreground/40 transition-colors">
-                    <Upload size={20} className="text-foreground/40" />
-                    <input
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                    />
-                  </label>
-                )}
-              </div>
-              <p className="text-xs text-foreground/60">
-                You can upload up to 5 images
-              </p>
-            </div>
+          {/* Requirements Notice */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h4 className="text-sm font-medium text-blue-900 mb-2">
+              Review Requirements
+            </h4>
+            <ul className="text-xs text-blue-800 space-y-1">
+              <li>• Minimum {minWords} words for detailed review</li>
+              <li>• Be honest and specific about your experience</li>
+              <li>• Focus on product quality, features, and performance</li>
+              <li>• Avoid personal information or promotional content</li>
+            </ul>
           </div>
 
           {/* Actions */}
@@ -258,12 +260,18 @@ const handleSubmit = async (e: React.FormEvent) => {
             </button>
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="flex-1 px-4 py-2 bg-foreground text-background rounded-lg hover:bg-foreground/90 disabled:opacity-50 transition-colors"
+              disabled={isSubmitting || !isCommentValid}
+              className="flex-1 px-4 py-2 bg-foreground text-background rounded-lg hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isSubmitting ? 'Submitting...' : 'Submit Review'}
             </button>
           </div>
+
+          {errors.submit && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <p className="text-sm text-red-700">{errors.submit}</p>
+            </div>
+          )}
         </form>
       </motion.div>
     </motion.div>
