@@ -301,30 +301,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     </div>
   );
 
-  const renderPasswordRequirements = () => (
-    <div className="mb-4 p-3 bg-foreground/5 rounded-lg border border-foreground/10">
-      <p className="text-sm font-medium text-foreground/80 mb-2">Password must contain:</p>
-      <ul className="text-xs text-foreground/60 space-y-1">
-        <li className="flex items-center">
-          <span className="w-1.5 h-1.5 bg-foreground/40 rounded-full mr-2"></span>
-          At least 8 characters
-        </li>
-        <li className="flex items-center">
-          <span className="w-1.5 h-1.5 bg-foreground/40 rounded-full mr-2"></span>
-          At least one letter (a-z, A-Z)
-        </li>
-        <li className="flex items-center">
-          <span className="w-1.5 h-1.5 bg-foreground/40 rounded-full mr-2"></span>
-          At least one number (0-9)
-        </li>
-        <li className="flex items-center">
-          <span className="w-1.5 h-1.5 bg-foreground/40 rounded-full mr-2"></span>
-          At least one special character (!@#$%^&* etc.)
-        </li>
-      </ul>
-    </div>
-  );
-
   const renderForm = () => (
     <form onSubmit={handleSubmit} className="px-8 py-6">
       {/* Success/Error Messages */}
@@ -403,9 +379,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </div>
         </div>
       )}
-
-      {/* Password Requirements Info */}
-      {(currentView === 'register' || currentView === 'reset-password') && renderPasswordRequirements()}
 
       {/* Password Field (Login, Register, Reset-password) */}
       {(currentView === 'login' || currentView === 'register' || currentView === 'reset-password') && (
