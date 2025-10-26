@@ -228,7 +228,7 @@ async updateStatus(id: string, status: string): Promise<Order> {
   }
 
   // Validate status
-  const validStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
+  const validStatuses = ['pending', 'confirmed', 'processing', 'delivering', 'delivered', 'cancelled'];
   if (!validStatuses.includes(status)) {
     throw new BadRequestException(`Invalid status: ${status}`);
   }
@@ -238,7 +238,7 @@ async updateStatus(id: string, status: string): Promise<Order> {
   order.status = status;
 
   // Update timestamps based on status changes
-  if (status === 'shipped' && !order.shippedAt) {
+  if (status === 'delivering' && !order.shippedAt) {
     order.shippedAt = new Date();
   } else if (status === 'delivered' && !order.deliveredAt) {
     order.deliveredAt = new Date();

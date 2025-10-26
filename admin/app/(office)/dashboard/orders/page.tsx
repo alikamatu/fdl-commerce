@@ -62,10 +62,10 @@ interface Order {
   paymentMethod: string;
   paymentCompleted: boolean;
   paymentId?: string;
-  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'processing' | 'delivering' | 'delivered' | 'cancelled';
   createdAt: string;
   updatedAt: string;
-  shippedAt?: string;
+  deliveringAt?: string;
   deliveredAt?: string;
 }
 
@@ -308,7 +308,7 @@ export default function AdminOrdersPage() {
         return 'bg-blue-50 text-blue-700 border-blue-200';
       case 'processing':
         return 'bg-purple-50 text-purple-700 border-purple-200';
-      case 'shipped':
+      case 'delivering':
         return 'bg-indigo-50 text-indigo-700 border-indigo-200';
       case 'delivered':
         return 'bg-green-50 text-green-700 border-green-200';
@@ -327,7 +327,7 @@ export default function AdminOrdersPage() {
         return <CheckCircle className="w-4 h-4" />;
       case 'processing':
         return <Package className="w-4 h-4" />;
-      case 'shipped':
+      case 'delivering':
         return <Truck className="w-4 h-4" />;
       case 'delivered':
         return <CheckCircle className="w-4 h-4" />;
@@ -566,7 +566,7 @@ export default function AdminOrdersPage() {
         >
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Status Overview</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'].map((status) => (
+            {['pending', 'confirmed', 'processing', 'delivering', 'delivered', 'cancelled'].map((status) => (
               <div
                 key={status}
                 className={`p-4 rounded-xl border-2 text-center cursor-pointer transition-all duration-200 ${
@@ -618,7 +618,7 @@ export default function AdminOrdersPage() {
                 <option value="pending">Pending</option>
                 <option value="confirmed">Confirmed</option>
                 <option value="processing">Processing</option>
-                <option value="shipped">Shipped</option>
+                <option value="delivering">Delivering</option>
                 <option value="delivered">Delivered</option>
                 <option value="cancelled">Cancelled</option>
               </select>
@@ -634,7 +634,7 @@ export default function AdminOrdersPage() {
                 <option value="all">All Time</option>
                 <option value="today">Today</option>
                 <option value="week">Last 7 Days</option>
-                <option value="month">Last 30 Days</option>
+                <option value="monlg">Last 30 Days</option>
               </select>
             </div>
 

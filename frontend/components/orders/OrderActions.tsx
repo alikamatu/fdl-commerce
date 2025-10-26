@@ -49,9 +49,9 @@ export const OrderActions: React.FC<OrderActionsProps> = ({
     const message = `Hello! I need follow-up on my order:\n\n` +
       `Order #: ${order.orderNumber}\n` +
       `Status: ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}\n` +
-      `Total: $${(order.totalCents / 100).toFixed(2)}\n` +
+      `Total: GH₵${(order.totalCents / 100).toFixed(2)}\n` +
       `Ordered: ${new Date(order.createdAt).toLocaleDateString()}\n\n` +
-      `Items:\n${order.items.map(item => `• ${item.title} (Qty: ${item.quantity})`).join('\n')}\n\n` +
+      `Items:\n${order.items.map(item => `• ${item.title} (Qty: ${item.quantity}) - GH₵${(item.priceCents / 100).toFixed(2)}`).join('\n')}\n\n` +
       `Could you please provide an update on my order?`;
     
     // Encode the message for URL
@@ -77,7 +77,7 @@ export const OrderActions: React.FC<OrderActionsProps> = ({
       </button>
 
       {/* Track Order */}
-      {order.status === 'shipped' && order.trackingNumber && (
+      {order.status === 'delivering' && order.trackingNumber && (
         <button
           onClick={handleTrackOrder}
           className="flex items-center space-x-1 px-3 py-1.5 text-sm border border-foreground/20 rounded-lg hover:bg-foreground/5 transition-colors"

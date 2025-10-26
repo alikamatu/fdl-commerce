@@ -319,7 +319,7 @@ export default function InventoryPage() {
               <Package className="w-7 h-7 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="lg font-bold text-gray-900">
                 Inventory Management
               </h1>
               <p className="text-gray-600 mt-2 text-lg">
@@ -373,7 +373,7 @@ export default function InventoryPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Products</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.totalProducts}</p>
+                <p className="lg font-bold text-gray-900 mt-2">{stats.totalProducts}</p>
                 <div className="flex items-center gap-2 mt-3 text-sm">
                   <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
                     {stats.activeProducts} active
@@ -400,7 +400,7 @@ export default function InventoryPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Stock</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.totalStock.toLocaleString()}</p>
+                <p className="lg font-bold text-gray-900 mt-2">{stats.totalStock.toLocaleString()}</p>
                 <div className="flex items-center gap-2 mt-3 text-sm">
                   {stats.lowStockItems > 0 && (
                     <span className="bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-medium">
@@ -429,7 +429,7 @@ export default function InventoryPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Inventory Value</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{formatInventoryValue(stats.inventoryValue)}</p>
+                <p className="lg font-bold text-gray-900 mt-2">{formatInventoryValue(stats.inventoryValue)}</p>
                 <div className="flex items-center gap-2 mt-3 text-sm text-gray-600">
                   <span className='md'>₵</span>
                   <span>Total value at current prices</span>
@@ -450,7 +450,7 @@ export default function InventoryPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Performance</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.totalSold.toLocaleString()}</p>
+                <p className="lg font-bold text-gray-900 mt-2">{stats.totalSold.toLocaleString()}</p>
                 <div className="flex items-center gap-2 mt-3 text-sm text-gray-600">
                   <span>Total units sold</span>
                 </div>

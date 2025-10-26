@@ -59,7 +59,7 @@ interface Order {
   paymentMethod: string;
   paymentCompleted: boolean;
   paymentId?: string;
-  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'processing' | 'delivering' | 'delivered' | 'cancelled';
   createdAt: string;
   updatedAt: string;
   shippedAt?: string;
@@ -274,7 +274,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
         return 'bg-blue-50 text-blue-700 border-blue-200';
       case 'processing':
         return 'bg-purple-50 text-purple-700 border-purple-200';
-      case 'shipped':
+      case 'delivering':
         return 'bg-indigo-50 text-indigo-700 border-indigo-200';
       case 'delivered':
         return 'bg-green-50 text-green-700 border-green-200';
@@ -293,7 +293,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
         return <CheckCircle className="w-4 h-4" />;
       case 'processing':
         return <Package className="w-4 h-4" />;
-      case 'shipped':
+      case 'delivering':
         return <Truck className="w-4 h-4" />;
       case 'delivered':
         return <CheckCircle className="w-4 h-4" />;
@@ -617,7 +617,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
                     <option value="pending">Pending</option>
                     <option value="confirmed">Confirmed</option>
                     <option value="processing">Processing</option>
-                    <option value="shipped">Delivering</option>
+                    <option value="delivering">Delivering</option>
                     <option value="delivered">Delivered</option>
                     <option value="cancelled">Cancelled</option>
                   </select>

@@ -23,7 +23,7 @@ export interface ShippingAddress {
 export interface Order {
   _id: string;
   orderNumber: string;
-  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'processing' | 'delivering' | 'delivered' | 'cancelled';
   totalCents: number;
   subtotalCents: number;
   taxCents: number;

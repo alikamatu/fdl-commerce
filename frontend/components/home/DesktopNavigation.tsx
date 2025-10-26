@@ -16,6 +16,12 @@ export const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
 }) => {
   const navItems = [
     {
+      href: "/",
+      label: "Home",
+      icon: ShoppingBag,
+      description: "Back to homepage"
+    },
+    {
       href: "/products",
       label: "Shop",
       icon: ShoppingBag,
@@ -37,9 +43,6 @@ export const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
 
   return (
     <div className="hidden lg:flex items-center space-x-1">
-      {/* Categories Dropdown */}
-      <CategoriesDropdown categories={categories} loading={loading} />
-      
       {/* Other Navigation Items */}
       {navItems.map((item) => (
         <motion.div

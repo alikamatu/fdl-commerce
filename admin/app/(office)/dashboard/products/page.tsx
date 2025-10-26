@@ -17,7 +17,6 @@ import {
   AlertCircle,
   RefreshCw,
   Users,
-  TrendingUp,
   Star,
   Zap,
   Clock,

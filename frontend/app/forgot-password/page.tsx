@@ -74,7 +74,7 @@ export default function ForgotPasswordPage() {
                 you will receive a password reset link shortly.
               </p>
               <p className="text-sm text-foreground/60 mb-6">
-                Please check your inbox and spam/junk folder. The link will expire in 1 hour.
+                Please check your inbox or spam/junk folder. The link will expire in 1 hour.
               </p>
               
               <div className="space-y-3">
