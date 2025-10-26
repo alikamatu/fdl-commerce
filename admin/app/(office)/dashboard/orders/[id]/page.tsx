@@ -19,12 +19,7 @@ import {
   Phone,
   CreditCard,
   Calendar,
-  Download,
-  Send,
-  Printer,
   AlertCircle,
-  Info,
-  ArrowUpRight,
   Package2,
   BadgeCheck,
   FileText
@@ -622,7 +617,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
                     <option value="pending">Pending</option>
                     <option value="confirmed">Confirmed</option>
                     <option value="processing">Processing</option>
-                    <option value="shipped">Shipped</option>
+                    <option value="shipped">Delivering</option>
                     <option value="delivered">Delivered</option>
                     <option value="cancelled">Cancelled</option>
                   </select>
@@ -644,23 +639,6 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
                     {updating ? 'Updating...' : selectedStatus === order.status ? 'No Changes' : 'Update Status'}
                   </span>
                 </motion.button>
-
-                {selectedStatus === 'shipped' && order.status !== 'shipped' && (
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleSendShippingNotification}
-                    disabled={sendingNotification}
-                    className="w-full flex items-center justify-center space-x-3 px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-sm"
-                  >
-                    {sendingNotification ? (
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
-                    ) : (
-                      <Send className="w-5 h-5" />
-                    )}
-                    <span>{sendingNotification ? 'Sending...' : 'Notify Customer'}</span>
-                  </motion.button>
-                )}
               </div>
             </motion.div>
 

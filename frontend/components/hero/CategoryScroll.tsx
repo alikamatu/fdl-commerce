@@ -1,4 +1,3 @@
-// components/categories/CategoryScroll.tsx
 "use client";
 
 import { motion } from 'framer-motion';
@@ -18,7 +17,7 @@ export const CategoryScroll: React.FC = () => {
             <div className="h-3 md:h-4 bg-foreground/10 rounded w-60 md:w-96 mx-auto animate-pulse" />
           </div>
           <div className="flex gap-3 md:gap-6 lg:gap-8 overflow-x-auto pb-3 md:pb-6 scrollbar-hide px-1">
-            {[...Array(6)].map((_, index) => (
+            {[...Array(4)].map((_, index) => (
               <div
                 key={index}
                 className="flex flex-col items-center flex-shrink-0 w-20 xs:w-24 sm:w-28 md:w-36 lg:w-44 animate-pulse"
@@ -158,7 +157,7 @@ export const CategoryScroll: React.FC = () => {
         </div>
 
         {/* View All Categories Link */}
-        {categories.length > 4 && (
+        {categories.length > 3 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

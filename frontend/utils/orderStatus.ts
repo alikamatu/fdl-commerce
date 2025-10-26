@@ -4,6 +4,7 @@ import { Order } from '@/types/order';
 export const ORDER_STATUSES = {
   pending: { label: 'Pending', color: 'yellow' },
   confirmed: { label: 'Confirmed', color: 'blue' },
+  shipped: { label: 'Delivering', color: 'blue'},
   processing: { label: 'Processing', color: 'orange' },
   delivered: { label: 'Delivered', color: 'green' },
   cancelled: { label: 'Cancelled', color: 'red' },

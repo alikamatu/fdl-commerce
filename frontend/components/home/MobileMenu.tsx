@@ -77,7 +77,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
 
             {/* Categories Accordion */}
             <div className="border-t border-foreground/10 pt-2">
-              <button
+              {/* <button
                 onClick={() => setShowCategories(!showCategories)}
                 className="flex items-center justify-between w-full px-4 py-3 text-foreground/80 hover:text-foreground hover:bg-foreground/5 rounded-lg transition-colors"
               >
@@ -91,7 +91,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
                     showCategories ? 'rotate-180' : ''
                   }`}
                 />
-              </button>
+              </button> */}
 
               <AnimatePresence>
                 {showCategories && (

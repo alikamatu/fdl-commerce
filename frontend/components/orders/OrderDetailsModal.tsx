@@ -205,7 +205,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
               className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
               <MessageCircle size={16} />
-              <span>Contact Support</span>
+              <span>Message</span>
             </button>
               
               {canCancelOrder(order.status) && (

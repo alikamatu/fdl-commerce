@@ -135,9 +135,9 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
       {/* Price Section with Discount */}
       <div className="space-y-2">
         <div className="flex items-baseline gap-2">
-          <span className="text-3xl font-bold text-foreground">₵{price}</span>
+          <span className="text-3xl font-bold text-foreground">GH₵{price}</span>
           {originalPrice && originalPrice !== price && (
-            <span className="text-xl text-foreground/40 line-through">₵{originalPrice}</span>
+            <span className="text-xl text-foreground/40 line-through">GH₵{originalPrice}</span>
           )}
           {discountPercent > 0 && (
             <span className="bg-red-500 text-white text-sm font-bold px-2 py-1 rounded">

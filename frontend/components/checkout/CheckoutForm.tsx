@@ -218,11 +218,12 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
             </div>
             <div>
               <label className="block text-sm font-medium text-foreground/80 mb-2">
-                Phone Number *
+                Calling Number *
               </label>
               <input
                 type="tel"
                 name="phone"
+                max={10}
                 value={formData.phone}
                 onChange={handleInputChange}
                 required
