@@ -100,11 +100,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         token: data.token,
         isEmailVerified: data.user.isEmailVerified,
       };
-
-      if (typeof window !== "undefined") {
-        localStorage.setItem('user', JSON.stringify(userData));
-        localStorage.setItem('token', data.token);
-      }
+      
     } catch (error) {
       console.error('Registration error:', error);
       throw error;

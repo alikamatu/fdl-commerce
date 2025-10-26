@@ -32,13 +32,31 @@ function ResetPasswordForm() {
     }
   }, [token]);
 
+    const validatePassword = (password: string): string | null => {
+    if (!password) return 'Password is required';
+    if (password.length < 8) return 'Password must be at least 8 characters';
+    
+    const hasLetter = /[a-zA-Z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+
+    if (!hasLetter) return 'Password must contain at least one letter';
+    if (!hasNumber) return 'Password must contain at least one number';
+    if (!hasSpecialChar) return 'Password must contain at least one special character';
+    
+    return null;
+  };
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+    } else {
+      const passwordError = validatePassword(formData.password);
+      if (passwordError) {
+        newErrors.password = passwordError;
+      }
     }
 
     if (!formData.confirmPassword) {

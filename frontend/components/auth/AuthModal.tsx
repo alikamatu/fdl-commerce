@@ -143,7 +143,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         
         case 'register':
           await register(formData.email, formData.password, formData.name);
-          setSuccessMessage('Registration successful! Please check your email to verify your account. If you do not see it, check your spam folder.');
+          setSuccessMessage('Registration successful! Please check your email to verify your account. If you do not see it, check your spam/junk folder.');
           setCurrentView('success');
           break;
         
@@ -444,6 +444,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
       )}
 
+      {currentView === 'login' && (
+        <div className="mb-4 text-sm text-foreground/70">
+          By signing in, you agree to our{' '}
+          <a href="/terms" target="_blank" className="text-blue-700 hover:underline font-medium">
+            Conditions of Use
+          </a>{' '}
+          and{' '}
+          <a href="/privacy" target="_blank" className="text-blue-700 hover:underline font-medium">
+            Privacy Policy
+          </a>.
+        </div>
+      )}
+
       {/* Terms Acceptance (Register only) */}
       {currentView === 'register' && (
         <div className="mb-6">
@@ -461,7 +474,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               className="mt-1 w-4 h-4 text-foreground border-foreground/20 rounded focus:ring-foreground/20 focus:ring-2"
             />
             <label htmlFor="terms" className="text-sm text-foreground/80 leading-tight">
-              By signing in, you agree to Forbes Digital Lifeline{' '}
+              By creating an account, you agree to Forbes Digital Lifeline{' '}
               <a href="/terms" target="_blank" className="text-blue-700 hover:underline font-medium">
                 Conditions of Use
               </a>{' '}
@@ -502,7 +515,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               onClick={() => switchView('forgot-password')}
               className="text-foreground/60 hover:text-foreground transition-colors"
             >
-              Forgot your password?
+              Forgot your password? <span className="text-blue-700">Reset</span>
             </button>
           </div>
         )}
