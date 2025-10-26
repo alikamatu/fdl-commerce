@@ -31,7 +31,7 @@ function calculateCartTotals(items: CartItem[]): Omit<Cart, 'items'> {
   const subtotal = items.reduce((sum, item) => sum + (item.priceCents * item.quantity), 0);
   const shipping = subtotal > 5000 ? 0 : 999; // Free shipping over $50
   const taxes = Math.round(subtotal * 0.08); // 8% tax
-  const total = subtotal + shipping + taxes;
+  const total = subtotal;
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   return {

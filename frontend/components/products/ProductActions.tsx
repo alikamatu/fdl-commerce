@@ -150,7 +150,6 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
             You save GH₵ {(parseFloat(originalPrice) - parseFloat(price)).toFixed(2)}
           </div>
         )}
-        <span className="text-foreground/60 text-sm">{product.currency}</span>
       </div>
 
       {/* Stock Status */}
@@ -210,14 +209,6 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
           )}
         </button>
 
-          <button
-    onClick={handleWhatsAppShare}
-    className="flex items-center justify-center gap-2 flex-1 px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
-  >
-    <MessageCircle size={20} />
-    <span>Buy on WhatsApp</span>
-  </button>
-        
         <div className="flex gap-2">
           <button
             onClick={handleWishlist}
@@ -243,15 +234,11 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-foreground/10">
         <div className="flex items-center gap-2 text-sm text-foreground/60">
           <Truck size={16} />
-          <span>Free shipping</span>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-foreground/60">
-          <Shield size={16} />
-          <span>2-year warranty</span>
+          <span>Free Delivery</span>
         </div>
         <div className="flex items-center gap-2 text-sm text-foreground/60">
           <RotateCcw size={16} />
-          <span>30-day returns</span>
+          <span>90-day returns</span>
         </div>
       </div>
     </motion.div>

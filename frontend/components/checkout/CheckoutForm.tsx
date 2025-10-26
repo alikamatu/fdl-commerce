@@ -34,8 +34,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   // Calculate totals
   const subtotalCents = cart.total;
   const shippingCents = 0; // Free shipping
-  const taxCents = Math.round(subtotalCents * 0.08); // 8% tax
-  const totalCents = subtotalCents + shippingCents + taxCents;
+  const totalCents = subtotalCents;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
@@ -69,7 +68,6 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
       paymentMethod: 'cash_on_delivery',
       subtotalCents,
       shippingCents,
-      taxCents,
       totalCents,
     };
 
@@ -124,7 +122,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   };
 
   const steps = [
-    { number: 1, title: 'Shipping', icon: Truck },
+    { number: 1, title: 'Delivery', icon: Truck },
     { number: 2, title: 'Review', icon: Lock },
   ];
 
@@ -172,7 +170,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
         >
           <h3 className="text-xl font-semibold text-foreground mb-6 flex items-center gap-2">
             <Truck size={20} />
-            Shipping Information
+            Delivery Information
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -276,18 +274,6 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                 className="w-full px-4 py-3 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/20 bg-transparent"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground/80 mb-2">
-                Postal Code
-              </label>
-              <input
-                type="text"
-                name="zipCode"
-                value={formData.zipCode}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/20 bg-transparent"
-              />
-            </div>
           </div>
 
           <div className="flex justify-end">
@@ -339,12 +325,8 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                   <span>GH₵{(subtotalCents / 100).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-foreground/60">Shipping</span>
+                  <span className="text-foreground/60">Delivery</span>
                   <span>GH₵{(shippingCents / 100).toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-foreground/60">Tax</span>
-                  <span>GH₵{(taxCents / 100).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between font-semibold text-lg pt-2 border-t border-foreground/10">
                   <span>Total</span>
@@ -354,9 +336,9 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
             </div>
           </div>
 
-          {/* Shipping Info */}
+          {/* Delivery Info */}
           <div className="border border-foreground/10 rounded-lg p-6">
-            <h4 className="font-semibold text-foreground mb-4">Shipping Address</h4>
+            <h4 className="font-semibold text-foreground mb-4">Delivery Address</h4>
             <p className="text-foreground/80 text-sm">
               {formData.firstName} {formData.lastName}<br />
               {formData.email}<br />
@@ -380,7 +362,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
               onClick={() => setStep(1)}
               className="px-6 py-3 border border-foreground/20 rounded-lg font-medium hover:bg-foreground/5 transition-colors"
             >
-              Back to Shipping
+              Back to Delivery
             </button>
             <button
               onClick={handlePlaceOrder}

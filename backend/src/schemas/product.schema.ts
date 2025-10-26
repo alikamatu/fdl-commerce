@@ -42,6 +42,12 @@ export class Product {
   @Prop({ required: true })
   priceCents: number;
 
+@Prop({ default: 0 })
+averageRating: number;
+
+@Prop({ default: 0 })
+reviewCount: number;
+
   @Prop({ required: true, default: 'USD' })
   currency: string;
 

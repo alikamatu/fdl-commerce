@@ -5,7 +5,6 @@ export const ORDER_STATUSES = {
   pending: { label: 'Pending', color: 'yellow' },
   confirmed: { label: 'Confirmed', color: 'blue' },
   processing: { label: 'Processing', color: 'orange' },
-  shipped: { label: 'Shipped', color: 'purple' },
   delivered: { label: 'Delivered', color: 'green' },
   cancelled: { label: 'Cancelled', color: 'red' },
 } as const;
@@ -54,8 +53,5 @@ export const formatOrderDate = (dateString: string) => {
 };
 
 export const formatCurrency = (cents: number) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'GHS',
-  }).format(cents / 100);
+  return 'GH₵ ' + (cents / 100).toFixed(2);
 };

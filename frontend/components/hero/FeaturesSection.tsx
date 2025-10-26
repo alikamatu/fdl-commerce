@@ -9,16 +9,16 @@ const features = [
     title: 'Authenticity Guaranteed',
     description: 'Every item is verified by our expert team',
   },
-  // {
-  //   icon: Truck,
-  //   title: 'Free Shipping',
-  //   description: 'On orders over $50 with secure packaging',
-  // },
-  // {
-  //   icon: RotateCcw,
-  //   title: 'Hassle-Free Returns',
-  //   description: '30-day return policy for your peace of mind',
-  // },
+  {
+    icon: Truck,
+    title: 'Free Shipping',
+    description: 'On orders over GH₵1000 with secure packaging',
+  },
+  {
+    icon: RotateCcw,
+    title: 'Hassle-Free Returns',
+    description: '90-day return policy for your peace of mind',
+  },
   {
     icon: Headphones,
     title: '24/7 Support',

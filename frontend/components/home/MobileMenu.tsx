@@ -129,12 +129,6 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
                     <User size={20} />
                     <span className="font-medium">Sign In</span>
                   </button>
-                  <button
-                    onClick={handleLoginClick}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg font-medium text-center"
-                  >
-                    Get Started
-                  </button>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -158,14 +152,6 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
                   >
                     <Heart size={20} />
                     <span>Wishlist</span>
-                  </Link>
-                  <Link 
-                    href="/settings" 
-                    className="flex items-center space-x-3 px-4 py-2 text-foreground/80 hover:text-foreground hover:bg-foreground/5 rounded-lg transition-colors"
-                    onClick={onClose}
-                  >
-                    <Settings size={20} />
-                    <span>Settings</span>
                   </Link>
                   
                   <button

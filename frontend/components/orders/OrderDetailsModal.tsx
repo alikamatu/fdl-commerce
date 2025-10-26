@@ -102,12 +102,8 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                     <span>{formatCurrency(order.subtotalCents)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-foreground/60">Shipping:</span>
+                    <span className="text-foreground/60">Delivery:</span>
                     <span>{formatCurrency(order.shippingCents)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-foreground/60">Tax:</span>
-                    <span>{formatCurrency(order.taxCents)}</span>
                   </div>
                   <div className="flex justify-between font-medium border-t border-foreground/10 pt-2">
                     <span>Total:</span>
@@ -116,9 +112,9 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                 </div>
               </div>
 
-              {/* Shipping Address */}
+              {/* Delivery Address */}
               <div>
-                <h3 className="font-medium text-foreground mb-3">Shipping Address</h3>
+                <h3 className="font-medium text-foreground mb-3">Delivery Address</h3>
                 <div className="flex items-start space-x-2 text-foreground/60 bg-foreground/5 rounded-lg p-4">
                   <MapPin size={18} className="mt-0.5 flex-shrink-0" />
                   <div className="space-y-1">
@@ -192,13 +188,13 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
 
                   <button
               onClick={() => {
-                const adminWhatsAppNumber = process.env.NEXT_PUBLIC_ADMIN_WHATSAPP_NUMBER || '1234567890';
+                const adminWhatsAppNumber = process.env.NEXT_PUBLIC_ADMIN_WHATSAPP_NUMBER || '233547129636';
                 const message = `Hello! I need follow-up on my order:\n\n` +
                   `Order #: ${order.orderNumber}\n` +
                   `Status: ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}\n` +
                   `Total: ₵${(order.totalCents / 100).toFixed(2)}\n` +
                   `Ordered: ${new Date(order.createdAt).toLocaleDateString()}\n` +
-                  `Shipping: ${order.shippingAddress.firstName} ${order.shippingAddress.lastName}, ${order.shippingAddress.city}\n\n` +
+                  `Delivery: ${order.shippingAddress.firstName} ${order.shippingAddress.lastName}, ${order.shippingAddress.city}\n\n` +
                   `Items:\n${order.items.map(item => `• ${item.title} (Qty: ${item.quantity}) - ₵${(item.priceCents / 100).toFixed(2)}`).join('\n')}\n\n` +
                   `Could you please provide an update on my order?`;
                 

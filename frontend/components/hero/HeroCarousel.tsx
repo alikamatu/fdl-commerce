@@ -40,14 +40,6 @@ const defaultSlides: HeroSlide[] = [
     ctaText: 'View Deals',
     ctaLink: '/products?discount=true',
   },
-  {
-    id: '4',
-    image: '/images/2149404179.jpg',
-    title: 'Premium Quality Guaranteed',
-    description: 'Shop with confidence with our authenticity promise',
-    ctaText: 'Learn More',
-    ctaLink: '/about',
-  },
 ];
 
 interface HeroCarouselProps {

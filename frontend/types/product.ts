@@ -27,6 +27,7 @@ export interface Product {
   discountPercent?: number;
   currency: string;
   categoryId: Category;
+  averageRating: number;
   images: ProductImage[];
   stock: number;
   brand: string;

@@ -39,7 +39,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     loading: authLoading,
     forgotPassword,
     resetPassword,
-    resendVerification
   } = useAuth();
 
   useEffect(() => {
@@ -51,6 +50,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       setAcceptedTerms(false);
     }
   }, [isOpen, defaultTab]);
+
+  const validatePassword = (password: string): string | null => {
+    if (!password) return 'Password is required';
+    if (password.length < 8) return 'Password must be at least 8 characters';
+    
+    const hasLetter = /[a-zA-Z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+
+    if (!hasLetter) return 'Password must contain at least one letter';
+    if (!hasNumber) return 'Password must contain at least one number';
+    if (!hasSpecialChar) return 'Password must contain at least one special character';
+    
+    return null;
+  };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -64,10 +78,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
 
     if (currentView === 'login' || currentView === 'register') {
-      if (!formData.password) {
-        newErrors.password = 'Password is required';
-      } else if (formData.password.length < 6) {
-        newErrors.password = 'Password must be at least 6 characters';
+      const passwordError = validatePassword(formData.password);
+      if (passwordError) {
+        newErrors.password = passwordError;
       }
     }
 
@@ -80,6 +93,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         newErrors.confirmPassword = 'Please confirm your password';
       } else if (formData.password !== formData.confirmPassword) {
         newErrors.confirmPassword = 'Passwords do not match';
+      } else {
+        const confirmPasswordError = validatePassword(formData.confirmPassword);
+        if (confirmPasswordError) {
+          newErrors.confirmPassword = confirmPasswordError;
+        }
       }
 
       // Terms validation for registration
@@ -89,16 +107,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
 
     if (currentView === 'reset-password') {
-      if (!formData.password) {
-        newErrors.password = 'Password is required';
-      } else if (formData.password.length < 6) {
-        newErrors.password = 'Password must be at least 6 characters';
+      const passwordError = validatePassword(formData.password);
+      if (passwordError) {
+        newErrors.password = passwordError;
       }
 
       if (!formData.confirmPassword) {
         newErrors.confirmPassword = 'Please confirm your password';
       } else if (formData.password !== formData.confirmPassword) {
         newErrors.confirmPassword = 'Passwords do not match';
+      } else {
+        const confirmPasswordError = validatePassword(formData.confirmPassword);
+        if (confirmPasswordError) {
+          newErrors.confirmPassword = confirmPasswordError;
+        }
       }
     }
 
@@ -121,7 +143,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         
         case 'register':
           await register(formData.email, formData.password, formData.name);
-          setSuccessMessage('Registration successful! Please check your email to verify your account.');
+          setSuccessMessage('Registration successful! Please check your email to verify your account. If you do not see it, check your spam folder.');
           setCurrentView('success');
           break;
         
@@ -211,7 +233,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       <div className="px-8 pt-8">
         {/* Logo */}
         <div className="flex items-center justify-center mb-6 gap-3">
-          <img src='/logo/fdll.jpeg' alt="Logo" className="rounded-lg w-10 h-10 object-contain" />
+          <img src='/logo/fdll.jpeg' alt="Logo" className="rounded-lg w-16 h-16 object-contain" />
           <span className="text-xl font-semibold text-foreground hidden sm:block bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
             Forbes Digital Lifeline
           </span>
@@ -276,6 +298,30 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       >
         Back to Login
       </button>
+    </div>
+  );
+
+  const renderPasswordRequirements = () => (
+    <div className="mb-4 p-3 bg-foreground/5 rounded-lg border border-foreground/10">
+      <p className="text-sm font-medium text-foreground/80 mb-2">Password must contain:</p>
+      <ul className="text-xs text-foreground/60 space-y-1">
+        <li className="flex items-center">
+          <span className="w-1.5 h-1.5 bg-foreground/40 rounded-full mr-2"></span>
+          At least 8 characters
+        </li>
+        <li className="flex items-center">
+          <span className="w-1.5 h-1.5 bg-foreground/40 rounded-full mr-2"></span>
+          At least one letter (a-z, A-Z)
+        </li>
+        <li className="flex items-center">
+          <span className="w-1.5 h-1.5 bg-foreground/40 rounded-full mr-2"></span>
+          At least one number (0-9)
+        </li>
+        <li className="flex items-center">
+          <span className="w-1.5 h-1.5 bg-foreground/40 rounded-full mr-2"></span>
+          At least one special character (!@#$%^&* etc.)
+        </li>
+      </ul>
     </div>
   );
 
@@ -358,6 +404,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
       )}
 
+      {/* Password Requirements Info */}
+      {(currentView === 'register' || currentView === 'reset-password') && renderPasswordRequirements()}
+
       {/* Password Field (Login, Register, Reset-password) */}
       {(currentView === 'login' || currentView === 'register' || currentView === 'reset-password') && (
         <div className="mb-4">
@@ -439,13 +488,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               className="mt-1 w-4 h-4 text-foreground border-foreground/20 rounded focus:ring-foreground/20 focus:ring-2"
             />
             <label htmlFor="terms" className="text-sm text-foreground/80 leading-tight">
-              I agree to the{' '}
+              By signing in, you agree to Forbes Digital Lifeline{' '}
               <a href="/terms" target="_blank" className="text-blue-700 hover:underline font-medium">
-                Terms and Conditions
+                Conditions of Use
               </a>{' '}
               and{' '}
               <a href="/privacy" target="_blank" className="text-blue-700 hover:underline font-medium">
-                Privacy Policy
+                Privacy Notice
               </a>
             </label>
           </div>

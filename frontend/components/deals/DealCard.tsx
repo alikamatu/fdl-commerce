@@ -192,20 +192,6 @@ export const DealCard: React.FC<DealCardProps> = ({
             by <span className="font-medium">{product.brand}</span>
           </div>
 
-          {/* Rating */}
-          <div className="flex items-center gap-2 mb-4">
-            <div className="flex">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                  key={star}
-                  size={14}
-                  className={star <= 4.5 ? "fill-amber-400 text-amber-400" : "text-gray-300"}
-                />
-              ))}
-            </div>
-            <span className="text-xs text-gray-500">(24 reviews)</span>
-          </div>
-
           {/* Price Section */}
           <div className="mb-4">
             <div className="flex items-baseline gap-2">

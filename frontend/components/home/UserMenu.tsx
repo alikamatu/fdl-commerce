@@ -93,19 +93,6 @@ export const UserMenu = forwardRef<HTMLDivElement, UserMenuProps>(
                 </Link>
               </div>
 
-              <div className="border-t border-foreground/10 my-1" />
-              
-              {/* <Link 
-                href="/settings" 
-                className="flex items-center gap-3 px-3 py-2 text-sm text-foreground/80 hover:bg-foreground/5 rounded-lg transition-colors"
-                onClick={onClose}
-              >
-                <Settings size={16} className="text-foreground/40" />
-                <span>Settings</span>
-              </Link> */}
-              
-              <div className="border-t border-foreground/10 my-1" />
-              
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-3 w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-500/10 transition-colors"

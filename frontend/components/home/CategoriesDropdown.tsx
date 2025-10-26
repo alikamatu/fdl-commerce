@@ -101,44 +101,6 @@ export const CategoriesDropdown: React.FC<CategoriesDropdownProps> = ({
               </div>
             </div>
 
-            {/* Quick Links */}
-            <div className="p-4 border-t border-foreground/10 bg-foreground/2">
-              <div className="grid grid-cols-2 gap-2">
-                <Link
-                  href="/products?on_sale=true"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center space-x-2 p-2 text-xs text-foreground/60 hover:text-foreground hover:bg-foreground/5 rounded transition-colors"
-                >
-                  <Zap size={12} />
-                  <span>Hot Deals</span>
-                </Link>
-                <Link
-                  href="/products?new_arrivals=true"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center space-x-2 p-2 text-xs text-foreground/60 hover:text-foreground hover:bg-foreground/5 rounded transition-colors"
-                >
-                  <Star size={12} />
-                  <span>New Arrivals</span>
-                </Link>
-                <Link
-                  href="/products?trending=true"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center space-x-2 p-2 text-xs text-foreground/60 hover:text-foreground hover:bg-foreground/5 rounded transition-colors"
-                >
-                  <TrendingUp size={12} />
-                  <span>Trending</span>
-                </Link>
-                <Link
-                  href="/products"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center space-x-2 p-2 text-xs text-foreground/60 hover:text-foreground hover:bg-foreground/5 rounded transition-colors"
-                >
-                  <Grid size={12} />
-                  <span>All Products</span>
-                </Link>
-              </div>
-            </div>
-
             {/* View All Categories */}
             {remainingCategories.length > 0 && (
               <div className="p-4 border-t border-foreground/10">

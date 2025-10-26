@@ -248,8 +248,8 @@ export default function VerifyEmailContent() {
         className="w-full max-w-md"
       >
         {/* Logo/Brand */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground">Forbes Digital Lifeline</h1>
+        <div className="text-center mb-8 w-full flex flex-col items-center">
+          <img src="/logo/fdll.jpeg" className="w-24 h-24" alt="" />
           <p className="text-foreground/60 mt-2">Email Verification</p>
         </div>
 
@@ -268,19 +268,6 @@ export default function VerifyEmailContent() {
             <p className="text-foreground/80 text-center text-sm">{message}</p>
           </motion.div>
         )}
-
-        {/* Help Text */}
-        <div className="mt-8 text-center">
-          <p className="text-foreground/50 text-sm">
-            Need help?{" "}
-            <a 
-              href="mailto:support@yourapp.com" 
-              className="text-foreground hover:underline transition-colors"
-            >
-              Contact support
-            </a>
-          </p>
-        </div>
       </motion.div>
     </div>
   );

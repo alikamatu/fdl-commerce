@@ -53,8 +53,8 @@ export default function ForgotPasswordPage() {
         className="w-full max-w-md"
       >
         {/* Logo/Brand */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground">Forbes Digital LifeLine</h1>
+        <div className="text-center mb-8 w-full flex flex-col items-center">
+          <img src="/logo/fdll.jpeg" className="w-24 h-24 mx-auto" alt="Forbes Digital Lifeline Logo" />
           <p className="text-foreground/60 mt-2">Forgot Password</p>
         </div>
 

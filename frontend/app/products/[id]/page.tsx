@@ -16,6 +16,7 @@ import { Snackbar } from '@/components/Snackbar';
 import { Product } from '@/types/product';
 import { useSimilarProducts } from '@/hooks/useSimilarProducts';
 import { SimilarProducts } from '@/components/products/SimilarProducts';
+import { ProductReviews } from '@/components/reviews/ProductReviews';
 import Link from 'next/link';
 
 interface ProductDetailsPageProps {
@@ -23,7 +24,6 @@ interface ProductDetailsPageProps {
 }
 
 export default function ProductDetailsPage({ params }: ProductDetailsPageProps) {
-  // Unwrap the params promise using React.use()
   const { id } = use(params);
   const { product, loading, error } = useProduct(id);
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
@@ -39,13 +39,11 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
   );
 
   const handleAddToCart = (product: Product) => {
-    // Implement add to cart logic
     showSnackbar(`Added ${product.title} to cart`, 'success');
     console.log('Add to cart:', product);
   };
 
   const handleViewDetails = (product: Product) => {
-    // You can implement quick view or navigation here
     console.log('View details:', product);
   };
 
@@ -82,6 +80,11 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
       </div>
     );
   }
+
+  // Use actual rating data from the product - no fallbacks
+  const averageRating = product.averageRating || 0;
+  const reviewCount = product.reviewCount || 0;
+  const hasReviews = reviewCount > 0;
 
   return (
     <motion.div
@@ -140,19 +143,38 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                 {product.title}
               </h1>
 
-              {/* Rating */}
-              <div className="flex items-center gap-2">
-                <div className="flex">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      size={16}
-                      className={star <= 4.5 ? "fill-amber-400 text-amber-400" : "text-gray-300"}
-                    />
-                  ))}
+              {/* Rating - Only show if there are reviews */}
+              {hasReviews ? (
+                <div className="flex items-center gap-2">
+                  <div className="flex">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        size={16}
+                        className={star <= Math.round(averageRating) ? "fill-amber-400 text-amber-400" : "text-gray-300"}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-sm text-foreground/60">
+                    {averageRating.toFixed(1)} ({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
+                  </span>
                 </div>
-                <span className="text-sm text-foreground/60">4.5 (24 reviews)</span>
-              </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <div className="flex">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        size={16}
+                        className="text-gray-300"
+                      />
+                    ))}
+                  </div>
+                  <span className="text-sm text-foreground/60">
+                    No reviews yet
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Description */}
@@ -196,6 +218,13 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
             </motion.div>
           </motion.div>
         </div>
+
+        {/* Product Reviews Section */}
+        <ProductReviews
+          productId={product._id}
+          productTitle={product.title}
+          productImage={product.images[0]?.url || '/placeholder-product.jpg'}
+        />
 
         {/* Similar Products */}
         <SimilarProducts

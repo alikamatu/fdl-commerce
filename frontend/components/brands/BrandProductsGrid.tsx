@@ -99,36 +99,6 @@ export const BrandProductsGrid: React.FC<BrandProductsGridProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* View Toggle */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex justify-end"
-      >
-        <div className="flex border border-foreground/10 rounded-lg overflow-hidden">
-          <button
-            onClick={() => setViewMode('grid')}
-            className={`p-2 transition-colors ${
-              viewMode === 'grid' 
-                ? 'bg-foreground text-background' 
-                : 'text-foreground/60 hover:text-foreground/80 hover:bg-foreground/5'
-            }`}
-          >
-            <LayoutGrid size={20} />
-          </button>
-          <button
-            onClick={() => setViewMode('list')}
-            className={`p-2 transition-colors ${
-              viewMode === 'list' 
-                ? 'bg-foreground text-background' 
-                : 'text-foreground/60 hover:text-foreground/80 hover:bg-foreground/5'
-            }`}
-          >
-            <List size={20} />
-          </button>
-        </div>
-      </motion.div>
-
       <AnimatePresence mode="wait">
         {viewMode === 'grid' ? (
           <motion.div

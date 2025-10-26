@@ -15,7 +15,8 @@ import {
   DollarSign,
   NewspaperIcon,
   StrikethroughIcon,
-  LogOut
+  LogOut,
+  StarIcon
 } from "lucide-react";
 import ThemeToggle from "../ThemeToggle";
 import { cn } from "@/lib/utils";
@@ -72,6 +73,11 @@ export default function Sidenav() {
       href: "/dashboard/blog",
       icon: <NewspaperIcon className="w-5 h-5" />,
     },
+    {
+      name: "Reviews",
+      href: "/dashboard/reviews",
+      icon: <StarIcon className="w-5 h-5" />,
+    }
   ];
 
   const toggleMenu = (menuName: string) => {
@@ -118,14 +124,9 @@ export default function Sidenav() {
       >
         <motion.span 
           className="text-2xl text-black"
-          animate={{ rotate: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity, repeatDelay: 5 }}
         >
-          <img src="/logo/fdll.jpeg" alt="Forbes Logo" className="h-6 w-auto" />
+          <img src="/logo/fdll.jpeg" alt="Forbes Logo" className="h-20 w-44 object-cover" />
         </motion.span>
-        <h2 className="text-xl font-bold text-white dark:text-black">
-          Forbes DLL
-        </h2>
       </motion.div>
 
       {/* Navigation */}

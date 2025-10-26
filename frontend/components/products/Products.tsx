@@ -72,7 +72,7 @@ export default function Products() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-2xl text-start font-semibold text-foreground mb-4"
+            className="text-2xl md:text-3xl text-center font-light text-foreground mb-4"
           >
             {filters.search ? `Search Results for "${filters.search}"` : 'Available Products'}
           </motion.h1>
@@ -87,13 +87,6 @@ export default function Products() {
             </motion.p>
           )}
         </div>
-
-        {/* Filters - Uncomment this section */}
-        {/* <ProductsFilter
-          filters={filters}
-          onFiltersChange={setFilters}
-          categories={categories}
-        /> */}
 
         {/* Products Grid */}
         <ProductsGrid

@@ -47,7 +47,6 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, index, onCancelOrde
               <span>{formatOrderDate(order.createdAt)}</span>
             </div>
             <div className="flex items-center space-x-1 font-medium text-foreground">
-              <span>₵</span>
               <span>{formatCurrency(order.totalCents)}</span>
             </div>
           </div>

@@ -16,12 +16,7 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ onCheckout }) => {
   const router = useRouter();
 
   const subtotal = (cart.subtotal / 100).toFixed(2);
-  const shipping = (cart.shipping / 100).toFixed(2);
-  const taxes = (cart.taxes / 100).toFixed(2);
   const total = (cart.total / 100).toFixed(2);
-
-  const isEligibleForFreeShipping = cart.subtotal >= 5000; // $50
-  const freeShippingRemaining = ((5000 - cart.subtotal) / 100).toFixed(2);
 
   return (
     <motion.div
@@ -41,6 +36,11 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ onCheckout }) => {
           <div className="flex justify-between text-foreground/80">
             <span>Subtotal ({cart.itemCount} items)</span>
             <span>GH₵ {subtotal}</span>
+          </div>
+
+          <div className="flex justify-between text-foreground/80">
+            <span>Delivery</span>
+            <span>Free</span>
           </div>
 
           <div className="border-t border-foreground/10 pt-3">

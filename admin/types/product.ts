@@ -16,6 +16,7 @@ export interface Product {
   reviewCount?: number;
   specifications: ProductSpecification[];
   isActive: boolean;
+  averageRating?: number;
   soldCount: number;
   dealExpiresAt?: string;
   createdAt: string;

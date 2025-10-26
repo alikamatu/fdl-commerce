@@ -72,7 +72,7 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) =
         <div className="flex items-center justify-between">
           <span className="text-foreground/60">Estimated Delivery</span>
           <span className="font-semibold text-foreground">
-            {new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+            {new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString()}
           </span>
         </div>
       </div>
@@ -103,7 +103,7 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) =
           <div className="w-10 h-10 bg-foreground/10 rounded-full flex items-center justify-center mb-2">
             <Truck size={16} className="text-foreground/40" />
           </div>
-          <span className="text-xs text-foreground/40">Shipped</span>
+          <span className="text-xs text-foreground/40">Delivering</span>
         </div>
         <div className="flex-1 h-0.5 bg-foreground/20 mx-2" />
         <div className="flex flex-col items-center">
@@ -116,7 +116,7 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) =
 
       {/* Shipping Address */}
       <div className="bg-foreground/5 border border-foreground/10 rounded-lg p-4 mb-8 text-left">
-        <h3 className="font-semibold text-foreground mb-2">Shipping Address</h3>
+        <h3 className="font-semibold text-foreground mb-2">Delivery Address</h3>
         <p className="text-foreground/80 text-sm">
           {order.shippingAddress?.firstName} {order.shippingAddress?.lastName}<br />
           {order.shippingAddress?.address}<br />

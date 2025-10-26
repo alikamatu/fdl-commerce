@@ -5,12 +5,17 @@ import { ShoppingCart, Eye, Star, ChevronRight } from 'lucide-react';
 import { Product } from '@/types/product';
 import { useCart } from '@/context/CartContext';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface BrandProductListItemProps {
   product: Product;
   onViewDetails: (product: Product) => void;
+}
+
+interface ReviewStats {
+  averageRating: number;
+  totalReviews: number;
 }
 
 export const BrandProductListItem: React.FC<BrandProductListItemProps> = ({
@@ -19,11 +24,42 @@ export const BrandProductListItem: React.FC<BrandProductListItemProps> = ({
 }) => {
   const { addItem } = useCart();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [reviewStats, setReviewStats] = useState<ReviewStats | null>(null);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
   const router = useRouter();
 
   const price = (product.priceCents / 100).toFixed(2);
   const mainImage = product.images[0]?.url || '/placeholder-product.jpg';
   const isOutOfStock = product.stock === 0;
+
+  // Fetch review stats when component mounts
+  useEffect(() => {
+    const fetchReviewStats = async () => {
+      if (!product?._id) return;
+
+      try {
+        setReviewsLoading(true);
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1000';
+        
+        const response = await fetch(
+          `${apiUrl}/reviews/product/${product._id}/stats`
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setReviewStats(data.data);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching review stats:', error);
+      } finally {
+        setReviewsLoading(false);
+      }
+    };
+
+    fetchReviewStats();
+  }, [product._id]);
 
   const handleAddToCart = async () => {
     if (isOutOfStock) return;
@@ -51,6 +87,27 @@ export const BrandProductListItem: React.FC<BrandProductListItemProps> = ({
   const handleProductClick = () => {
     router.push(`/products/${product._id}`);
   };
+
+  // Use real review data or fallback to product data
+  const averageRating = reviewStats?.averageRating || product.averageRating || 0;
+  const reviewCount = reviewStats?.totalReviews || product.reviewCount || 0;
+  const hasReviews = reviewCount > 0;
+
+  const RatingStars = ({ rating, size = 14 }: { rating: number; size?: number }) => (
+    <div className="flex items-center gap-0.5">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <Star
+          key={star}
+          size={size}
+          className={
+            star <= Math.round(rating)
+              ? 'fill-amber-400 text-amber-400'
+              : 'text-gray-300'
+          }
+        />
+      ))}
+    </div>
+  );
 
   return (
     <motion.div
@@ -92,6 +149,13 @@ export const BrandProductListItem: React.FC<BrandProductListItemProps> = ({
                 </span>
               </div>
             )}
+
+            {/* Deal Badge */}
+            {product.isDeal && product.discountPercent && product.discountPercent > 0 && (
+              <div className="absolute top-3 left-3 z-10 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg">
+                {product.discountPercent}% OFF
+              </div>
+            )}
           </div>
 
           {/* Product Details */}
@@ -126,22 +190,45 @@ export const BrandProductListItem: React.FC<BrandProductListItemProps> = ({
                   {product.description}
                 </p>
 
-                {/* Rating and Reviews */}
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="flex items-center gap-1">
-                    <div className="flex">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star
-                          key={star}
-                          size={14}
-                          className={star <= 4.5 ? "fill-amber-400 text-amber-400" : "text-gray-300"}
-                        />
-                      ))}
+                {/* Rating and Reviews - Real Data */}
+                <div className="flex items-center gap-3 mb-4 flex-wrap">
+                  {reviewsLoading ? (
+                    // Loading skeleton for ratings
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-0.5">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            size={14}
+                            className="text-gray-300"
+                          />
+                        ))}
+                      </div>
+                      <div className="h-4 w-16 bg-foreground/10 rounded animate-pulse" />
                     </div>
-                    <span className="text-sm text-foreground/60 ml-1">4.5</span>
-                  </div>
-                  <span className="text-foreground/30">•</span>
-                  <span className="text-sm text-foreground/60">24 reviews</span>
+                  ) : hasReviews ? (
+                    <>
+                      <div className="flex items-center gap-1">
+                        <RatingStars rating={averageRating} />
+                        <span className="text-sm text-foreground/60 ml-1">
+                          {averageRating.toFixed(1)}
+                        </span>
+                      </div>
+                      <span className="text-foreground/30">•</span>
+                      <span className="text-sm text-foreground/60">
+                        {reviewCount} review{reviewCount !== 1 ? 's' : ''}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-1">
+                        <RatingStars rating={0} />
+                        <span className="text-sm text-foreground/60 ml-1">No ratings</span>
+                      </div>
+                      <span className="text-foreground/30">•</span>
+                      <span className="text-sm text-foreground/60">No reviews</span>
+                    </>
+                  )}
                   <span className="text-foreground/30">•</span>
                   <span className="text-sm text-foreground/60">SKU: {product.sku}</span>
                 </div>
@@ -162,25 +249,24 @@ export const BrandProductListItem: React.FC<BrandProductListItemProps> = ({
               {/* Price and Actions */}
               <div className="flex flex-col items-start lg:items-end gap-4">
                 {/* Price */}
-                <div className="text-2xl font-bold text-foreground">
-                  ${price}
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-foreground">
+                    ₵{price}
+                  </div>
+                  {product.originalPriceCents && product.originalPriceCents > product.priceCents && (
+                    <div className="text-sm text-foreground/40 line-through">
+                      ₵{(product.originalPriceCents / 100).toFixed(2)}
+                    </div>
+                  )}
                 </div>
 
                 {/* Stock Status */}
                 <div className={`text-sm font-medium ${isOutOfStock ? 'text-red-500' : 'text-green-600'}`}>
-                  {isOutOfStock ? 'Out of Stock' : `${product.stock}+ in stock`}
+                  {isOutOfStock ? 'Out of Stock' : `${product.stock} in stock`}
                 </div>
 
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row lg:flex-col gap-2 w-full lg:w-auto">
-                  <button
-                    onClick={() => onViewDetails(product)}
-                    className="flex items-center justify-center gap-2 px-4 py-2 border border-foreground/20 rounded-lg text-sm font-medium hover:bg-foreground/5 transition-colors whitespace-nowrap"
-                  >
-                    <Eye size={16} />
-                    Quick View
-                    <ChevronRight size={14} className="opacity-60" />
-                  </button>
                   <button
                     onClick={handleAddToCart}
                     disabled={isOutOfStock || isAddingToCart}
@@ -206,9 +292,9 @@ export const BrandProductListItem: React.FC<BrandProductListItemProps> = ({
               <div className="flex items-center gap-4 text-xs text-foreground/50">
                 <span>Free shipping</span>
                 <span className="text-foreground/30">•</span>
-                <span>30-day returns</span>
+                <span>90-day returns</span>
                 <span className="text-foreground/30">•</span>
-                <span>1-year warranty</span>
+                <span>Secure payment</span>
               </div>
               
               {/* View Full Details */}

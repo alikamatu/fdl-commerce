@@ -62,12 +62,12 @@ export const BrandsSection: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="w-full flex flex-col items-center text-center mb-12"
         >
-          <h2 className="text-3xl text-start md:text-4xl font-light text-foreground mb-4">
+          <h2 className="text-2xl md:text-3xl text-center font-light text-foreground mb-4">
             Shop by Brand
           </h2>
-          <p className="text-lg text-start text-foreground/60 max-w-2xl">
+          <p className="text-lg text-center text-foreground/60 max-w-2xl">
             Discover products from your favorite trusted brands
           </p>
         </motion.div>

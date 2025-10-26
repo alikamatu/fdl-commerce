@@ -65,7 +65,7 @@ export class EmailService {
                     </tr>
                   </table>
                   <p style="color: #999; font-size: 12px; text-align: center; margin: 20px 0 0 0;">
-                    © 2020 - ${new Date().getFullYear()} Forbes Digital Lifeline. All rights reserved.
+                    © 2020-${new Date().getFullYear()} Forbes Digital Lifeline. All rights reserved.
                   </p>
                 </td>
               </tr>
@@ -138,7 +138,7 @@ export class EmailService {
                     </tr>
                   </table>
                   <p style="color: #999; font-size: 12px; text-align: center; margin: 20px 0 0 0;">
-                    © 2020 - ${new Date().getFullYear()} Forbes Digital Lifeline. All rights reserved.
+                    © 2020-${new Date().getFullYear()} Forbes Digital Lifeline. All rights reserved.
                   </p>
                 </td>
               </tr>
@@ -205,7 +205,7 @@ export class EmailService {
                     </tr>
                   </table>
                   <p style="color: #999; font-size: 12px; text-align: center; margin: 20px 0 0 0;">
-                    © 2020 - ${new Date().getFullYear()} Forbes Digital Lifeline. All rights reserved.
+                    © 2020-${new Date().getFullYear()} Forbes Digital Lifeline. All rights reserved.
                   </p>
                 </td>
               </tr>

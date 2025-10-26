@@ -73,10 +73,10 @@ export const Footer = () => {
 
           <div className="flex items-center gap-4">
             <Link href="/privacy" className="hover:text-blue-700 transition-colors">
-              Privacy
+              Privacy Notice
             </Link>
             <Link href="/terms" className="hover:text-blue-700 transition-colors">
-              Terms
+              Conditions of Use
             </Link>
           </div>
         </motion.div>

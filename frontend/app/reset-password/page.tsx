@@ -241,8 +241,8 @@ function ResetPasswordForm() {
         className="w-full max-w-md"
       >
         {/* Logo/Brand */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-foreground">Forbes Digital Lifeline</h1>
+        <div className="text-center mb-8 w-full flex flex-col items-center">
+          <img src="/logo/fdll.jpeg" className="w-24 h-24" alt="" />
           <p className="text-foreground/60 mt-2">Reset Password</p>
         </div>
 
