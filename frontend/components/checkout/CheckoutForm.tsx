@@ -223,11 +223,11 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
               <input
                 type="tel"
                 name="phone"
-                max={10}
+                maxLength={10}
                 value={formData.phone}
                 onChange={handleInputChange}
                 required
-                placeholder="+233 XX XXX XXXX"
+                placeholder="024 XXX XXXX"
                 className="w-full px-4 py-3 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/20 bg-transparent"
               />
             </div>

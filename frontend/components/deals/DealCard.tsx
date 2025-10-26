@@ -274,7 +274,7 @@ export const DealCard: React.FC<DealCardProps> = ({
           <div className="flex items-center justify-between text-xs text-gray-500 mt-3">
             <span>Free Delivery</span>
             <span>•</span>
-            <span>30-day returns</span>
+            <span>90-day returns</span>
           </div>
         </div>
       </div>
