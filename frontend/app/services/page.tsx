@@ -1,7 +1,16 @@
 export default function ServicesPage() {
   return (
-    <main className="min-h-screen bg-background flex items-center justify-center p-8">
-        <img src="/images/FORBES DIGITAL LIFELINE FLYER.png" alt="service flyer" />
+    <main className="bg-background flex items-center justify-center p-8">
+      <video
+        src="/images/FDL.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        controls={false}
+        className="object-cover"
+      />
     </main>
   );
 }

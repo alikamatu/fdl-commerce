@@ -12,7 +12,7 @@ const features = [
   {
     icon: Truck,
     title: 'Free Shipping',
-    description: 'On all product',
+    description: 'On all products',
   },
   {
     icon: RotateCcw,
