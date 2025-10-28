@@ -13,16 +13,18 @@ export class OrdersService {
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
   ) {}
 
-  async create(createOrderDto: CreateOrderDto, userId?: string): Promise<Order> {
+  async create(createOrderDto: CreateOrderDto, userId: string): Promise<Order> {
+    if (!userId) {
+      throw new BadRequestException('User authentication required to place order');
+    }
+
     const session = await this.orderModel.db.startSession();
     session.startTransaction();
 
     try {
-      // Generate order number
       const orderCount = await this.orderModel.countDocuments();
       const orderNumber = `ORD-${(orderCount + 1).toString().padStart(6, '0')}`;
 
-      // Validate products and check stock
       for (const item of createOrderDto.items) {
         const product = await this.productModel.findById(item.productId);
         
@@ -36,30 +38,28 @@ export class OrdersService {
           );
         }
 
-        // Reserve stock by decrementing
         product.stock -= item.quantity;
         product.soldCount += item.quantity;
         await product.save({ session });
       }
 
-      // Create order
       const orderData: any = {
         orderNumber,
+        userId: new Types.ObjectId(userId),
         email: createOrderDto.email,
         items: createOrderDto.items,
         shippingAddress: createOrderDto.shippingAddress,
+        deliveryMethod: createOrderDto.deliveryMethod || 'delivery', // Save delivery method
         subtotalCents: createOrderDto.subtotalCents,
         shippingCents: createOrderDto.shippingCents,
-        taxCents: createOrderDto.taxCents,
+        taxCents: createOrderDto.taxCents || 0,
         totalCents: createOrderDto.totalCents,
-        paymentMethod: createOrderDto.paymentMethod || 'paystack',
-        paymentCompleted: false, // Will be updated after payment verification
-        status: 'pending',
+        paymentMethod: createOrderDto.paymentMethod || 'cash_on_delivery',
+        paymentCompleted: createOrderDto.paymentMethod === 'cash_on_delivery',
+        status: createOrderDto.paymentMethod === 'cash_on_delivery' ? 'confirmed' : 'pending',
       };
 
-      if (userId) {
-        orderData.userId = new Types.ObjectId(userId);
-      }
+      console.log('Creating order with deliveryMethod:', createOrderDto.deliveryMethod);
 
       const order = new this.orderModel(orderData);
       await order.save({ session });
@@ -70,6 +70,8 @@ export class OrdersService {
       if (!savedOrder) {
         throw new NotFoundException('Order not found after creation');
       }
+      
+      console.log('Order created successfully:', savedOrder._id, 'for user:', userId);
       return savedOrder;
     } catch (error) {
       await session.abortTransaction();
@@ -97,19 +99,44 @@ export class OrdersService {
   }
 
   async findAll(userId?: string, includeAll: boolean = false) {
-  let query = {};
-  
-  if (!includeAll && userId) {
-    query = { userId: new Types.ObjectId(userId) };
-  }
-  
-  const orders = await this.orderModel
-    .find(query)
-    .sort({ createdAt: -1 })
-    .exec();
+    let query = {};
+    
+    if (!includeAll && userId) {
+      query = { userId: new Types.ObjectId(userId) };
+    }
+    
+    const orders = await this.orderModel
+      .find(query)
+      .sort({ createdAt: -1 })
+      .exec();
 
-  return orders;
-}
+    return orders;
+  }
+
+  // New method to find orders by userId OR email (includes legacy guest orders)
+  async findAllByUserOrEmail(userId: string, email: string, includeAll: boolean = false) {
+    let query = {};
+    
+    if (!includeAll) {
+      // Find orders where userId matches OR email matches (for guest orders)
+      query = {
+        $or: [
+          { userId: new Types.ObjectId(userId) },
+          { email: email, userId: { $exists: false } } // Guest orders with same email
+        ]
+      };
+    }
+    
+    const orders = await this.orderModel
+      .find(query)
+      .sort({ createdAt: -1 })
+      .exec();
+
+    console.log('Query:', JSON.stringify(query));
+    console.log('Found orders:', orders.length);
+
+    return orders;
+  }
 
   async confirmPayment(
     orderId: string,
@@ -117,14 +144,12 @@ export class OrdersService {
     paystackReference: string,
     userId?: string
   ): Promise<Order> {
-    // Verify payment with Paystack
     const verificationResult = await this.verifyPaystackPayment(paymentReference);
 
     if (verificationResult.status !== true || verificationResult.data.status !== 'success') {
       throw new BadRequestException('Payment verification failed');
     }
 
-    // Find order
     const query: any = { _id: orderId };
     if (userId) {
       query.userId = new Types.ObjectId(userId);
@@ -136,13 +161,11 @@ export class OrdersService {
       throw new NotFoundException('Order not found');
     }
 
-    // Check if payment amount matches
-    const paidAmount = verificationResult.data.amount; // In kobo/pesewas
+    const paidAmount = verificationResult.data.amount;
     if (paidAmount !== order.totalCents) {
       throw new BadRequestException('Payment amount mismatch');
     }
 
-    // Update order
     order.paymentCompleted = true;
     order.paymentId = paystackReference;
     order.status = 'confirmed';
@@ -153,7 +176,6 @@ export class OrdersService {
   async findOne(id: string, userId?: string, isAdmin: boolean = false) {
     const query: any = { _id: id };
     
-    // Only filter by userId if NOT admin
     if (!isAdmin && userId) {
       query.userId = new Types.ObjectId(userId);
     }
@@ -170,7 +192,6 @@ export class OrdersService {
   async findById(id: string, userId?: string, isAdmin: boolean = false) {
     const query: any = { _id: id };
     
-    // Only filter by userId if NOT admin
     if (!isAdmin && userId) {
       query.userId = new Types.ObjectId(userId);
     }
@@ -220,52 +241,79 @@ export class OrdersService {
     return stats[0] || { totalOrders: 0, totalRevenue: 0, averageOrderValue: 0 };
   }
 
-async updateStatus(id: string, status: string): Promise<Order> {
-  const order = await this.orderModel.findById(id);
+  async updateStatus(id: string, status: string): Promise<Order> {
+    const order = await this.orderModel.findById(id);
 
-  if (!order) {
-    throw new NotFoundException('Order not found');
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    // Validate status
+    const validStatuses = ['pending', 'confirmed', 'processing', 'delivering', 'available', 'delivered', 'cancelled'];
+    if (!validStatuses.includes(status)) {
+      throw new BadRequestException(`Invalid status: ${status}`);
+    }
+
+    console.log(`Updating order ${id} from ${order.status} to ${status}`);
+
+    order.status = status;
+
+    // Update timestamps based on status changes
+    if (status === 'delivering' && !order.shippedAt) {
+      order.shippedAt = new Date();
+    } else if (status === 'delivered' && !order.deliveredAt) {
+      order.deliveredAt = new Date();
+    }
+
+    const updatedOrder = await order.save();
+    console.log('Order updated successfully:', updatedOrder._id);
+    
+    return updatedOrder;
   }
 
-  // Validate status
-  const validStatuses = ['pending', 'confirmed', 'processing', 'delivering', 'delivered', 'cancelled'];
-  if (!validStatuses.includes(status)) {
-    throw new BadRequestException(`Invalid status: ${status}`);
-  }
+  async cancelOrder(id: string, userId?: string, isAdmin: boolean = false): Promise<Order> {
+    const query: any = { _id: id };
+    
+    // Only filter by userId if NOT admin
+    if (!isAdmin && userId) {
+      query.userId = new Types.ObjectId(userId);
+    }
 
-  console.log(`Updating order ${id} from ${order.status} to ${status}`); // Debug log
+    const order = await this.orderModel.findOne(query);
 
-  order.status = status;
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
 
-  // Update timestamps based on status changes
-  if (status === 'delivering' && !order.shippedAt) {
-    order.shippedAt = new Date();
-  } else if (status === 'delivered' && !order.deliveredAt) {
-    order.deliveredAt = new Date();
-  }
+    // Check if order can be cancelled (only pending or confirmed orders)
+    if (!['pending', 'confirmed'].includes(order.status)) {
+      throw new BadRequestException(`Cannot cancel order with status: ${order.status}`);
+    }
 
-  const updatedOrder = await order.save();
-  console.log('Order updated successfully:', updatedOrder._id); // Debug log
-  
-  return updatedOrder;
-}
+    // Restore product stock
+    const session = await this.orderModel.db.startSession();
+    session.startTransaction();
 
-  // Webhook handler for Paystack events
-  async handlePaystackWebhook(event: any) {
-    if (event.event === 'charge.success') {
-      const reference = event.data.reference;
-      const metadata = event.data.metadata;
-
-      // Find order by reference (you'll need to store this during order creation)
-      const order = await this.orderModel.findOne({ 
-        paymentId: reference 
-      });
-
-      if (order && !order.paymentCompleted) {
-        order.paymentCompleted = true;
-        order.status = 'confirmed';
-        await order.save();
+    try {
+      for (const item of order.items) {
+        const product = await this.productModel.findById(item.productId);
+        if (product) {
+          product.stock += item.quantity;
+          product.soldCount = Math.max(0, product.soldCount - item.quantity);
+          await product.save({ session });
+        }
       }
+
+      order.status = 'cancelled';
+      const updatedOrder = await order.save({ session });
+
+      await session.commitTransaction();
+      return updatedOrder;
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
     }
   }
 }

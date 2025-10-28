@@ -18,8 +18,8 @@ const fontInter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Forbes Digital LifeLine Admin",
-  description: "Admin panel for managing Forbes Digital LifeLine e-commerce platform",
+  title: "Admin | Forbes Digital Lifeline - Your Digital SOS",
+  description: "Admin panel for managing Forbes Digital Lifeline e-commerce platform",
 };
 
 export default function RootLayout({

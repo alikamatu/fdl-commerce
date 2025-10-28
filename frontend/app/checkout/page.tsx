@@ -1,111 +1,204 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { Truck, MapPin } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
-import { CheckoutAuth } from '@/components/checkout/CheckoutAuth';
 import { CheckoutForm } from '@/components/checkout/CheckoutForm';
 import { OrderConfirmation } from '@/components/checkout/OrderConfirmation';
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { AuthModal } from '@/components/auth/AuthModal';
 
-type CheckoutStep = 'auth' | 'checkout' | 'complete';
+type CheckoutStep = 'method' | 'form' | 'confirmation';
 
 export default function CheckoutPage() {
+  const router = useRouter();
   const { cart } = useCart();
   const { user, loading: authLoading } = useAuth();
-  const [step, setStep] = useState<CheckoutStep>('auth');
-  const [order, setOrder] = useState<any>(null);
-
-  // Skip auth step if user is already logged in
+  const [step, setStep] = useState<CheckoutStep>('method');
+  const [deliveryMethod, setDeliveryMethod] = useState<'delivery' | 'pickup'>('delivery');
+  const [orderData, setOrderData] = useState<any>(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
+  // Check authentication and cart on mount
   useEffect(() => {
-    if (!authLoading && user) {
-      setStep('checkout');
+    if (!authLoading) {
+      setIsChecking(false);
+      
+      // Show auth modal if user is not logged in
+      if (!user) {
+        setShowAuthModal(true);
+      }
     }
-  }, [user, authLoading]);
+  }, [authLoading, user, cart.items.length, router]);
 
-  const handleAuthSuccess = () => {
-    setStep('checkout');
+  const handleOrderComplete = (order: any) => {
+    setOrderData(order);
+    setStep('confirmation');
   };
 
-  const handleContinueAsGuest = () => {
-    setStep('checkout');
-  };
-
-  const handleOrderComplete = (orderData: any) => {
-    setOrder(orderData);
-    setStep('complete');
-  };
-
-  if (authLoading) {
+  // Show loading while checking authentication
+  if (authLoading || isChecking) {
     return (
-      <div className="min-h-screen bg-foreground/5 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-foreground border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-foreground/60">Loading...</p>
+          <div className="w-16 h-16 border-4 border-gray-200 border-t-black rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading checkout...</p>
         </div>
       </div>
     );
   }
 
-  if (cart.items.length === 0 && step !== 'complete') {
+  // Show auth modal if not logged in
+  if (!user) {
     return (
-      <div className="min-h-screen bg-foreground/5 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-light text-foreground mb-4">Your cart is empty</h1>
-          <p className="text-foreground/60 mb-6">Add some items to your cart before checking out</p>
-          <Link
-            href="/products"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background rounded-lg font-medium hover:bg-foreground/90 transition-colors"
-          >
-            Continue Shopping
-          </Link>
+      <>
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          <div className="text-center max-w-md mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-8"
+            >
+              <h1 className="text-2xl font-light text-gray-900 mb-4">
+                Sign In Required
+              </h1>
+              <p className="text-gray-600 mb-6">
+                Please sign in to your account to continue with checkout. Don't have an account? Create one now!
+              </p>
+              <button
+                onClick={() => setShowAuthModal(true)}
+                className="px-8 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
+              >
+                Sign In to Continue
+              </button>
+            </motion.div>
+          </div>
         </div>
-      </div>
+
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => {
+            setShowAuthModal(false);
+            router.push('/checkout');
+          }}
+          defaultTab="login"
+        />
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-foreground/5">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <Link
-            href="/cart"
-            className="inline-flex items-center gap-2 text-foreground/60 hover:text-foreground transition-colors mb-4"
-          >
-            <ArrowLeft size={16} />
-            Back to Cart
-          </Link>
-          <h1 className="text-3xl font-light text-foreground">
-            {step === 'auth' && 'Sign In to Checkout'}
-            {step === 'checkout' && 'Checkout'}
-            {step === 'complete' && 'Order Confirmation'}
-          </h1>
-        </div>
+    <div className="min-h-screen bg-white py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <AnimatePresence mode="wait">
+          {step === 'method' && (
+            <motion.div
+              key="method"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="max-w-2xl mx-auto">
+                <motion.h1 
+                  className="text-3xl font-light text-gray-900 mb-2 text-center"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  Choose Delivery Method
+                </motion.h1>
+                <motion.p 
+                  className="text-gray-600 text-center mb-12"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  How would you like to receive your order?
+                </motion.p>
 
-        {/* Content */}
-        <div className="max-w-4xl mx-auto">
-          {step === 'auth' && (
-            <CheckoutAuth
-              onSuccess={handleAuthSuccess}
-              onContinueAsGuest={handleContinueAsGuest}
-            />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <motion.button
+                    onClick={() => {
+                      setDeliveryMethod('delivery');
+                      setStep('form');
+                    }}
+                    className="relative p-8 border-2 border-gray-200 rounded-xl hover:border-black hover:shadow-lg transition-all duration-300 bg-white"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Truck size={40} className="mx-auto mb-4 text-gray-700" />
+                    <h3 className="text-xl font-medium text-gray-900 mb-2">
+                      Delivery
+                    </h3>
+                    <p className="text-gray-600 text-sm">
+                      Get your order delivered to your doorstep
+                    </p>
+                    <div className="mt-4 text-green-600 font-medium text-sm">
+                      FREE Delivery
+                    </div>
+                  </motion.button>
+
+                  <motion.button
+                    onClick={() => {
+                      setDeliveryMethod('pickup');
+                      setStep('form');
+                    }}
+                    className="relative p-8 border-2 border-gray-200 rounded-xl hover:border-black hover:shadow-lg transition-all duration-300 bg-white"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.4 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <MapPin size={40} className="mx-auto mb-4 text-gray-700" />
+                    <h3 className="text-xl font-medium text-gray-900 mb-2">
+                      Pickup
+                    </h3>
+                    <p className="text-gray-600 text-sm">
+                      Pick up your order at UPSA - Madina Campus
+                    </p>
+                    <div className="mt-4 text-blue-600 font-medium text-sm">
+                      Available 24/7
+                    </div>
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
           )}
 
-          {step === 'checkout' && (
-            <CheckoutForm
-              user={user}
-              onOrderComplete={handleOrderComplete}
-            />
+          {step === 'form' && (
+            <motion.div
+              key="form"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+            >
+              <CheckoutForm
+                deliveryMethod={deliveryMethod}
+                onOrderComplete={handleOrderComplete}
+              />
+            </motion.div>
           )}
 
-          {step === 'complete' && order && (
-            <OrderConfirmation order={order} />
+          {step === 'confirmation' && orderData && (
+            <motion.div
+              key="confirmation"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.5 }}
+            >
+              <OrderConfirmation order={orderData} deliveryMethod={deliveryMethod} />
+            </motion.div>
           )}
-        </div>
+        </AnimatePresence>
       </div>
     </div>
   );

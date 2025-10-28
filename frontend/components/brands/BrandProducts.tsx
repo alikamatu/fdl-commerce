@@ -54,7 +54,7 @@ export const BrandProducts: React.FC<BrandProductsProps> = ({ brand }) => {
                 <img
                   src={brand.logoUrl}
                   alt={brand.name}
-                  className="w-full h-full object-cover p-3"
+                  className="w-full h-full object-contain p-3"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-foreground/5">

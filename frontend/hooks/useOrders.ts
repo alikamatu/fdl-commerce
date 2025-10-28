@@ -33,6 +33,7 @@ export const useOrders = () => {
       }
 
       const data: OrdersResponse = await response.json();
+      console.log('Fetched orders:', data);
       
       if (data.success) {
         setOrders(data.data || []);

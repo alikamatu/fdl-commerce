@@ -7,22 +7,21 @@ import { useRouter } from 'next/navigation';
 
 interface OrderConfirmationProps {
   order: any;
+  deliveryMethod?: 'delivery' | 'pickup';
 }
 
-export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
+export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order, deliveryMethod }) => {
   const isGuestUser = !order.userId && (!order.user || !order.user.id);
   const userName = order.user?.name || order.shippingAddress?.firstName || 'Guest';
   const router = useRouter();
 
   // Determine payment method display text
-  const getPaymentMethodText = (method: string) => {
-    switch(method) {
-      case 'cash_on_delivery':
+  const getPaymentMethodText = (deliveryMethod: string) => {
+    switch(deliveryMethod) {
+      case 'delivery':
         return 'Cash on Delivery';
-      case 'bank_transfer':
-        return 'Bank Transfer';
-      case 'mobile_money':
-        return 'Mobile Money';
+      case 'pickup':
+        return 'Cash / MoMo';
       default:
         return 'Cash on Delivery';
     }
@@ -65,7 +64,7 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) =
           <span className="text-foreground/60">Payment Method</span>
           <span className="font-semibold text-foreground flex items-center gap-2">
             <CreditCard size={16} />
-            {getPaymentMethodText(order.paymentMethod)}
+            {getPaymentMethodText(deliveryMethod || 'delivery')}
           </span>
         </div>
         
@@ -85,7 +84,9 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) =
             Payment Instructions
           </h3>
           <p className="text-blue-800 text-sm">
-            Please have the exact amount ready when your order arrives. Our delivery agent will collect payment upon delivery.
+            {deliveryMethod === 'delivery'
+              ? 'Please have the exact amount ready upon delivery to ensure a smooth transaction.'
+              : 'You can pay with cash or Mobile Money (MoMo) when you pick up your order at the designated location.'}
           </p>
         </div>
       )}
@@ -103,7 +104,7 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) =
           <div className="w-10 h-10 bg-foreground/10 rounded-full flex items-center justify-center mb-2">
             <Truck size={16} className="text-foreground/40" />
           </div>
-          <span className="text-xs text-foreground/40">Delivering</span>
+          <span className="text-xs text-foreground/40">{order.deliveryMethod === "delivery" ? 'Delivering' : 'Available for Pickup'}</span>
         </div>
         <div className="flex-1 h-0.5 bg-foreground/20 mx-2" />
         <div className="flex flex-col items-center">
@@ -114,16 +115,27 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) =
         </div>
       </div>
 
-      {/* Shipping Address */}
-      <div className="bg-foreground/5 border border-foreground/10 rounded-lg p-4 mb-8 text-left">
-        <h3 className="font-semibold text-foreground mb-2">Delivery Address</h3>
-        <p className="text-foreground/80 text-sm">
-          {order.shippingAddress?.firstName} {order.shippingAddress?.lastName}<br />
-          {order.shippingAddress?.address}<br />
-          {order.shippingAddress?.city}, {order.shippingAddress?.state} {order.shippingAddress?.zipCode}<br />
-          {order.shippingAddress?.phone}
-        </p>
-      </div>
+      {deliveryMethod === 'pickup' ? (
+  <div className="bg-foreground/5 border border-foreground/10 rounded-lg p-4 mb-8 text-left">
+    <h3 className="font-semibold text-foreground mb-2">Pickup Information</h3>
+    <p className="text-foreground/80 text-sm">
+      <strong>Location:</strong> UPSA - Madina Campus<br />
+      University of Professional Studies, Accra<br />
+      Madina Campus, Accra, Ghana<br />
+      <strong>Contact:</strong> {order.shippingAddress?.phone}
+    </p>
+  </div>
+) : (
+  <div className="bg-foreground/5 border border-foreground/10 rounded-lg p-4 mb-8 text-left">
+    <h3 className="font-semibold text-foreground mb-2">Delivery Address</h3>
+    <p className="text-foreground/80 text-sm">
+      {order.shippingAddress?.firstName} {order.shippingAddress?.lastName}<br />
+      {order.shippingAddress?.address}<br />
+      {order.shippingAddress?.city}, {order.shippingAddress?.state} {order.shippingAddress?.zipCode}<br />
+      {order.shippingAddress?.phone}
+    </p>
+  </div>
+)}
 
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         <Link

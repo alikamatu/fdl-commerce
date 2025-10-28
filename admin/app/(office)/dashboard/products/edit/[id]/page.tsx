@@ -630,11 +630,11 @@ export default function ProductEditPage() {
                     type="number"
                     step="0.01"
                     min="0.01"
-                    max="100000"
+                    max="99999"
                     {...register('price', { 
                       required: 'Price is required',
                       min: { value: 0.01, message: 'Price must be greater than 0' },
-                      max: { value: 100000, message: 'Price cannot exceed ₵100,000' }
+                      max: { value: 99999, message: 'Price cannot exceed GH₵99,999' }
                     })}
                     className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
                     placeholder="1999.99"

@@ -1,4 +1,4 @@
-import { IsArray, IsEmail, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsEmail, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, ValidateNested, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class OrderItemDto {
@@ -63,6 +63,10 @@ export class ShippingAddressDto {
   @IsString()
   @IsOptional()
   country: string;
+
+  @IsString()
+  @IsOptional()
+  pickupLocation?: string; // For pickup orders
 }
 
 export class CreateOrderDto {
@@ -82,6 +86,7 @@ export class CreateOrderDto {
 
   @IsString()
   @IsNotEmpty()
+  @IsEnum(['cash_on_delivery', 'bank_transfer', 'mobile_money', 'paystack'])
   paymentMethod: string;
 
   @IsNumber()
@@ -93,10 +98,14 @@ export class CreateOrderDto {
   shippingCents: number;
 
   @IsNumber()
-  @IsNotEmpty()
+  @IsOptional()
   taxCents: number;
 
   @IsNumber()
   @IsNotEmpty()
   totalCents: number;
+
+  @IsString()
+  @IsOptional()
+  deliveryMethod?: 'delivery' | 'pickup';
 }

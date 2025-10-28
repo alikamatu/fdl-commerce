@@ -9,19 +9,13 @@ import {
   Filter,
   RefreshCw,
   Eye,
-  Edit,
   Truck,
   CheckCircle,
   XCircle,
   Clock,
-  DollarSign,
   User,
   Calendar,
   Download,
-  MoreVertical,
-  ArrowUpRight,
-  ShoppingCart,
-  TrendingUp,
   MapPin,
   CreditCard,
   Info,
@@ -62,11 +56,12 @@ interface Order {
   paymentMethod: string;
   paymentCompleted: boolean;
   paymentId?: string;
-  status: 'pending' | 'confirmed' | 'processing' | 'delivering' | 'delivered' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'processing' | 'delivering' | 'available' | 'delivered' | 'cancelled';
   createdAt: string;
   updatedAt: string;
   deliveringAt?: string;
   deliveredAt?: string;
+  deliveryMethod: 'delivery' | 'pickup';
 }
 
 interface OrderStats {
@@ -310,6 +305,8 @@ export default function AdminOrdersPage() {
         return 'bg-purple-50 text-purple-700 border-purple-200';
       case 'delivering':
         return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+      case 'available':
+        return 'bg-green-50 text-green-700 border-green-200';
       case 'delivered':
         return 'bg-green-50 text-green-700 border-green-200';
       case 'cancelled':
@@ -329,6 +326,8 @@ export default function AdminOrdersPage() {
         return <Package className="w-4 h-4" />;
       case 'delivering':
         return <Truck className="w-4 h-4" />;
+      case 'available':
+        return <CheckCircle className="w-4 h-4" />;
       case 'delivered':
         return <CheckCircle className="w-4 h-4" />;
       case 'cancelled':
@@ -462,101 +461,6 @@ export default function AdminOrdersPage() {
           </div>
         </motion.div>
 
-        {/* Stats Grid */}
-        {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Total Orders</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">{stats.totalOrders}</p>
-                  <div className="flex items-center gap-2 mt-3 text-sm">
-                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
-                      {stats.completedOrders} completed
-                    </span>
-                  </div>
-                </div>
-                <div className="p-3 bg-blue-50 rounded-xl">
-                  <ShoppingCart className="w-6 h-6 text-blue-600" />
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">
-                    {formatPrice(stats.totalRevenue)}
-                  </p>
-                  <div className="flex items-center gap-2 mt-3 text-sm text-gray-600">
-                    <TrendingUp className="w-4 h-4" />
-                    <span>Last 30 days</span>
-                  </div>
-                </div>
-                <div className="p-3 bg-green-50 rounded-xl">
-                  <span className="text-sm font-medium text-gray-600">GHC</span>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Average Order</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">
-                    {formatPrice(stats.averageOrderValue)}
-                  </p>
-                  <div className="flex items-center gap-2 mt-3 text-sm text-gray-600">
-                    <CreditCard className="w-4 h-4" />
-                    <span>Per order</span>
-                  </div>
-                </div>
-                <div className="p-3 bg-purple-50 rounded-xl">
-                  <Truck className="w-6 h-6 text-purple-600" />
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Pending Orders</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">{stats.pendingOrders}</p>
-                  <div className="flex items-center gap-2 mt-3 text-sm">
-                    <span className="bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-medium">
-                      Needs attention
-                    </span>
-                  </div>
-                </div>
-                <div className="p-3 bg-amber-50 rounded-xl">
-                  <Clock className="w-6 h-6 text-amber-600" />
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-
         {/* Status Overview */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -566,7 +470,7 @@ export default function AdminOrdersPage() {
         >
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Status Overview</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {['pending', 'confirmed', 'processing', 'delivering', 'delivered', 'cancelled'].map((status) => (
+            {['pending', 'confirmed', 'processing', 'delivering', 'available', 'delivered', 'cancelled'].map((status) => (
               <div
                 key={status}
                 className={`p-4 rounded-xl border-2 text-center cursor-pointer transition-all duration-200 ${
@@ -619,6 +523,7 @@ export default function AdminOrdersPage() {
                 <option value="confirmed">Confirmed</option>
                 <option value="processing">Processing</option>
                 <option value="delivering">Delivering</option>
+                <option value="available">Available for Pickup</option>
                 <option value="delivered">Delivered</option>
                 <option value="cancelled">Cancelled</option>
               </select>
@@ -664,7 +569,7 @@ export default function AdminOrdersPage() {
                   <th className="text-left p-6 font-semibold text-gray-900">Order Details</th>
                   <th className="text-left p-6 font-semibold text-gray-900">Customer</th>
                   <th className="text-left p-6 font-semibold text-gray-900">Date & Time</th>
-                  <th className="text-left p-6 font-semibold text-gray-900">Items</th>
+                  <th className="text-left p-6 font-semibold text-gray-900">Item(s)</th>
                   <th className="text-left p-6 font-semibold text-gray-900">Total Amount</th>
                   <th className="text-left p-6 font-semibold text-gray-900">Payment</th>
                   <th className="text-left p-6 font-semibold text-gray-900">Status</th>
@@ -684,8 +589,8 @@ export default function AdminOrdersPage() {
                       <div>
                         <p className="font-semibold text-gray-900">{order.orderNumber}</p>
                         <div className="flex items-center gap-2 mt-1">
-                          <CreditCard className="w-3 h-3 text-gray-400" />
-                          <p className="text-sm text-gray-600">{order.paymentMethod}</p>
+                          <CheckCircle className="w-3 h-3 text-orange-400" />
+                          <p className="text-sm text-orange-600">{order.deliveryMethod}</p>
                         </div>
                       </div>
                     </td>
@@ -704,35 +609,35 @@ export default function AdminOrdersPage() {
                     </td>
                     <td className="p-6">
                       <div>
-                        <p className="font-medium text-gray-900">{formatDate(order.createdAt)}</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="font-medium text-sm text-gray-700">{formatDate(order.createdAt)}</p>
+                        <p className="text-xs text-gray-600">
                           {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
                     </td>
                     <td className="p-6">
                       <div>
-                        <p className="font-medium text-gray-900">{order.items.length} items</p>
+                        <p className="font-medium text-gray-900">{order.items.length} item(s)</p>
                         <p className="text-sm text-gray-600">
-                          {order.items.reduce((sum, item) => sum + item.quantity, 0)} units total
+                          {order.items.reduce((sum, item) => sum + item.quantity, 0)} unit(s) total
                         </p>
                       </div>
                     </td>
                     <td className="p-6">
                       <div>
-                        <p className="font-semibold text-gray-900">{formatPrice(order.totalCents)}</p>
+                        <p className="font-semibold text-gray-900">GH{formatPrice(order.totalCents)}</p>
                         <p className="text-sm text-gray-600">
-                          Subtotal: {formatPrice(order.subtotalCents)}
+                          Subtotal: GH{formatPrice(order.subtotalCents)}
                         </p>
                       </div>
                     </td>
                     <td className="p-6">
                       <span className={`px-3 py-1.5 text-xs font-semibold border rounded-lg ${
-                        order.paymentCompleted 
+                        order.deliveryMethod === 'delivery'
                           ? 'bg-green-50 text-green-700 border-green-200' 
                           : 'bg-amber-50 text-amber-700 border-amber-200'
                       }`}>
-                        {order.paymentCompleted ? 'Cash' : 'Cash'}
+                        {order.deliveryMethod === 'delivery' ? 'Cash' : 'Cash / Momo'}
                       </span>
                     </td>
                     <td className="p-6">

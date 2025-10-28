@@ -240,6 +240,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                       <input
                         type="number"
                         placeholder="1000"
+                        maxLength={90000}
                         value={filters.maxPrice || ''}
                         onChange={(e) =>
                           handlePriceChange(

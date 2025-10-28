@@ -49,11 +49,14 @@ export class ShippingAddress {
   @Prop({ required: false })
   zipCode: string;
 
-  @Prop({ required: true, default: 'US' })
+  @Prop({ required: true, default: 'GH' })
   country: string;
 
   @Prop({ required: true })
   phone: string;
+
+  @Prop({ required: false })
+  pickupLocation?: string; // For pickup orders
 }
 
 export const ShippingAddressSchema = SchemaFactory.createForClass(ShippingAddress);
@@ -72,9 +75,6 @@ export class Order {
   @Prop({ type: [OrderItemSchema], required: true })
   items: OrderItem[];
 
-  @Prop({ type: [String], required: true })
-  phone: string[];
-
   @Prop({ type: ShippingAddressSchema, required: true })
   shippingAddress: ShippingAddress;
 
@@ -90,16 +90,23 @@ export class Order {
   @Prop({ required: true })
   totalCents: number;
 
+    @Prop({ 
+    type: String, 
+    enum: ['delivery', 'pickup'], 
+    default: 'delivery' 
+  })
+  deliveryMethod: string;
+
   @Prop({ 
     required: true, 
-    enum: ['pending', 'confirmed', 'processing', 'delivering', 'delivered', 'cancelled'],
+    enum: ['pending', 'confirmed', 'processing', 'delivering', 'available', 'delivered', 'cancelled'],
     default: 'pending'
   })
   status: string;
 
   @Prop({ 
     required: true,
-    enum: ['credit_card', 'paypal', 'stripe', 'cash_on_delivery'],
+    enum: ['cash_on_delivery', 'bank_transfer', 'mobile_money', 'paystack'],
     default: 'cash_on_delivery'
   })
   paymentMethod: string;
@@ -118,6 +125,9 @@ export class Order {
 
   @Prop()
   deliveredAt?: Date;
+
+  @Prop()
+  estimatedDelivery?: Date;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);

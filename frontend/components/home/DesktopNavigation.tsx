@@ -34,10 +34,16 @@ export const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
       description: "Latest articles & news"
     },
     {
-      href: "/faqs",
-      label: "FAQs",
+      href: "/services",
+      label: "Services",
+      icon: ShoppingBag,
+      description: "Explore our services"
+    },
+    {
+      href: "/about",
+      label: "About Us",
       icon: HelpCircle,
-      description: "Get help & support"
+      description: "Learn more about our company"
     },
   ];
 

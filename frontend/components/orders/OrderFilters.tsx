@@ -21,24 +21,26 @@ export const OrderFilters: React.FC<OrderFiltersProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1 }}
+      transition={{ delay: 0.1, duration: 0.5 }}
       className="flex flex-col sm:flex-row gap-4 mb-8"
     >
       <div className="flex-1 relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/40" size={20} />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
         <input
           type="text"
           placeholder="Search orders or products..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/30 bg-transparent text-foreground placeholder-foreground/40"
+          className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-all duration-300 bg-white text-gray-900 placeholder-gray-500"
         />
       </div>
       
-      <select
+      <motion.select
         value={statusFilter}
         onChange={(e) => onStatusFilterChange(e.target.value)}
-        className="px-4 py-2.5 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/30 bg-transparent text-foreground"
+        className="px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-all duration-300 bg-white text-gray-900"
+        whileHover={{ scale: 1.02 }}
+        whileFocus={{ scale: 1.02 }}
       >
         <option value="all">All Status</option>
         {Object.entries(ORDER_STATUSES).map(([value, { label }]) => (
@@ -46,7 +48,7 @@ export const OrderFilters: React.FC<OrderFiltersProps> = ({
             {label}
           </option>
         ))}
-      </select>
+      </motion.select>
     </motion.div>
   );
 };

@@ -23,7 +23,7 @@ export default function CartPage() {
             Your Shopping Cart
           </h1>
           <p className="text-foreground/60 max-w-2xl mx-auto">
-            Review your items and proceed to checkout when you&apos;re ready
+            Review your item(s) and proceed to checkout when you are ready
           </p>
         </motion.div>
 

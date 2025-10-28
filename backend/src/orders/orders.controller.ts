@@ -6,7 +6,8 @@ import {
   Body, 
   Param, 
   UseGuards, 
-  Request
+  Request,
+  Query
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { OrdersService } from './orders.service';
@@ -16,16 +17,18 @@ import { CreateOrderDto } from './dto/create-order.dto';
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  // Require authentication for order creation
   @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() createOrderDto: CreateOrderDto, @Request() req) {
-    return this.ordersService.create(createOrderDto, req.user._id);
+    const userId = req.user._id;
+    console.log('Creating order for userId:', userId);
+    return this.ordersService.create(createOrderDto, userId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('admin/all')
   async findAllForAdmin(@Request() req) {
-    // Check if user is admin
     if (req.user.role !== 'admin') {
       return { success: false, message: 'Access denied. Admin role required.' };
     }
@@ -41,7 +44,16 @@ export class OrdersController {
   @Get()
   async findAll(@Request() req) {
     const isAdmin = req.user.role === 'admin';
-    const orders = await this.ordersService.findAll(req.user._id, isAdmin);
+    const userId = req.user._id;
+    const email = req.user.email;
+    
+    console.log('Fetching orders for userId:', userId, 'email:', email);
+    
+    // Fetch orders by userId AND email to include guest orders
+    const orders = await this.ordersService.findAllByUserOrEmail(userId, email, isAdmin);
+    
+    console.log('Found orders:', orders.length);
+    
     return {
       success: true,
       data: orders
@@ -55,7 +67,6 @@ export class OrdersController {
     @Body() body: { status: string },
     @Request() req
   ) {
-    // Only admins should be able to update status
     if (req.user.role !== 'admin') {
       return { success: false, message: 'Access denied. Admin role required.' };
     }
@@ -66,7 +77,6 @@ export class OrdersController {
   @UseGuards(JwtAuthGuard)
   @Get('stats/overview')
   async getOrderStats(@Request() req) {
-    // Only admin should access this
     if (req.user.role !== 'admin') {
       return { success: false, message: 'Access denied. Admin role required.' };
     }
@@ -81,9 +91,9 @@ export class OrdersController {
     return this.ordersService.findOne(id, req.user._id, isAdmin);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('number/:orderNumber')
   async findByOrderNumber(@Param('orderNumber') orderNumber: string, @Request() req) {
-    // This endpoint should probably also check authentication
     const isAdmin = req.user?.role === 'admin';
     const userId = req.user?._id;
     return this.ordersService.findByOrderNumber(orderNumber, userId, isAdmin);
@@ -92,6 +102,9 @@ export class OrdersController {
   @UseGuards(JwtAuthGuard)
   @Post(':id/cancel')
   async cancelOrder(@Param('id') id: string, @Request() req) {
-    return this.ordersService.updateStatus(id, 'cancelled');
+    const isAdmin = req.user.role === 'admin';
+    const userId = req.user._id;
+    
+    return this.ordersService.cancelOrder(id, userId, isAdmin);
   }
 }

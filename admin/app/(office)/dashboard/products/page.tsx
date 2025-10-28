@@ -487,7 +487,7 @@ export default function ProductsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Total Products</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{totalProducts}</p>
+                  <p className="text-md font-bold text-gray-900 mt-1">{totalProducts}</p>
                 </div>
                 <div className="p-3 bg-blue-50 rounded-xl">
                   <Package className="w-6 h-6 text-blue-600" />
@@ -499,7 +499,7 @@ export default function ProductsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Inventory Value</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{formatPrice(totalInventoryValue)}</p>
+                  <p className="text-md font-bold text-gray-900 mt-1">{formatPrice(totalInventoryValue)}</p>
                 </div>
                 <div className="p-3 bg-green-50 rounded-xl">
                   <span className="text-green-600 text-xl">₵</span>
@@ -511,7 +511,7 @@ export default function ProductsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Total Stock</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{totalStock.toLocaleString()}</p>
+                  <p className="text-md font-bold text-gray-900 mt-1">{totalStock.toLocaleString()}</p>
                 </div>
                 <div className="p-3 bg-amber-50 rounded-xl">
                   <Box className="w-6 h-6 text-amber-600" />
@@ -523,7 +523,7 @@ export default function ProductsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Active Deals</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{activeDeals}</p>
+                  <p className="text-md font-bold text-gray-900 mt-1">{activeDeals}</p>
                 </div>
                 <div className="p-3 bg-purple-50 rounded-xl">
                   <Zap className="w-6 h-6 text-purple-600" />
@@ -535,7 +535,7 @@ export default function ProductsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Avg Rating</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{averageRating.toFixed(1)}</p>
+                  <p className="text-md font-bold text-gray-900 mt-1">{averageRating.toFixed(1)}</p>
                   <div className="flex items-center gap-1 mt-1">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star
@@ -556,7 +556,7 @@ export default function ProductsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Total Reviews</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{totalReviews.toLocaleString()}</p>
+                  <p className="text-md font-bold text-gray-900 mt-1">{totalReviews.toLocaleString()}</p>
                 </div>
                 <div className="p-3 bg-emerald-50 rounded-xl">
                   <Users className="w-6 h-6 text-emerald-600" />
@@ -574,7 +574,7 @@ export default function ProductsPage() {
             className="bg-white rounded-2xl p-12 text-center border-2 border-dashed border-gray-300 shadow-sm"
           >
             <Box className="w-20 h-20 mx-auto mb-6 text-gray-400" />
-            <h3 className="text-2xl font-semibold text-gray-900 mb-3">
+            <h3 className="text-md font-semibold text-gray-900 mb-3">
               {searchTerm || selectedCategory !== 'all' ? 'No products found' : 'No products yet'}
             </h3>
             <p className="text-gray-600 mb-8 max-w-md mx-auto text-lg">
@@ -595,7 +595,7 @@ export default function ProductsPage() {
             )}
           </motion.div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {safeProducts.map((product, index) => {
               const productId = product?._id;
               const productTitle = product?.title || 'Untitled Product';

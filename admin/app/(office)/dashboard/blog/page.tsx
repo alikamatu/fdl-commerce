@@ -417,24 +417,6 @@ export default function BlogDashboardPage() {
                 />
               </div>
 
-              {/* Category Filter */}
-              <div className="relative">
-                <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full pl-12 pr-10 py-3.5 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none cursor-pointer text-gray-900"
-                >
-                  <option value="all">All Categories</option>
-                  {categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-              </div>
-
               {/* Status Filter */}
               <div className="relative">
                 <select
@@ -598,40 +580,6 @@ export default function BlogDashboardPage() {
                     </div>
                   </div>
 
-                  {/* Categories and Tags */}
-                  <div className="space-y-2 mb-6">
-                    {post.categories.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {post.categories.slice(0, 2).map((category) => (
-                          <span
-                            key={category}
-                            className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-md font-medium"
-                          >
-                            {category}
-                          </span>
-                        ))}
-                        {post.categories.length > 2 && (
-                          <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md">
-                            +{post.categories.length - 2}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                    {post.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {post.tags.slice(0, 3).map((tag) => (
-                          <span
-                            key={tag}
-                            className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md flex items-center"
-                          >
-                            <Tag className="w-3 h-3 mr-1" />
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
                   {/* Actions */}
                   <div className="flex items-center space-x-2 pt-4 border-t border-gray-100">
                     <motion.button
@@ -787,34 +735,6 @@ export default function BlogDashboardPage() {
                   </div>
                 </div>
 
-                {/* Categories and Tags */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Categories
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {categories.map((category) => (
-                        <button
-                          type="button"
-                          key={category}
-                          onClick={() => {
-                            const updatedCategories = formData.categories.includes(category)
-                              ? formData.categories.filter(c => c !== category)
-                              : [...formData.categories, category];
-                            setFormData(prev => ({ ...prev, categories: updatedCategories }));
-                          }}
-                          className={`px-3 py-1 rounded-full text-sm font-medium transition-all duration-200 ${
-                            formData.categories.includes(category)
-                              ? 'bg-blue-500 text-white'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                          }`}
-                        >
-                          {category}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -858,7 +778,6 @@ export default function BlogDashboardPage() {
                       className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     />
                   </div>
-                </div>
 
                 {/* SEO Fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

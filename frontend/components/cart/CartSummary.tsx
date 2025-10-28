@@ -5,6 +5,7 @@ import { Truck, Shield, RotateCcw, ArrowRight } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface CartSummaryProps {
   onCheckout?: () => void;
@@ -34,12 +35,12 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ onCheckout }) => {
         {/* Price Breakdown */}
         <div className="space-y-3">
           <div className="flex justify-between text-foreground/80">
-            <span>Subtotal ({cart.itemCount} items)</span>
+            <span>Subtotal [{cart.itemCount} item(s)]</span>
             <span>GH₵ {subtotal}</span>
           </div>
 
           <div className="flex justify-between text-foreground/80">
-            <span>Delivery</span>
+            <span>Pick Up / Delivery</span>
             <span>Free</span>
           </div>
 
@@ -65,7 +66,7 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ onCheckout }) => {
         {!user && (
           <div className="mt-4 p-3 bg-foreground/5 rounded-lg">
             <p className="text-xs text-foreground/60 text-center">
-              You&apos;ll be able to create an account or checkout
+              You will be able to create an account or checkout
             </p>
           </div>
         )}
@@ -76,9 +77,18 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ onCheckout }) => {
             <Shield size={16} />
             <span>Secure checkout</span>
           </div>
-          <p className="text-xs text-foreground/40">
-            Your payment information is encrypted and secure
-          </p>
+          <span className="text-xs text-foreground/40">
+            <div className="mb-4 text-sm text-foreground/70">
+          Proceeding to checkout means you have read and accepted our{' '}
+          <Link href="/terms" target="_blank" className="text-blue-700 hover:underline font-medium">
+            Return Policy
+          </Link>{' '}
+          having considered our{' '}
+          <Link href="/faqs" target="_blank" className="text-blue-700 hover:underline font-medium">
+            FAQs
+          </Link>.
+        </div>
+          </span>
         </div>
       </div>
     </motion.div>

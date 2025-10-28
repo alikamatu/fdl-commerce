@@ -85,7 +85,7 @@ export default function BrandsPage() {
                       <img
                         src={brand.logoUrl}
                         alt={brand.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300 p-2"
+                        className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300 p-2"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-foreground/5">
