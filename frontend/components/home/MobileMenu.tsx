@@ -49,7 +49,8 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
     { href: "/", label: "Home", icon: ShoppingBag },
     { href: "/products", label: "Shop", icon: ShoppingBag },
     { href: "/blogs", label: "Blogs", icon: FileText },
-    { href: "/faqs", label: "FAQs", icon: HelpCircle },
+    { href: "/services", label: "Services", icon: ShoppingBag },
+    { href: "/faqs", label: "About Us", icon: HelpCircle },
   ];
 
   return (

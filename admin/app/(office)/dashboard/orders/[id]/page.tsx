@@ -377,7 +377,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
           >
             <Package className="w-16 h-16 mx-auto mb-4 text-gray-400" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Order Not Found</h3>
-            <p className="text-gray-600 mb-6">The order you're looking for doesn't exist.</p>
+            <p className="text-gray-600 mb-6">The order you are looking for does not exist.</p>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

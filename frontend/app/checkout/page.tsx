@@ -54,29 +54,6 @@ export default function CheckoutPage() {
   if (!user) {
     return (
       <>
-        <div className="min-h-screen bg-white flex items-center justify-center">
-          <div className="text-center max-w-md mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-8"
-            >
-              <h1 className="text-2xl font-light text-gray-900 mb-4">
-                Sign In Required
-              </h1>
-              <p className="text-gray-600 mb-6">
-                Please sign in to your account to continue with checkout. Don't have an account? Create one now!
-              </p>
-              <button
-                onClick={() => setShowAuthModal(true)}
-                className="px-8 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
-              >
-                Sign In to Continue
-              </button>
-            </motion.div>
-          </div>
-        </div>
-
         <AuthModal
           isOpen={showAuthModal}
           onClose={() => {
