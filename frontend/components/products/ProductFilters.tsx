@@ -239,17 +239,20 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                       <label className="text-xs text-foreground/60">Max Price</label>
                       <input
                         type="number"
-                        placeholder="1000"
-                        maxLength={90000}
+                        placeholder="99999"
                         value={filters.maxPrice || ''}
-                        onChange={(e) =>
-                          handlePriceChange(
-                            filters.minPrice,
-                            e.target.value ? Number(e.target.value) : undefined
-                          )
-                        }
+                        onChange={(e) => {
+                          let value = e.target.value ? Number(e.target.value) : undefined;
+
+                          if (value !== undefined && value > 99999) {
+                            value = 99999;
+                          }
+
+                          handlePriceChange(filters.minPrice, value);
+                        }}
                         className="w-full px-3 py-2 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/30 bg-transparent text-sm"
                         min="0"
+                        max="99999"
                       />
                     </div>
                   </div>
