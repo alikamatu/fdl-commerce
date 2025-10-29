@@ -2,7 +2,6 @@ import { Package, Truck, CheckCircle, Clock, AlertCircle, XCircle } from 'lucide
 import { Order } from '@/types/order';
 
 export const ORDER_STATUSES = {
-  pending: { label: 'Pending', color: 'yellow' },
   confirmed: { label: 'Confirmed', color: 'blue' },
   processing: { label: 'Processing', color: 'orange' },
   delivering: { label: 'Delivering', color: 'blue'},

@@ -10,7 +10,7 @@ export default function CartPage() {
   const { cart } = useCart();
 
   return (
-    <main className="min-h-screen bg-foreground/5">
+    <main className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <motion.div

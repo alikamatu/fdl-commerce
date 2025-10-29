@@ -96,7 +96,7 @@ export const CategoryScroll: React.FC = () => {
         </motion.div>
 
         {/* Horizontal Scroll Container - Fixed for mobile */}
-        <div className="flex gap-3 md:gap-6 lg:gap-8 overflow-x-auto pb-3 md:pb-6 scrollbar-hide px-1">
+        <div className="flex items-center justify-center gap-3 md:gap-6 lg:gap-8 overflow-x-auto pb-3 md:pb-6 scrollbar-hide px-1">
           {categories.map((category, index) => (
             <motion.div
               key={category._id}

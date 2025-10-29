@@ -135,7 +135,7 @@ export default function CheckoutPage() {
                   >
                     <MapPin size={40} className="mx-auto mb-4 text-gray-700" />
                     <h3 className="text-xl font-medium text-gray-900 mb-2">
-                      Pickup
+                      Pick Up
                     </h3>
                     <p className="text-gray-600 text-sm">
                       Pick up your order at UPSA - Madina Campus

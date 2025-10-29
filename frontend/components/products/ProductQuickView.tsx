@@ -449,7 +449,7 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                           <Package size={18} className="text-foreground/40 flex-shrink-0" />
                           <div>
                             <div className="font-medium text-foreground">Easy Returns</div>
-                            <div className="text-xs">90-day guarantee</div>
+                            <div className="text-xs">7-day guarantee</div>
                           </div>
                         </div>
                         <div className="flex items-center gap-3 text-sm text-foreground/60">

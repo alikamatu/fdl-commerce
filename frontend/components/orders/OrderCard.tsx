@@ -59,7 +59,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, index, onCancelOrde
         <div className="flex items-start space-x-2 text-sm text-gray-600 mb-4">
           <MapPin size={16} className="mt-0.5 flex-shrink-0" />
           <span>
-            Delivery to {order.shippingAddress.firstName} {order.shippingAddress.lastName}, <span> </span>  {order.shippingAddress.address}
+            {order.deliveryMethod === "delivery" ? `Devlivery to ${order.shippingAddress.firstName} ${order.shippingAddress.lastName},` : "Pickup at"} <span> </span>  {order.shippingAddress.address}
           </span>
         </div>
 

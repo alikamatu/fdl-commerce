@@ -39,7 +39,7 @@ export const CartItem: React.FC<CartItemProps> = ({ item }) => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
-      className="flex flex-col sm:flex-row gap-4 p-6 border border-foreground/10 rounded-lg bg-background"
+      className="flex flex-col sm:flex-row gap-4 p-6 rounded-lg bg-background"
     >
       {/* Product Image */}
       <div className="flex-shrink-0">

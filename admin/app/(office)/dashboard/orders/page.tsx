@@ -470,7 +470,7 @@ export default function AdminOrdersPage() {
         >
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Status Overview</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {['pending', 'confirmed', 'processing', 'delivering', 'available', 'delivered', 'cancelled'].map((status) => (
+            {['confirmed', 'processing', 'delivering', 'available', 'delivered', 'cancelled'].map((status) => (
               <div
                 key={status}
                 className={`p-4 rounded-xl border-2 text-center cursor-pointer transition-all duration-200 ${
@@ -519,7 +519,6 @@ export default function AdminOrdersPage() {
                 className="w-full pl-12 pr-10 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white appearance-none cursor-pointer"
               >
                 <option value="all">All Statuses</option>
-                <option value="pending">Pending</option>
                 <option value="confirmed">Confirmed</option>
                 <option value="processing">Processing</option>
                 <option value="delivering">Delivering</option>

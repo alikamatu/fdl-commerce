@@ -159,7 +159,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   };
 
   const steps = [
-    { number: 1, title: deliveryMethod === 'delivery' ? 'Delivery' : 'Pickup', icon: deliveryMethod === 'delivery' ? Truck : MapPin },
+    { number: 1, title: deliveryMethod === 'delivery' ? 'Delivery' : 'PickUp', icon: deliveryMethod === 'delivery' ? Truck : MapPin },
     { number: 2, title: 'Review', icon: Lock },
   ];
 

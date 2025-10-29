@@ -61,7 +61,7 @@ interface Order {
   paymentMethod: string;
   paymentCompleted: boolean;
   paymentId?: string;
-  status: 'pending' | 'confirmed' | 'processing' | 'delivering' | 'available' | 'delivered' | 'cancelled';
+  status:  'confirmed' | 'processing' | 'delivering' | 'available' | 'delivered' | 'cancelled';
   createdAt: string;
   updatedAt: string;
   shippedAt?: string;
@@ -208,7 +208,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
     sendShippingNotification
   } = useOrder(orderId);
 
-  const [selectedStatus, setSelectedStatus] = useState<Order['status']>('pending');
+  const [selectedStatus, setSelectedStatus] = useState<Order['status']>('confirmed');
   const [sendingNotification, setSendingNotification] = useState(false);
 
   useEffect(() => {
@@ -271,8 +271,6 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
 
   const getStatusColor = (status: Order['status']) => {
     switch (status) {
-      case 'pending':
-        return 'bg-amber-50 text-amber-700 border-amber-200';
       case 'confirmed':
         return 'bg-blue-50 text-blue-700 border-blue-200';
       case 'processing':
@@ -292,8 +290,6 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
 
   const getStatusIcon = (status: Order['status']) => {
     switch (status) {
-      case 'pending':
-        return <Clock className="w-4 h-4" />;
       case 'confirmed':
         return <CheckCircle className="w-4 h-4" />;
       case 'processing':
@@ -660,7 +656,6 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
                     onChange={(e) => setSelectedStatus(e.target.value as Order['status'])}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black focus:border-black transition-all duration-200 bg-white appearance-none cursor-pointer"
                   >
-                    <option value="pending">Pending</option>
                     <option value="confirmed">Confirmed</option>
                     <option value="processing">Processing</option>
                     <option value="delivering">Delivering</option>

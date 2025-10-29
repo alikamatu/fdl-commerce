@@ -11,13 +11,13 @@ const features = [
   },
   {
     icon: Truck,
-    title: 'Free Shipping',
+    title: 'Free Delivery',
     description: 'On all products',
   },
   {
     icon: RotateCcw,
     title: 'Hassle-Free Returns',
-    description: '90-day return policy for your peace of mind',
+    description: '7-day return policy for your peace of mind',
   },
   {
     icon: Headphones,

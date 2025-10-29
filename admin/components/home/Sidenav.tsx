@@ -119,30 +119,23 @@ export default function Sidenav() {
   return (
     <>
       {/* Sidebar */}
-      <motion.div
-        initial={{ x: -100, opacity: 0 }}
-        animate={{ 
-          x: 0, 
-          opacity: 1,
-          width: isSidebarCollapsed ? 64 : 256
-        }}
-        transition={{ duration: 0.3 }}
-        className={cn(
-          "h-screen fixed bg-white p-4 flex flex-col z-40 border-r border-gray-200",
-          isSidebarCollapsed ? "w-16" : "w-64"
-        )}
-      >
-        {/* Logo and Toggle */}
-        <motion.div 
-          className="flex items-center justify-between mb-8 px-2"
-          whileHover={{ scale: 1.02 }}
-        >
-          <AnimatePresence mode="wait">
-            {!isSidebarCollapsed && (
+      <AnimatePresence>
+        {!isSidebarCollapsed && (
+          <motion.div
+            initial={{ x: -300, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -300, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="h-screen fixed bg-white p-4 flex flex-col z-40 border-r border-gray-200 w-64"
+          >
+            {/* Logo and Toggle */}
+            <motion.div 
+              className="flex items-center justify-between mb-8 px-2"
+              whileHover={{ scale: 1.02 }}
+            >
               <motion.span
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
                 transition={{ duration: 0.2 }}
               >
                 <img 
@@ -151,193 +144,145 @@ export default function Sidenav() {
                   className="h-20 w-auto rounded-2xl object-cover" 
                 />
               </motion.span>
-            )}
-          </AnimatePresence>
-          
-          {/* Toggle Button */}
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={toggleSidebar}
-            className={cn(
-              "p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors",
-              isSidebarCollapsed ? "ml-0" : ""
-            )}
-          >
-            {isSidebarCollapsed ? (
-              <ChevronRight className="w-4 h-4 text-gray-600" />
-            ) : (
-              <ChevronLeft className="w-4 h-4 text-gray-600" />
-            )}
-          </motion.button>
-        </motion.div>
+              
+              {/* Toggle Button */}
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={toggleSidebar}
+                className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4 text-gray-600" />
+              </motion.button>
+            </motion.div>
 
-        {/* Navigation */}
-        <nav className="space-y-1 flex-1">
-          {navItems.map((item) => (
-            <div key={item.name}>
-              {item.children ? (
-                <div>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => toggleMenu(item.name.toLowerCase())}
-                    className={cn(
-                      "w-full flex items-center justify-between p-3 rounded-lg text-sm font-medium transition-all duration-200",
-                      isActive(item.href) || 
-                      item.children.some(child => isActive(child.href))
-                        ? "bg-blue-50 text-blue-700 border border-blue-200"
-                        : "text-gray-700 hover:bg-gray-50 hover:border hover:border-gray-200",
-                      isSidebarCollapsed ? "justify-center px-2" : ""
-                    )}
-                  >
-                    <div className={cn(
-                      "flex items-center space-x-3",
-                      isSidebarCollapsed ? "space-x-0" : ""
-                    )}>
-                      {item.icon}
-                      <AnimatePresence>
-                        {!isSidebarCollapsed && (
-                          <motion.span
-                            initial={{ opacity: 0, width: 0 }}
-                            animate={{ opacity: 1, width: "auto" }}
-                            exit={{ opacity: 0, width: 0 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            {item.name}
-                          </motion.span>
+            {/* Navigation */}
+            <nav className="space-y-1 flex-1">
+              {navItems.map((item) => (
+                <div key={item.name}>
+                  {item.children ? (
+                    <div>
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => toggleMenu(item.name.toLowerCase())}
+                        className={cn(
+                          "w-full flex items-center justify-between p-3 rounded-lg text-sm font-medium transition-all duration-200",
+                          isActive(item.href) || 
+                          item.children.some(child => isActive(child.href))
+                            ? "bg-blue-50 text-blue-700 border border-blue-200"
+                            : "text-gray-700 hover:bg-gray-50 hover:border hover:border-gray-200"
                         )}
-                      </AnimatePresence>
-                    </div>
-                    
-                    <AnimatePresence>
-                      {!isSidebarCollapsed && (
+                      >
+                        <div className="flex items-center space-x-3">
+                          {item.icon}
+                          <span>{item.name}</span>
+                        </div>
+                        
                         <motion.div
                           animate={{ rotate: openMenus[item.name.toLowerCase()] ? 180 : 0 }}
                           transition={{ duration: 0.2 }}
-                          initial={{ opacity: 0 }}
-                          exit={{ opacity: 0 }}
                         >
                           <ChevronDown className="w-4 h-4" />
                         </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </motion.button>
-                  
-                  {/* Submenu */}
-                  <AnimatePresence>
-                    {!isSidebarCollapsed && openMenus[item.name.toLowerCase()] && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="mt-1 space-y-1 ml-4 overflow-hidden"
-                      >
-                        {item.children.map((child, index) => (
+                      </motion.button>
+                      
+                      {/* Submenu */}
+                      <AnimatePresence>
+                        {openMenus[item.name.toLowerCase()] && (
                           <motion.div
-                            key={child.name}
-                            initial={{ x: -20, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: index * 0.1 }}
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="mt-1 space-y-1 ml-4 overflow-hidden"
                           >
-                            <Link
-                              href={child.href}
-                              className={cn(
-                                "block p-2 pl-8 rounded-lg text-sm transition-all duration-200",
-                                isActive(child.href)
-                                  ? "bg-blue-100 text-blue-600 font-medium shadow-sm"
-                                  : "text-gray-700 hover:text-white hover:bg-gray-100"
-                              )}
-                            >
-                              {child.name}
-                            </Link>
+                            {item.children.map((child, index) => (
+                              <motion.div
+                                key={child.name}
+                                initial={{ x: -20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                transition={{ delay: index * 0.1 }}
+                              >
+                                <Link
+                                  href={child.href}
+                                  className={cn(
+                                    "block p-2 pl-8 rounded-lg text-sm transition-all duration-200",
+                                    isActive(child.href)
+                                      ? "bg-blue-100 text-blue-600 font-medium shadow-sm"
+                                      : "text-gray-700 hover:text-white hover:bg-gray-100"
+                                  )}
+                                >
+                                  {child.name}
+                                </Link>
+                              </motion.div>
+                            ))}
                           </motion.div>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  ) : (
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <Link
+                        href={item.href}
+                        className={cn(
+                          "flex items-center space-x-3 p-3 rounded-lg text-sm font-medium transition-all duration-200",
+                          isActive(item.href)
+                            ? "bg-blue-50 text-blue-700 border border-blue-200"
+                            : "text-gray-700 hover:bg-white hover:border hover:border-gray-200"
+                        )}
+                      >
+                        {item.icon}
+                        <span>{item.name}</span>
+                      </Link>
+                    </motion.div>
+                  )}
                 </div>
-              ) : (
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Link
-                    href={item.href}
-                    className={cn(
-                      "flex items-center space-x-3 p-3 rounded-lg text-sm font-medium transition-all duration-200",
-                      isActive(item.href)
-                        ? "bg-blue-50 text-blue-700 border border-blue-200"
-                        : "text-gray-700 hover:bg-white hover:border hover:border-gray-200",
-                      isSidebarCollapsed ? "justify-center px-2" : ""
-                    )}
-                  >
-                    {item.icon}
-                    <AnimatePresence>
-                      {!isSidebarCollapsed && (
-                        <motion.span
-                          initial={{ opacity: 0, width: 0 }}
-                          animate={{ opacity: 1, width: "auto" }}
-                          exit={{ opacity: 0, width: 0 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          {item.name}
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </Link>
-                </motion.div>
-              )}
-            </div>
-          ))}
-        </nav>
+              ))}
+            </nav>
 
-        {/* Footer Actions */}
-        <div className="mt-6 pt-4 border-t border-gray-200 space-y-2">
-          <div className={cn(
-            "flex items-center justify-between",
-            isSidebarCollapsed ? "flex-col space-y-2" : ""
-          )}>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={logout}
-              className={cn(
-                "bg-red-600 text-white p-2 rounded-lg flex items-center space-x-2 cursor-pointer hover:bg-red-700 transition-colors",
-                isSidebarCollapsed ? "justify-center w-full" : ""
-              )}
-            >
-              <LogOut size={15} />
-              <AnimatePresence>
-                {!isSidebarCollapsed && (
-                  <motion.span
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: "auto" }}
-                    exit={{ opacity: 0, width: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    Logout
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </motion.button>
-            
-            <motion.div 
-              whileHover={{ scale: 1.05 }} 
-              whileTap={{ scale: 0.95 }}
-              className={isSidebarCollapsed ? "w-full" : ""}
-            >
-            </motion.div>
-          </div>
-        </div>
-      </motion.div>
+            {/* Footer Actions */}
+            <div className="mt-6 pt-4 border-t border-gray-200 space-y-2">
+              <div className="flex items-center justify-between">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={logout}
+                  className="bg-red-600 text-white p-2 rounded-lg flex items-center space-x-2 cursor-pointer hover:bg-red-700 transition-colors"
+                >
+                  <LogOut size={15} />
+                  <span>Logout</span>
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Toggle Button when sidebar is hidden */}
+      <AnimatePresence>
+        {isSidebarCollapsed && (
+          <motion.button
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.2 }}
+            onClick={toggleSidebar}
+            className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors shadow-md"
+          >
+            <ChevronRight className="w-4 h-4 text-gray-600" />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {/* Main Content Spacer */}
       <div 
         className={cn(
           "transition-all duration-300 ease-in-out",
-          isSidebarCollapsed ? "ml-16" : "ml-64"
+          isSidebarCollapsed ? "ml-0" : "ml-64"
         )}
       />
     </>
