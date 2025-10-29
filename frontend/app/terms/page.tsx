@@ -103,7 +103,7 @@ export default function TermsPage() {
                 Warranty Disclaimer
               </h2>
               <p className="text-gray-700 mb-4">
-                Our services are provided on an "as is" and "as available" basis. Forbes Digital Lifeline makes no representations or warranties of any kind, express or implied, regarding the operation of our services or the information, content, or products included therein.
+                Our services are provided on an &quot;as is&quot; and &quot;as available&quot; basis. Forbes Digital Lifeline makes no representations or warranties of any kind, express or implied, regarding the operation of our services or the information, content, or products included therein.
               </p>
               <p className="text-gray-700">
                 We disclaim all warranties, including but not limited to implied warranties of merchantability and fitness for a particular purpose, to the full extent permitted by law.
