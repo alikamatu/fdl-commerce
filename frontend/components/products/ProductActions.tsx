@@ -238,7 +238,7 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
         </div>
         <div className="flex items-center gap-2 text-sm text-foreground/60">
           <RotateCcw size={16} />
-          <span>90-day returns</span>
+          <span>7-day returns</span>
         </div>
       </div>
     </motion.div>
