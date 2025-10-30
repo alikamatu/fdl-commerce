@@ -391,9 +391,9 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
   return (
     <div className="min-h-screen bg-white py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 ml-12">
             <img src="/logo/fdll.jpeg" className='w-16 h-auto rounded-2xl' alt="" />
-            <p className='font-bold text-2xl'>Forbes Digital Lifeline</p>
+            <p className='font-bold text-2xl flex flex-col'>Forbes Digital Lifeline <span className='text-lg font-light'>Your Digital 🆘 </span></p>
           </div>
         {/* Header */}
         <motion.div
