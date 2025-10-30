@@ -83,7 +83,7 @@ export default function FAQsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100/50 py-16">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -93,110 +93,216 @@ export default function FAQsPage() {
         >
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-gray-800 to-gray-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
             <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
-            Frequently Asked Questions
+            Frequently Asked Questions & About Us
           </div>
           <h1 className="text-5xl font-bold bg-gradient-to-br from-gray-900 to-gray-700 bg-clip-text text-transparent mb-6">
             How can we help you?
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Find comprehensive answers to common questions about our products, services, and support processes.
+            Find comprehensive answers to common questions and learn more about Forbes Digital Lifeline.
           </p>
         </motion.div>
 
-        {/* FAQ Categories */}
-        <div className="space-y-6">
-          {faqCategories.map((category, categoryIndex) => (
-            <motion.div
-              key={categoryIndex}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: categoryIndex * 0.1 }}
-              className="group"
-            >
-              {/* Category Header */}
-              <div className="flex items-center gap-4 mb-4">
-                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
-                <h2 className="text-2xl font-semibold text-gray-800 whitespace-nowrap">
-                  {category.category}
-                </h2>
-                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
-              </div>
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* FAQ Section - 2/3 width */}
+          <div className="lg:col-span-2 space-y-8">
+            {faqCategories.map((category, categoryIndex) => (
+              <motion.div
+                key={categoryIndex}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: categoryIndex * 0.1 }}
+                className="group"
+              >
+                {/* Category Header */}
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+                  <h2 className="text-2xl font-semibold text-gray-800 whitespace-nowrap">
+                    {category.category}
+                  </h2>
+                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+                </div>
 
-              {/* FAQ Items */}
-              <div className="space-y-3">
-                {category.items.map((item, itemIndex) => {
-                  const globalIndex = faqCategories
-                    .slice(0, categoryIndex)
-                    .reduce((acc, cat) => acc + cat.items.length, 0) + itemIndex;
-                  const isOpen = openItems.has(globalIndex);
+                {/* FAQ Items */}
+                <div className="space-y-3">
+                  {category.items.map((item, itemIndex) => {
+                    const globalIndex = faqCategories
+                      .slice(0, categoryIndex)
+                      .reduce((acc, cat) => acc + cat.items.length, 0) + itemIndex;
+                    const isOpen = openItems.has(globalIndex);
 
-                  return (
-                    <motion.div
-                      key={itemIndex}
-                      layout
-                      className="bg-white/80 backdrop-blur-sm rounded-2xl  -gray-200/80 -sm hover:-md transition-all duration-300 overflow-hidden"
-                      whileHover={{ scale: 1.01 }}
-                    >
-                      <motion.button
-                        onClick={() => toggleItem(globalIndex)}
-                        className="w-full flex items-center justify-between p-6 text-left focus:outline-none focus:-2 focus:-blue-500/20 focus:-inset"
-                        whileTap={{ scale: 0.98 }}
+                    return (
+                      <motion.div
+                        key={itemIndex}
+                        layout
+                        className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200/80 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
+                        whileHover={{ scale: 1.01 }}
                       >
-                        <span className="text-lg font-semibold text-gray-900 pr-8 leading-relaxed">
-                          {item.question}
-                        </span>
-                        <motion.div
-                          animate={{ rotate: isOpen ? 180 : 0 }}
-                          transition={{ duration: 0.3, type: "spring", stiffness: 200 }}
-                          className="flex-shrink-0 ml-4 p-2 rounded-full bg-gray-100 group-hover:bg-gray-200 transition-colors"
+                        <motion.button
+                          onClick={() => toggleItem(globalIndex)}
+                          className="w-full flex items-center justify-between p-6 text-left focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:ring-inset"
+                          whileTap={{ scale: 0.98 }}
                         >
-                          <ChevronDown className="w-5 h-5 text-gray-600" />
-                        </motion.div>
-                      </motion.button>
-
-                      <AnimatePresence>
-                        {isOpen && (
+                          <span className="text-lg font-semibold text-gray-900 pr-8 leading-relaxed">
+                            {item.question}
+                          </span>
                           <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ 
-                              opacity: 1, 
-                              height: "auto",
-                              transition: {
-                                height: { duration: 0.3, ease: "easeOut" },
-                                opacity: { duration: 0.2, delay: 0.1 }
-                              }
-                            }}
-                            exit={{ 
-                              opacity: 0, 
-                              height: 0,
-                              transition: {
-                                height: { duration: 0.2 },
-                                opacity: { duration: 0.1 }
-                              }
-                            }}
-                            className="overflow-hidden"
+                            animate={{ rotate: isOpen ? 180 : 0 }}
+                            transition={{ duration: 0.3, type: "spring", stiffness: 200 }}
+                            className="flex-shrink-0 ml-4 p-2 rounded-full bg-gray-100 group-hover:bg-gray-200 transition-colors"
                           >
-                            <div className="px-6 pb-6">
-                              <div className="pl-4 -l-2 -blue-500/30">
-                                <motion.p 
-                                  initial={{ opacity: 0, x: -10 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{ delay: 0.2 }}
-                                  className="text-gray-700 leading-relaxed text-lg"
-                                >
-                                  {item.answer}
-                                </motion.p>
-                              </div>
-                            </div>
+                            <ChevronDown className="w-5 h-5 text-gray-600" />
                           </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </motion.div>
-                  );
-                })}
+                        </motion.button>
+
+                        <AnimatePresence>
+                          {isOpen && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ 
+                                opacity: 1, 
+                                height: "auto",
+                                transition: {
+                                  height: { duration: 0.3, ease: "easeOut" },
+                                  opacity: { duration: 0.2, delay: 0.1 }
+                                }
+                              }}
+                              exit={{ 
+                                opacity: 0, 
+                                height: 0,
+                                transition: {
+                                  height: { duration: 0.2 },
+                                  opacity: { duration: 0.1 }
+                                }
+                              }}
+                              className="overflow-hidden"
+                            >
+                              <div className="px-6 pb-6">
+                                <div className="pl-4 border-l-2 border-blue-500/30">
+                                  <motion.p 
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.2 }}
+                                    className="text-gray-700 leading-relaxed text-lg"
+                                  >
+                                    {item.answer}
+                                  </motion.p>
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* About Us Section - 1/3 width */}
+          <div className="lg:col-span-1">
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="sticky top-8"
+            >
+              <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-8 text-white shadow-xl">
+                <div className="text-center mb-6">
+                  <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <span className="text-2xl">🚀</span>
+                  </div>
+                  <h2 className="text-2xl font-bold">About Forbes Digital Lifeline</h2>
+                  <p className="text-gray-300 mt-2">Your Trusted Digital Partner</p>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="font-semibold text-white mb-3 flex items-center gap-2">
+                      <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
+                      Our Story
+                    </h3>
+                    <p className="text-gray-300 text-sm leading-relaxed">
+                      Founded with a mission to make technology accessible and manageable for everyone, Forbes Digital Lifeline has grown from humble beginnings into a full-service digital hub offering comprehensive tech solutions.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-white mb-3 flex items-center gap-2">
+                      <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                      What We Do
+                    </h3>
+                    <ul className="text-gray-300 text-sm space-y-2">
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-400 mt-1">•</span>
+                        Affordable laptops and mobile devices
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-400 mt-1">•</span>
+                        Professional unlocking and flashing services
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-400 mt-1">•</span>
+                        Hardware and software repairs
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-400 mt-1">•</span>
+                        IT accessories and peripherals
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-white mb-3 flex items-center gap-2">
+                      <span className="w-2 h-2 bg-purple-400 rounded-full"></span>
+                      Our Values
+                    </h3>
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+                        <div className="text-blue-400 mb-1">Integrity</div>
+                        <div className="text-gray-400">Transparent & Honest</div>
+                      </div>
+                      <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+                        <div className="text-green-400 mb-1">Expertise</div>
+                        <div className="text-gray-400">Certified Professionals</div>
+                      </div>
+                      <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+                        <div className="text-purple-400 mb-1">Customer Focus</div>
+                        <div className="text-gray-400">Your Satisfaction First</div>
+                      </div>
+                      <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+                        <div className="text-orange-400 mb-1">Innovation</div>
+                        <div className="text-gray-400">Cutting-edge Solutions</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-gray-700">
+                    <h3 className="font-semibold text-white mb-3">Why Choose Us?</h3>
+                    <div className="space-y-2 text-gray-300 text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="text-yellow-400">⚡</span>
+                        Quick turnaround times
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-yellow-400">💰</span>
+                        Competitive pricing
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-yellow-400">🎯</span>
+                        Personalized service
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-yellow-400">✅</span>
+                        Guaranteed satisfaction
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </motion.div>
-          ))}
+          </div>
         </div>
 
         {/* Contact Section */}
@@ -206,13 +312,13 @@ export default function FAQsPage() {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="mt-16 text-center"
         >
-          <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl p-8  -gray-200/60 -sm">
+          <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl p-8 border border-gray-200/60 shadow-sm">
             <div className="max-w-md mx-auto">
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.6, type: "spring" }}
-                className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 -lg"
+                className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg"
               >
                 <span className="text-2xl">💬</span>
               </motion.div>
@@ -229,7 +335,7 @@ export default function FAQsPage() {
                   href="https://wa.me/233547129636"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-xl -lg hover:-xl transition-all duration-300"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   <span className="mr-2">💬</span>
                   WhatsApp Support
@@ -239,7 +345,7 @@ export default function FAQsPage() {
                   href="tel:+233547129636"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-700 font-semibold rounded-xl -2 -gray-300 hover:-gray-400 -sm hover:-md transition-all duration-300"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-700 font-semibold rounded-xl border-2 border-gray-300 hover:border-gray-400 shadow-sm hover:shadow-md transition-all duration-300"
                 >
                   <span className="mr-2">📞</span>
                   Call Directly

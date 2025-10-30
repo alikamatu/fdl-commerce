@@ -391,6 +391,10 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
   return (
     <div className="min-h-screen bg-white py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="flex items-center gap-2">
+            <img src="/logo/fdll.jpeg" className='w-16 h-auto rounded-2xl' alt="" />
+            <p className='font-bold text-2xl'>Forbes Digital Lifeline</p>
+          </div>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -582,7 +586,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
                   <div className="p-2 bg-gray-100 rounded-xl">
                     <MapPin className="w-5 h-5 text-gray-700" />
                   </div>
-                  <h2 className="text-xl font-semibold text-gray-900">Delivery Address</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">{order.deliveryMethod === "delivery" ? "Delivey" : "Pickup"} Address</h2>
                 </div>
                 <div className="space-y-3">
                   <p className="font-semibold text-gray-900">{order.shippingAddress.fullName}</p>
@@ -681,8 +685,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
                     {updating ? 'Updating...' : selectedStatus === order.status ? 'No Changes' : 'Update Status'}
                   </span>
                 </motion.button>
-
-                {order.status === 'delivering' && (
+                {/* {order.status === 'delivering' && (
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -699,7 +702,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
                       {sendingNotification ? 'Sending...' : 'Send Delivery Notification'}
                     </span>
                   </motion.button>
-                )}
+                )} */}
               </div>
             </motion.div>
 
@@ -760,7 +763,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
                 </div>
                 {order.shippedAt && (
                   <div className="flex justify-between items-center py-2">
-                    <span className="text-gray-600">Shipped</span>
+                    <span className="text-gray-600">{order.deliveryMethod === "delivery" ? "Delivery" : "Pickup"}</span>
                     <span className="font-medium text-gray-900">{formatDate(order.shippedAt)}</span>
                   </div>
                 )}
@@ -770,10 +773,6 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
                     <span className="font-medium text-gray-900">{formatDate(order.deliveredAt)}</span>
                   </div>
                 )}
-                <div className="flex justify-between items-center py-2 border-t border-gray-200 pt-3">
-                  <span className="text-gray-600">Last Updated</span>
-                  <span className="font-medium text-gray-900">{formatDate(order.updatedAt)}</span>
-                </div>
               </div>
             </motion.div>
           </div>

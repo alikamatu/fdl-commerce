@@ -153,7 +153,7 @@ export default function TermsPage() {
               <div className="bg-gray-50 rounded-lg p-4">
                 <p className="text-gray-700">
                   <strong>Forbes Digital Lifeline</strong><br />
-                  Email: legal@forbesdigitallifeline.com<br />
+                  Email: shop@forbesdigitals.com<br />
                   Telephone: +233 54 712 9636<br />
                   WhatsApp: +233 54 712 9636
                 </p>

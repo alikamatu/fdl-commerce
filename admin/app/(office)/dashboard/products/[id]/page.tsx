@@ -76,11 +76,21 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       return;
     }
 
+    
     setDeleting(true);
+    const token = localStorage.getItem('token')
+
+        if (!token) {
+      throw new Error('No authentication token found. Please login again.');
+    }
+
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/products/${id}`, {
-        method: 'DELETE',
-      });
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/products/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
 
       if (!response.ok) {
         throw new Error('Failed to delete product');
