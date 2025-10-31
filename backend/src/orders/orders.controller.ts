@@ -100,6 +100,59 @@ export class OrdersController {
   }
 
   @UseGuards(JwtAuthGuard)
+@Post(':id/notify-delivering')
+async sendShippingNotification(
+  @Param('id') id: string,
+  @Request() req
+) {
+  if (req.user.role !== 'admin') {
+    return { success: false, message: 'Access denied. Admin role required.' };
+  }
+  
+  return this.ordersService.sendShippingNotification(id);
+}
+
+@UseGuards(JwtAuthGuard)
+@Patch(':id/payment-method')
+async updatePaymentMethod(
+  @Param('id') id: string,
+  @Body() body: { paymentMethod: string },
+  @Request() req
+) {
+  if (req.user.role !== 'admin') {
+    return { success: false, message: 'Access denied. Admin role required.' };
+  }
+  
+  return this.ordersService.updatePaymentMethod(id, body.paymentMethod);
+}
+
+@UseGuards(JwtAuthGuard)
+@Post(':id/notify-pickup')
+async sendPickupNotification(
+  @Param('id') id: string,
+  @Request() req
+) {
+  if (req.user.role !== 'admin') {
+    return { success: false, message: 'Access denied. Admin role required.' };
+  }
+  
+  return this.ordersService.sendPickupNotification(id);
+}
+
+@UseGuards(JwtAuthGuard)
+@Post(':id/notify-delivered')
+async sendDeliveredNotification(
+  @Param('id') id: string,
+  @Request() req
+) {
+  if (req.user.role !== 'admin') {
+    return { success: false, message: 'Access denied. Admin role required.' };
+  }
+  
+  return this.ordersService.sendDeliveredNotification(id);
+}
+
+  @UseGuards(JwtAuthGuard)
   @Post(':id/cancel')
   async cancelOrder(@Param('id') id: string, @Request() req) {
     const isAdmin = req.user.role === 'admin';

@@ -36,7 +36,7 @@ export default function FAQsPage() {
         },
         {
           question: "Do you offer delivery or pickup options?",
-          answer: "Yes, we provide both delivery and pickup options for customer convenience. During the checkout process, you may select your preferred method. We collect necessary personal information to ensure accurate and timely delivery or pickup coordination."
+          answer: "Yes, we provide free delivery and pickup options for customer convenience. During the checkout process, you may select your preferred method. We collect necessary personal information to ensure accurate and timely delivery or pickup coordination."
         }
       ]
     },

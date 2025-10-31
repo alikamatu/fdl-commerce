@@ -90,7 +90,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
         phone: formData.phone,
         pickupLocation: 'UPSA - Madina'
       },
-      deliveryMethod: deliveryMethod, // Explicitly set the delivery method
+      deliveryMethod: deliveryMethod, 
       paymentMethod: 'cash_on_delivery',
       subtotalCents,
       shippingCents,

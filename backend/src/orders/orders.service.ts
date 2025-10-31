@@ -5,81 +5,15 @@ import { Order, OrderDocument } from '../schemas/order.schema';
 import { Product, ProductDocument } from '../schemas/product.schema';
 import { CreateOrderDto } from './dto/create-order.dto';
 import axios from 'axios';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
+    private readonly emailService: EmailService,
   ) {}
-
-  async create(createOrderDto: CreateOrderDto, userId: string): Promise<Order> {
-    if (!userId) {
-      throw new BadRequestException('User authentication required to place order');
-    }
-
-    const session = await this.orderModel.db.startSession();
-    session.startTransaction();
-
-    try {
-      const orderCount = await this.orderModel.countDocuments();
-      const orderNumber = `ORD-${(orderCount + 1).toString().padStart(6, '0')}`;
-
-      for (const item of createOrderDto.items) {
-        const product = await this.productModel.findById(item.productId);
-        
-        if (!product) {
-          throw new NotFoundException(`Product ${item.title} not found`);
-        }
-
-        if (product.stock < item.quantity) {
-          throw new BadRequestException(
-            `Insufficient stock for ${item.title}. Available: ${product.stock}`
-          );
-        }
-
-        product.stock -= item.quantity;
-        product.soldCount += item.quantity;
-        await product.save({ session });
-      }
-
-      const orderData: any = {
-        orderNumber,
-        userId: new Types.ObjectId(userId),
-        email: createOrderDto.email,
-        items: createOrderDto.items,
-        shippingAddress: createOrderDto.shippingAddress,
-        deliveryMethod: createOrderDto.deliveryMethod || 'delivery', // Save delivery method
-        subtotalCents: createOrderDto.subtotalCents,
-        shippingCents: createOrderDto.shippingCents,
-        taxCents: createOrderDto.taxCents || 0,
-        totalCents: createOrderDto.totalCents,
-        paymentMethod: createOrderDto.paymentMethod || 'cash_on_delivery',
-        paymentCompleted: createOrderDto.paymentMethod === 'cash_on_delivery',
-        status: createOrderDto.paymentMethod === 'cash_on_delivery' ? 'confirmed' : 'pending',
-      };
-
-      console.log('Creating order with deliveryMethod:', createOrderDto.deliveryMethod);
-
-      const order = new this.orderModel(orderData);
-      await order.save({ session });
-
-      await session.commitTransaction();
-
-      const savedOrder = await this.orderModel.findById(order._id);
-      if (!savedOrder) {
-        throw new NotFoundException('Order not found after creation');
-      }
-      
-      console.log('Order created successfully:', savedOrder._id, 'for user:', userId);
-      return savedOrder;
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      session.endSession();
-    }
-  }
 
   async verifyPaystackPayment(reference: string): Promise<any> {
     try {
@@ -137,6 +71,7 @@ export class OrdersService {
 
     return orders;
   }
+  
 
   async confirmPayment(
     orderId: string,
@@ -171,6 +106,248 @@ export class OrdersService {
     order.status = 'confirmed';
 
     return order.save();
+  }
+
+  async sendShippingNotification(id: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const order = await this.orderModel.findById(id);
+      
+      if (!order) {
+        throw new NotFoundException('Order not found');
+      }
+
+      // Check for both 'delivering' and 'available' statuses
+      if (!['delivering', 'available'].includes(order.status)) {
+        throw new BadRequestException(`Order status must be 'delivering' or 'available'. Current status: ${order.status}`);
+      }
+
+      // Create fullName from firstName and lastName
+      const fullName = `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`;
+
+      // Determine the correct email type based on order status
+      let emailType = 'delivering';
+      if (order.status === 'available') {
+        emailType = 'available';
+      }
+
+      // Pass complete order details like confirmation email
+      await this.emailService.sendShippingNotificationEmail(
+        order.email,
+        fullName,
+        order.orderNumber,
+        {
+          items: order.items,
+          subtotalCents: order.subtotalCents,
+          shippingCents: order.shippingCents,
+          taxCents: order.taxCents,
+          totalCents: order.totalCents,
+          paymentMethod: order.paymentMethod,
+          deliveryMethod: order.deliveryMethod,
+          shippingAddress: order.shippingAddress,
+          email: order.email,
+          emailType: emailType  // Pass the email type
+        }
+      );
+
+      return {
+        success: true,
+        message: 'Shipping notification sent successfully'
+      };
+    } catch (error) {
+      console.error('Error sending shipping notification:', error);
+      throw error;
+    }
+  }
+
+  async sendPickupNotification(id: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const order = await this.orderModel.findById(id);
+      
+      if (!order) {
+        throw new NotFoundException('Order not found');
+      }
+
+      if (order.status !== 'available') {
+        throw new BadRequestException('Order is not available for pickup');
+      }
+
+      // Create fullName from firstName and lastName
+      const fullName = `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`;
+
+      // Pass complete order details like confirmation email with 'available' type
+      await this.emailService.sendShippingNotificationEmail(
+        order.email,
+        fullName,
+        order.orderNumber,
+        {
+          items: order.items,
+          subtotalCents: order.subtotalCents,
+          shippingCents: order.shippingCents,
+          taxCents: order.taxCents,
+          totalCents: order.totalCents,
+          paymentMethod: order.paymentMethod,
+          deliveryMethod: order.deliveryMethod,
+          shippingAddress: order.shippingAddress,
+          email: order.email,
+          pickupLocation: order.shippingAddress.pickupLocation,
+          emailType: 'available'  // Specify this is for pickup/available
+        }
+      );
+
+      return {
+        success: true,
+        message: 'Pickup notification sent successfully'
+      };
+    } catch (error) {
+      console.error('Error sending pickup notification:', error);
+      throw error;
+    }
+  }
+
+  async sendDeliveredNotification(id: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const order = await this.orderModel.findById(id);
+      
+      if (!order) {
+        throw new NotFoundException('Order not found');
+      }
+
+      if (order.status !== 'delivered') {
+        throw new BadRequestException('Order is not delivered');
+      }
+
+      // Create fullName from firstName and lastName
+      const fullName = `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`;
+
+      // Pass complete order details like confirmation email
+      await this.emailService.sendDeliveredNotificationEmail(
+        order.email,
+        fullName,
+        order.orderNumber,
+        {
+          items: order.items,
+          subtotalCents: order.subtotalCents,
+          shippingCents: order.shippingCents,
+          taxCents: order.taxCents,
+          totalCents: order.totalCents,
+          paymentMethod: order.paymentMethod,
+          deliveryMethod: order.deliveryMethod,
+          shippingAddress: order.shippingAddress,
+          email: order.email
+        }
+      );
+
+      return {
+        success: true,
+        message: 'Delivered notification sent successfully'
+      };
+    } catch (error) {
+      console.error('Error sending delivered notification:', error);
+      throw error;
+    }
+  }
+
+  async create(createOrderDto: CreateOrderDto, userId: string): Promise<Order> {
+    if (!userId) {
+      throw new BadRequestException('User authentication required to place order');
+    }
+
+    const session = await this.orderModel.db.startSession();
+    session.startTransaction();
+
+    try {
+      const orderCount = await this.orderModel.countDocuments();
+      const orderNumber = `ORD-${(orderCount + 1).toString().padStart(6, '0')}`;
+
+      for (const item of createOrderDto.items) {
+        const product = await this.productModel.findById(item.productId);
+        
+        if (!product) {
+          throw new NotFoundException(`Product ${item.title} not found`);
+        }
+
+        if (product.stock < item.quantity) {
+          throw new BadRequestException(
+            `Insufficient stock for ${item.title}. Available: ${product.stock}`
+          );
+        }
+
+        product.stock -= item.quantity;
+        product.soldCount += item.quantity;
+        await product.save({ session });
+      }
+
+      const orderData: any = {
+        orderNumber,
+        userId: new Types.ObjectId(userId),
+        email: createOrderDto.email,
+        items: createOrderDto.items,
+        shippingAddress: createOrderDto.shippingAddress,
+        deliveryMethod: createOrderDto.deliveryMethod || 'delivery',
+        subtotalCents: createOrderDto.subtotalCents,
+        shippingCents: createOrderDto.shippingCents,
+        taxCents: createOrderDto.taxCents || 0,
+        totalCents: createOrderDto.totalCents,
+        paymentMethod: createOrderDto.paymentMethod || 'cash_on_delivery',
+        paymentCompleted: createOrderDto.paymentMethod === 'cash_on_delivery',
+        status: createOrderDto.paymentMethod === 'cash_on_delivery' ? 'confirmed' : 'pending',
+      };
+
+      console.log('Creating order with deliveryMethod:', createOrderDto.deliveryMethod);
+
+      const order = new this.orderModel(orderData);
+      await order.save({ session });
+
+      await session.commitTransaction();
+
+      const savedOrder = await this.orderModel.findById(order._id);
+      if (!savedOrder) {
+        throw new NotFoundException('Order not found after creation');
+      }
+      
+      console.log('Order created successfully:', savedOrder._id, 'for user:', userId);
+
+      // // Send order confirmation email to customer
+      // try {
+      //   const fullName = `${savedOrder.shippingAddress.firstName} ${savedOrder.shippingAddress.lastName}`;
+
+      //   await this.emailService.sendOrderConfirmationEmail(
+      //     savedOrder.email,
+      //     fullName,
+      //     savedOrder.orderNumber,
+      //     {
+      //       items: savedOrder.items,
+      //       subtotalCents: savedOrder.subtotalCents,
+      //       shippingCents: savedOrder.shippingCents,
+      //       taxCents: savedOrder.taxCents,
+      //       totalCents: savedOrder.totalCents,
+      //       paymentMethod: savedOrder.paymentMethod,
+      //       deliveryMethod: savedOrder.deliveryMethod,
+      //       shippingAddress: savedOrder.shippingAddress,
+      //       email: savedOrder.email
+      //     }
+      //   );
+      // } catch (emailError) {
+      //   console.error('Failed to send order confirmation email:', emailError);
+      //   // Don't throw error - email failure shouldn't break order creation
+      // }
+
+      // Send new order notification to admin
+      try {
+        const adminEmail = process.env.ADMIN_EMAIL || 'admin@forbesdigitallifeline.com';
+        await this.emailService.sendNewOrderNotificationToAdmin(savedOrder, adminEmail);
+      } catch (adminEmailError) {
+        console.error('Failed to send admin notification:', adminEmailError);
+        // Don't throw error - admin notification failure shouldn't break order creation
+      }
+      
+      return savedOrder;
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
   }
 
   async findOne(id: string, userId?: string, isAdmin: boolean = false) {
@@ -267,6 +444,29 @@ export class OrdersService {
 
     const updatedOrder = await order.save();
     console.log('Order updated successfully:', updatedOrder._id);
+    
+    return updatedOrder;
+  }
+
+  async updatePaymentMethod(id: string, paymentMethod: string): Promise<Order> {
+    const order = await this.orderModel.findById(id);
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    // Validate payment method
+    const validPaymentMethods = ['cash_on_delivery', 'bank_transfer', 'mobile_money', 'paystack'];
+    if (!validPaymentMethods.includes(paymentMethod)) {
+      throw new BadRequestException(`Invalid payment method: ${paymentMethod}`);
+    }
+
+    console.log(`Updating order ${id} payment method from ${order.paymentMethod} to ${paymentMethod}`);
+
+    order.paymentMethod = paymentMethod;
+
+    const updatedOrder = await order.save();
+    console.log('Order payment method updated successfully:', updatedOrder._id);
     
     return updatedOrder;
   }

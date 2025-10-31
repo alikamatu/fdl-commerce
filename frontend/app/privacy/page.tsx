@@ -183,15 +183,15 @@ export default function PrivacyPage() {
                     <div className="space-y-4">
                       <div className="bg-gray-50 rounded-xl p-4">
                         <h4 className="font-semibold text-gray-900 mb-2">Refund Processing</h4>
-                        <p className="text-gray-700 text-sm">Approved refunds processed within 5-10 business days via original payment method</p>
+                        <p className="text-gray-700 ">Approved refunds processed within 5-10 business days via original payment method</p>
                       </div>
                       <div className="bg-gray-50 rounded-xl p-4">
                         <h4 className="font-semibold text-gray-900 mb-2">Exchanges</h4>
-                        <p className="text-gray-700 text-sm">Replacements of equal or higher value with price differences settled upfront</p>
+                        <p className="text-gray-700">Replacements of equal or higher value with price differences settled upfront</p>
                       </div>
                       <div className="bg-gray-50 rounded-xl p-4">
                         <h4 className="font-semibold text-gray-900 mb-2">Customer Responsibility</h4>
-                        <p className="text-gray-700 text-sm">Return delivery costs unless item was defective or incorrect</p>
+                        <p className="text-gray-700">Return delivery costs unless item was defective or incorrect</p>
                       </div>
                     </div>
                   </div>
@@ -209,7 +209,7 @@ export default function PrivacyPage() {
                 <div>
                   <h3 className="font-semibold mb-3">Privacy Concerns</h3>
                   <div className="space-y-2 text-gray-200">
-                    <p>Email: privacy@forbesdigitals.com</p>
+                    <p>Email: info@forbesdigitals.com</p>
                     <p>Telephone: +233 54 712 9636</p>
                   </div>
                 </div>
@@ -217,7 +217,7 @@ export default function PrivacyPage() {
                   <h3 className="font-semibold mb-3">Returns & Support</h3>
                   <div className="space-y-2 text-gray-200">
                     <p>WhatsApp: +233 54 712 9636</p>
-                    <p>Email: returns@forbesdigitals.com</p>
+                    <p>Email: info@forbesdigitals.com</p>
                   </div>
                 </div>
               </div>

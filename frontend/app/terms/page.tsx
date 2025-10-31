@@ -12,7 +12,7 @@ export default function TermsPage() {
             </p>
           </div>
 
-          <div className="bg-white rounded-xl p-8">
+          <div className="bg-white backdrop-blur-sm rounded-2xl shadow-sm p-8 border border-gray-200/60">
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">
                 Acceptance of Terms
@@ -153,7 +153,7 @@ export default function TermsPage() {
               <div className="bg-gray-50 rounded-lg p-4">
                 <p className="text-gray-700">
                   <strong>Forbes Digital Lifeline</strong><br />
-                  Email: shop@forbesdigitals.com<br />
+                  Email: info@forbesdigitals.com<br />
                   Telephone: +233 54 712 9636<br />
                   WhatsApp: +233 54 712 9636
                 </p>

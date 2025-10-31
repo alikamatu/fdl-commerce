@@ -5,6 +5,7 @@ import { OrdersService } from './orders.service';
 import { Order, OrderSchema } from '../schemas/order.schema';
 import { Product, ProductSchema } from '../schemas/product.schema';
 import { AuthModule } from 'src/auth/auth.module';
+import { EmailModule } from 'src/email/email.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { AuthModule } from 'src/auth/auth.module';
       { name: Product.name, schema: ProductSchema },
     ]),
     AuthModule,
+    EmailModule
   ],
   controllers: [OrdersController],
   providers: [OrdersService],

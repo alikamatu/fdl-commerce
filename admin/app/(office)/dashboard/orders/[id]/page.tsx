@@ -113,6 +113,46 @@ function useOrder(id: string) {
     }
   };
 
+  const updatePaymentMethod = async (paymentMethod: string) => {
+  try {
+    setUpdating(true);
+    const token = localStorage.getItem('token');
+    
+    console.log('Updating payment method to:', paymentMethod);
+    
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${id}/payment-method`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ paymentMethod }),
+    });
+
+    console.log('Response status:', response.status);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Error response:', errorData);
+      throw new Error(errorData.message || 'Failed to update payment method');
+    }
+
+    const updatedOrder = await response.json();
+    console.log('Updated order:', updatedOrder);
+    
+    setOrder(updatedOrder);
+    setError(null);
+    return true;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Failed to update payment method';
+    console.error('Update error:', err);
+    setError(message);
+    return false;
+  } finally {
+    setUpdating(false);
+  }
+};
+
   const updateOrderStatus = async (status: Order['status']) => {
     try {
       setUpdating(true);
@@ -156,7 +196,7 @@ function useOrder(id: string) {
   const sendShippingNotification = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${id}/notify-shipping`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${id}/notify-delivering`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -176,6 +216,52 @@ function useOrder(id: string) {
     }
   };
 
+  const sendPickupNotification = async () => {
+        const token = localStorage.getItem('token');
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${id}/notify-pickup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send notification');
+      }
+
+      return true;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to send notification';
+      setError(message);
+      return false;
+    }
+  };
+
+  const sendDeliveredNotification = async () => {
+        const token = localStorage.getItem('token');
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${id}/notify-delivered`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send notification');
+      }
+
+      return true;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to send notification';
+      setError(message);
+      return false;
+    }
+  }
+
   useEffect(() => {
     if (id) {
       fetchOrder();
@@ -190,8 +276,12 @@ function useOrder(id: string) {
     refetch: fetchOrder,
     updateOrderStatus,
     sendShippingNotification,
+    sendPickupNotification,
+    updatePaymentMethod,
+    sendDeliveredNotification,
   };
 }
+
 
 export default function OrderPage({ params }: { params: Promise<{ id: string }> }) {
   const unwrappedParams = React.use(params);
@@ -205,17 +295,41 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
     updating,
     refetch,
     updateOrderStatus,
-    sendShippingNotification
+    sendShippingNotification,
+    sendPickupNotification,
+    updatePaymentMethod,
+    sendDeliveredNotification,
   } = useOrder(orderId);
 
   const [selectedStatus, setSelectedStatus] = useState<Order['status']>('confirmed');
   const [sendingNotification, setSendingNotification] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('mobile_money');
 
   useEffect(() => {
     if (order) {
       setSelectedStatus(order.status);
+      setSelectedPaymentMethod(order.paymentMethod);
     }
   }, [order]);
+
+  const handlePaymentMethodUpdate = async () => {
+  if (!order || selectedPaymentMethod === order.paymentMethod) return;
+
+  const success = await updatePaymentMethod(selectedPaymentMethod);
+  if (success) {
+    addAlert({
+      type: 'success',
+      title: 'Payment Method Updated',
+      message: `Payment method changed to ${selectedPaymentMethod.replace('_', ' ')}`
+    });
+  } else {
+    addAlert({
+      type: 'error',
+      title: 'Update Failed',
+      message: 'Failed to update payment method'
+    });
+  }
+};
 
   const handleStatusUpdate = async () => {
     if (!order || selectedStatus === order.status) return;
@@ -236,6 +350,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
     }
   };
 
+
   const handleSendShippingNotification = async () => {
     setSendingNotification(true);
     const success = await sendShippingNotification();
@@ -249,11 +364,49 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
       addAlert({
         type: 'error',
         title: 'Send Failed',
-        message: 'Failed to send shipping notification'
+        message: 'Failed to send delivering notification'
       });
     }
     setSendingNotification(false);
   };
+
+    const handlePickupNotification = async () => {
+      setSendingNotification(true);
+      const success = await sendPickupNotification();
+      if (success) {
+        addAlert({
+          type: 'success',
+          title: 'Notification Sent',
+          message: 'Pickup notification sent to customer'
+        });
+      } else {
+        addAlert({
+          type: 'error',
+          title: 'Send Failed',
+          message: 'Failed to send pickup notification'
+        });
+      }
+      setSendingNotification(false);
+    }
+
+    const handleDeliveredNotification = async () => {
+      setSendingNotification(true);
+      const success = await sendDeliveredNotification(); 
+      if (success) {
+        addAlert({
+          type: 'success',
+          title: 'Notification Sent',
+          message: 'Delivery completion notification sent to customer'
+        });
+      } else {
+        addAlert({
+          type: 'error',
+          title: 'Send Failed',
+          message: 'Failed to send delivery completion notification'
+        });
+      }
+      setSendingNotification(false);
+    }
 
   const formatPrice = (priceCents: number) => {
     return `₵${(priceCents / 100).toFixed(2)}`;
@@ -391,7 +544,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
   return (
     <div className="min-h-screen bg-white py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          <div className="flex items-center gap-2 ml-12">
+          <div className="flex w-full items-center justify-center gap-2 ml-12">
             <img src="/logo/fdll.jpeg" className='w-16 h-auto rounded-2xl' alt="" />
             <p className='font-bold text-2xl flex flex-col'>Forbes Digital Lifeline <span className='text-lg font-light'>Your Digital 🆘 </span></p>
           </div>
@@ -685,63 +838,163 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
                     {updating ? 'Updating...' : selectedStatus === order.status ? 'No Changes' : 'Update Status'}
                   </span>
                 </motion.button>
-                {/* {order.status === 'delivering' && (
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleSendShippingNotification}
-                    disabled={sendingNotification}
-                    className="w-full flex items-center justify-center space-x-3 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
-                  >
-                    {sendingNotification ? (
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
-                    ) : (
-                      <Send className="w-5 h-5" />
-                    )}
-                    <span>
-                      {sendingNotification ? 'Sending...' : 'Send Delivery Notification'}
-                    </span>
-                  </motion.button>
-                )} */}
+{/* Smart Notification Buttons - Show correct button based on status and delivery method */}
+{order.status === 'delivering' && (
+  <motion.button
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    onClick={handleSendShippingNotification}
+    disabled={sendingNotification}
+    className="w-full flex items-center justify-center space-x-3 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
+  >
+    {sendingNotification ? (
+      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+    ) : (
+      <Truck className="w-5 h-5" />
+    )}
+    <span>
+      {sendingNotification ? 'Sending...' : 'Send Delivery Notification'}
+    </span>
+  </motion.button>
+)}
+
+{order.status === 'available' && order.deliveryMethod === 'pickup' && (
+  <motion.button
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    onClick={handlePickupNotification}
+    disabled={sendingNotification}
+    className="w-full flex items-center justify-center space-x-3 px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
+  >
+    {sendingNotification ? (
+      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+    ) : (
+      <Package className="w-5 h-5" />
+    )}
+    <span>
+      {sendingNotification ? 'Sending...' : 'Send Pickup Notification'}
+    </span>
+  </motion.button>
+)}
+
+{order.status === 'delivered' && (
+  <motion.button
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    onClick={handleDeliveredNotification}
+    disabled={sendingNotification}
+    className="w-full flex items-center justify-center space-x-3 px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
+  >
+    {sendingNotification ? (
+      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+    ) : (
+      <CheckCircle className="w-5 h-5" />
+    )}
+    <span>
+      {sendingNotification ? 'Sending...' : 'Send Delivered Notification'}
+    </span>
+  </motion.button>
+)}
               </div>
             </motion.div>
 
             {/* Payment Information */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="bg-white rounded-2xl border border-gray-200 p-6"
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-gray-100 rounded-xl">
-                  <CreditCard className="w-5 h-5 text-gray-700" />
-                </div>
-                <h2 className="text-xl font-semibold text-gray-900">Payment Information</h2>
-              </div>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
-                  <span className="font-medium text-gray-900">Payment Method</span>
-                  <span className="capitalize text-gray-700">{order.paymentMethod}</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
-                  <span className="font-medium text-gray-900">Payment Status</span>
-                  <span className={`px-3 py-1.5 text-xs font-semibold border rounded-lg ${
-                    order.paymentCompleted 
-                      ? 'bg-green-50 text-green-700 border-green-200' 
-                      : 'bg-amber-50 text-amber-700 border-amber-200'
-                  }`}>
-                    {order.paymentCompleted ? 'Completed' : 'Pending'}
-                  </span>
-                </div>
-                {order.paymentId && (
-                  <div className="p-3 bg-gray-50 rounded-xl">
-                    <p className="text-sm font-medium text-gray-900 mb-1">Payment ID</p>
-                    <p className="text-sm font-mono text-gray-700">{order.paymentId}</p>
-                  </div>
-                )}
-              </div>
-            </motion.div>
+<motion.div
+  initial={{ opacity: 0, x: 20 }}
+  animate={{ opacity: 1, x: 0 }}
+  transition={{ duration: 0.5, delay: 0.2 }}
+  className="bg-white rounded-2xl border border-gray-200 p-6"
+>
+  <div className="flex items-center gap-3 mb-6">
+    <div className="p-2 bg-gray-100 rounded-xl">
+      <CreditCard className="w-5 h-5 text-gray-700" />
+    </div>
+    <h2 className="text-xl font-semibold text-gray-900">Payment Information</h2>
+  </div>
+  <div className="space-y-4">
+    {/* Payment Method Selection */}
+    <div>
+      <label className="block text-sm font-semibold text-gray-900 mb-3">
+        Payment Method
+      </label>
+      <select
+        value={selectedPaymentMethod}
+        onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black focus:border-black transition-all duration-200 bg-white appearance-none cursor-pointer"
+      >
+        <option value="mobile_money">Mobile Money</option>
+        <option value="cash_on_delivery">Cash on Delivery</option>
+        <option value="bank_transfer">Bank Transfer</option>
+        <option value="paystack">Paystack</option>
+      </select>
+    </div>
+
+    {/* Update Payment Method Button */}
+    {selectedPaymentMethod !== order.paymentMethod && (
+      <motion.button
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={handlePaymentMethodUpdate}
+        disabled={updating}
+        className="w-full flex items-center justify-center space-x-3 px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
+      >
+        {updating ? (
+          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+        ) : (
+          <CreditCard className="w-5 h-5" />
+        )}
+        <span>
+          {updating ? 'Updating...' : 'Update Payment Method'}
+        </span>
+      </motion.button>
+    )}
+
+    {/* Payment Status */}
+    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+      <span className="font-medium text-gray-900">Payment Status</span>
+      <span className={`px-3 py-1.5 text-xs font-semibold border rounded-lg ${
+        order.paymentCompleted 
+          ? 'bg-green-50 text-green-700 border-green-200' 
+          : 'bg-amber-50 text-amber-700 border-amber-200'
+      }`}>
+        {order.paymentCompleted ? 'Completed' : 'Pending'}
+      </span>
+    </div>
+
+    {/* Payment ID */}
+    {order.paymentId && (
+      <div className="p-3 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-900 mb-1">Payment ID</p>
+        <p className="text-sm font-mono text-gray-700 break-all">{order.paymentId}</p>
+      </div>
+    )}
+
+    {/* Payment Method Display */}
+    <div className="p-3 border border-gray-200 rounded-xl bg-gradient-to-br from-gray-50 to-white">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-xs text-gray-500 mb-1">Current Payment Method</p>
+          <p className="font-semibold text-gray-900 capitalize">
+            {order.paymentMethod.replace(/_/g, ' ')}
+          </p>
+        </div>
+        <div className={`p-2 rounded-lg ${
+          order.paymentMethod === 'paystack' ? 'bg-blue-100' :
+          order.paymentMethod === 'bank_transfer' ? 'bg-green-100' :
+          'bg-amber-100'
+        }`}>
+          <CreditCard className={`w-5 h-5 ${
+            order.paymentMethod === 'paystack' ? 'text-blue-600' :
+            order.paymentMethod === 'bank_transfer' ? 'text-green-600' :
+            'text-amber-600'
+          }`} />
+        </div>
+      </div>
+    </div>
+  </div>
+</motion.div>
 
             {/* Order Timeline */}
             <motion.div
@@ -763,7 +1016,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
                 </div>
                 {order.shippedAt && (
                   <div className="flex justify-between items-center py-2">
-                    <span className="text-gray-600">{order.deliveryMethod === "delivery" ? "Delivery" : "Pickup"}</span>
+                    <span className="text-gray-600">{order.deliveryMethod === "delivery" ? "Delivery" : "Available for Pickup"}</span>
                     <span className="font-medium text-gray-900">{formatDate(order.shippedAt)}</span>
                   </div>
                 )}

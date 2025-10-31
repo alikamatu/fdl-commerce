@@ -29,7 +29,7 @@ export const UserMenu = forwardRef<HTMLDivElement, UserMenuProps>(
           className="flex items-center space-x-2 p-2 rounded-lg hover:bg-foreground/5 transition-colors duration-200 group"
         >
           <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white text-sm font-medium shadow-lg">
-            {user.name.charAt(0).toUpperCase()}
+            {(user?.name?.charAt(0)?.toUpperCase?.()) || "U"}
           </div>
           <ChevronDown 
             size={16} 
@@ -67,14 +67,6 @@ export const UserMenu = forwardRef<HTMLDivElement, UserMenuProps>(
               
               {/* Menu Items */}
               <div className="p-2">
-                {/* <Link 
-                  href="/profile" 
-                  className="flex items-center gap-3 px-3 py-2 text-sm text-foreground/80 hover:bg-foreground/5 rounded-lg transition-colors"
-                  onClick={onClose}
-                >
-                  <User size={16} className="text-foreground/40" />
-                  <span>Profile</span>
-                </Link> */}
                 <Link 
                   href="/orders" 
                   className="flex items-center gap-3 px-3 py-2 text-sm text-foreground/80 hover:bg-foreground/5 rounded-lg transition-colors"
