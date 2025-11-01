@@ -440,7 +440,7 @@ export class EmailService {
     text += `Forbes Digital Lifeline\n`;
     text += `Website: https://forbesdigitals.com\n`;
     text += `Email: info@forbesdigitals.com\n`;
-    text += ` +233 54 712 9636\n\n`;
+    text += `Phone: +233 54 712 9636\n\n`;
     
     text += `Thank you for choosing Forbes Digital Lifeline!\n\n`;
     text += `Best regards,\n`;

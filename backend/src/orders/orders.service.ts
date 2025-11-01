@@ -290,7 +290,7 @@ export class OrdersService {
         totalCents: createOrderDto.totalCents,
         paymentMethod: createOrderDto.paymentMethod || 'cash',
         paymentCompleted: createOrderDto.paymentMethod === 'cash',
-        status: createOrderDto.paymentMethod === 'cash' ? 'confirmed' : 'pending',
+        status: createOrderDto.paymentMethod === 'cash' ? 'confirmed' : 'confirmed',
       };
 
       console.log('Creating order with deliveryMethod:', createOrderDto.deliveryMethod);
