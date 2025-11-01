@@ -91,7 +91,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
         pickupLocation: 'UPSA - Madina'
       },
       deliveryMethod: deliveryMethod, 
-      paymentMethod: 'cash_on_delivery',
+      paymentMethod: 'cash_or_momo',
       subtotalCents,
       shippingCents,
       totalCents,

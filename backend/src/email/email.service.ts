@@ -429,7 +429,7 @@ export class EmailService {
       text += `${shippingAddress.address || ''}\n`;
       text += `${shippingAddress.city || ''}, ${shippingAddress.state || ''} ${shippingAddress.zipCode || ''}\n`;
       text += `${shippingAddress.country || ''}\n`;
-      text += ` ${shippingAddress.phone || 'Not provided'}\n\n`;
+      text += `${shippingAddress.phone || 'Not provided'}\n\n`;
     } else {
       text += `Address not available\n\n`;
     }
@@ -739,7 +739,7 @@ export class EmailService {
     text += `CUSTOMER INFORMATION:\n`;
     text += `Name: ${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}\n`;
     text += `Email: ${order.email}\n`;
-    text += ` ${shippingAddress.phone || 'Not provided'}\n\n`;
+    text += `Phone: ${shippingAddress.phone || 'Not provided'}\n\n`;
     
     text += `ORDER DETAILS:\n`;
     text += `Total Amount: GH₵${(order.totalCents / 100).toFixed(2)}\n`;
@@ -826,7 +826,7 @@ export class EmailService {
                         </tr>
                         <tr>
                           <td width="50%" style="padding: 5px 10px 5px 0; vertical-align: top;">
-                            <strong style="color: #555;"></strong><br>
+                            <strong style="color: #555;"></strong>Phone:<br>
                             <a href="tel:${shippingAddress.phone}" style="color: #007bff; text-decoration: none;">${shippingAddress.phone || 'Not provided'}</a>
                           </td>
                           <td width="50%" style="padding: 5px 0 5px 10px; vertical-align: top;">

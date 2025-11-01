@@ -838,7 +838,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
                     {updating ? 'Updating...' : selectedStatus === order.status ? 'No Changes' : 'Update Status'}
                   </span>
                 </motion.button>
-{order.status === 'delivering' && (
+{order.status === 'delivering' && order.deliveryMethod === 'delivery' && (
   <motion.button
     whileHover={{ scale: 1.05 }}
     whileTap={{ scale: 0.95 }}

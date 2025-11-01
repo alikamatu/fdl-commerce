@@ -130,6 +130,7 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order, del
     <h3 className="font-semibold text-foreground mb-2">Delivery Address</h3>
     <p className="text-foreground/80 text-sm">
       {order.shippingAddress?.firstName} {order.shippingAddress?.lastName}<br />
+      {order.email}<br />
       {order.shippingAddress?.address}<br />
       {order.shippingAddress?.city}, {order.shippingAddress?.state} {order.shippingAddress?.zipCode}<br />
       {order.shippingAddress?.phone}
