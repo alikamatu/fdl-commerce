@@ -33,7 +33,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, index, onCancelOrde
             <div className="flex items-center space-x-2">
               <StatusIcon className="w-4 h-4" />
               <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
-                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                {order.status.charAt(0).toUpperCase() + order.status.slice(1)} {order.status === "available" ? "for Pickup" : ""}
               </span>
             </div>
             <div className="text-sm text-gray-600 font-mono">

@@ -429,7 +429,7 @@ export class EmailService {
       text += `${shippingAddress.address || ''}\n`;
       text += `${shippingAddress.city || ''}, ${shippingAddress.state || ''} ${shippingAddress.zipCode || ''}\n`;
       text += `${shippingAddress.country || ''}\n`;
-      text += `Phone: ${shippingAddress.phone || 'Not provided'}\n\n`;
+      text += ` ${shippingAddress.phone || 'Not provided'}\n\n`;
     } else {
       text += `Address not available\n\n`;
     }
@@ -440,7 +440,7 @@ export class EmailService {
     text += `Forbes Digital Lifeline\n`;
     text += `Website: https://forbesdigitals.com\n`;
     text += `Email: info@forbesdigitals.com\n`;
-    text += `Phone: +233 54 712 9636\n\n`;
+    text += ` +233 54 712 9636\n\n`;
     
     text += `Thank you for choosing Forbes Digital Lifeline!\n\n`;
     text += `Best regards,\n`;
@@ -458,7 +458,7 @@ export class EmailService {
     const totalCents = orderDetails.totalCents || 0;
     const deliveryMethod = orderDetails.deliveryMethod || 'delivery';
     const shippingAddress = orderDetails.shippingAddress || {};
-    const paymentMethod = orderDetails.paymentMethod || 'cash_on_delivery'
+    const paymentMethod = orderDetails.paymentMethod || 'cash'
 
     let headerTitle = '';
     let headerEmoji = '';
@@ -493,7 +493,7 @@ export class EmailService {
           additionalInfo = `
             <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin: 20px 0;">
               <p style="margin: 0; color: #856404; font-size: 14px;">
-                <strong>📍 Important:</strong> Please bring your order confirmation and a valid ID when picking up your order.
+              Please show your order details to pickup your order
               </p>
             </div>
           `;
@@ -643,9 +643,7 @@ export class EmailService {
                             <p style="margin: 0; color: #555; font-size: 14px;">
                               ${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}<br>
                               ${shippingAddress.address || 'Address not available'}<br>
-                              ${shippingAddress.city || ''}, ${shippingAddress.state || ''} ${shippingAddress.zipCode || ''}<br>
-                              ${shippingAddress.country || ''}<br>
-                              <strong>Phone:</strong> ${shippingAddress.phone || 'Not provided'}
+                              ${shippingAddress.phone || 'Not provided'}
                             </p>
                           </div>
                         </td>
@@ -698,7 +696,7 @@ export class EmailService {
                             </tr>
                             <tr>
                               <td style="padding-right: 15px; vertical-align: top;">
-                                <p style="margin: 0 0 5px 0; color: #555; font-size: 14px;"><strong>Phone:</strong></p>
+                                <p style="margin: 0 0 5px 0; color: #555; font-size: 14px;"><strong></strong></p>
                               </td>
                               <td>
                                 <p style="margin: 0 0 5px 0; font-size: 14px;"><a href="tel:+233547129636" style="color: #007bff; text-decoration: none;">+233 54 712 9636</a></p>
@@ -741,7 +739,7 @@ export class EmailService {
     text += `CUSTOMER INFORMATION:\n`;
     text += `Name: ${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}\n`;
     text += `Email: ${order.email}\n`;
-    text += `Phone: ${shippingAddress.phone || 'Not provided'}\n\n`;
+    text += ` ${shippingAddress.phone || 'Not provided'}\n\n`;
     
     text += `ORDER DETAILS:\n`;
     text += `Total Amount: GH₵${(order.totalCents / 100).toFixed(2)}\n`;
@@ -757,7 +755,7 @@ export class EmailService {
     
     text += `${'-'.repeat(60)}\n`;
     text += `Subtotal: GH₵${(order.subtotalCents / 100).toFixed(2)}\n`;
-    text += `Shipping: GH₵${(order.shippingCents / 100).toFixed(2)}\n`;
+    text += `Delivery: GH₵${(order.shippingCents / 100).toFixed(2)}\n`;
     text += `TOTAL: GH₵${(order.totalCents / 100).toFixed(2)}\n\n`;
     
     text += `DELIVERY ADDRESS:\n`;
@@ -828,7 +826,7 @@ export class EmailService {
                         </tr>
                         <tr>
                           <td width="50%" style="padding: 5px 10px 5px 0; vertical-align: top;">
-                            <strong style="color: #555;">Phone:</strong><br>
+                            <strong style="color: #555;"></strong><br>
                             <a href="tel:${shippingAddress.phone}" style="color: #007bff; text-decoration: none;">${shippingAddress.phone || 'Not provided'}</a>
                           </td>
                           <td width="50%" style="padding: 5px 0 5px 10px; vertical-align: top;">
@@ -854,7 +852,7 @@ export class EmailService {
                           </td>
                           <td width="50%" style="padding: 5px 0 5px 10px;">
                             <strong style="color: #555;">Payment Method:</strong><br>
-                            <span style="color: #333;">${order.paymentMethod}</span>
+                            <span style="color: #333;">${order.deliveryMethod === 'delivery' ? 'Cash' : 'Cash/Momo'}</span>
                           </td>
                         </tr>
                         <tr>
@@ -863,7 +861,7 @@ export class EmailService {
                             <span style="color: #333; text-transform: capitalize;">${order.deliveryMethod}</span>
                           </td>
                           <td width="50%" style="padding: 5px 0 5px 10px;">
-                            <strong style="color: #555;">Shipping Fee:</strong><br>
+                            <strong style="color: #555; text-transform: capitalize;">${order.deliveryMethod} Fee:</strong><br>
                             <span style="color: #333;">GH₵${(order.shippingCents / 100).toFixed(2)}</span>
                           </td>
                         </tr>
@@ -901,7 +899,7 @@ export class EmailService {
                           <td style="text-align: right; padding: 12px 15px; border: 1px solid #dee2e6;">GH₵${(order.subtotalCents / 100).toFixed(2)}</td>
                         </tr>
                         <tr>
-                          <td colspan="3" style="text-align: right; padding: 12px 15px; border: 1px solid #dee2e6;">Shipping Fee:</td>
+                          <td colspan="3" style="text-align: right; padding: 12px 15px; border: 1px solid #dee2e6; text-transform: capitalize;">${order.deliveryMethod} Fee:</td>
                           <td style="text-align: right; padding: 12px 15px; border: 1px solid #dee2e6;">GH₵${(order.shippingCents / 100).toFixed(2)}</td>
                         </tr>
                         <tr>
@@ -923,7 +921,7 @@ export class EmailService {
                         ${shippingAddress.address || 'Address not available'}<br>
                         ${shippingAddress.city || ''}, ${shippingAddress.state || ''} ${shippingAddress.zipCode || ''}<br>
                         ${shippingAddress.country || ''}<br>
-                        <strong>Phone:</strong> <a href="tel:${shippingAddress.phone}" style="color: #007bff; text-decoration: none;">${shippingAddress.phone || 'Not provided'}</a>
+                        <strong></strong> <a href="tel:${shippingAddress.phone}" style="color: #007bff; text-decoration: none;">${shippingAddress.phone || 'Not provided'}</a>
                       </p>
                     </div>
                   </td>

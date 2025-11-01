@@ -18,7 +18,7 @@ export class OrdersService {
   async verifyPaystackPayment(reference: string): Promise<any> {
     try {
       const response = await axios.get(
-        `https://api.paystack.co/transaction/verify/${reference}`,
+        `https://api.cash_or_momo.co/transaction/verify/${reference}`,
         {
           headers: {
             Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
@@ -288,9 +288,9 @@ export class OrdersService {
         shippingCents: createOrderDto.shippingCents,
         taxCents: createOrderDto.taxCents || 0,
         totalCents: createOrderDto.totalCents,
-        paymentMethod: createOrderDto.paymentMethod || 'cash_on_delivery',
-        paymentCompleted: createOrderDto.paymentMethod === 'cash_on_delivery',
-        status: createOrderDto.paymentMethod === 'cash_on_delivery' ? 'confirmed' : 'pending',
+        paymentMethod: createOrderDto.paymentMethod || 'cash',
+        paymentCompleted: createOrderDto.paymentMethod === 'cash',
+        status: createOrderDto.paymentMethod === 'cash' ? 'confirmed' : 'pending',
       };
 
       console.log('Creating order with deliveryMethod:', createOrderDto.deliveryMethod);
@@ -456,7 +456,7 @@ export class OrdersService {
     }
 
     // Validate payment method
-    const validPaymentMethods = ['cash_on_delivery', 'bank_transfer', 'mobile_money', 'paystack'];
+    const validPaymentMethods = ['cash', 'bank_transfer', 'mobile_money', 'cash_or_momo'];
     if (!validPaymentMethods.includes(paymentMethod)) {
       throw new BadRequestException(`Invalid payment method: ${paymentMethod}`);
     }

@@ -106,7 +106,7 @@ export class Order {
 
   @Prop({ 
     required: true,
-    enum: ['cash_on_delivery', 'bank_transfer', 'mobile_money', 'paystack'],
+    enum: ['cash', 'bank_transfer', 'mobile_money', 'cash_or_momo'],
     default: 'mobile_money'
   })
   paymentMethod: string;

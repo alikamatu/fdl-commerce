@@ -154,8 +154,6 @@ export default function TermsPage() {
                 <p className="text-gray-700">
                   <strong>Forbes Digital Lifeline</strong><br />
                   Email: info@forbesdigitals.com<br />
-                  Telephone: +233 54 712 9636<br />
-                  WhatsApp: +233 54 712 9636
                 </p>
               </div>
             </section>

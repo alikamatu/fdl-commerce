@@ -203,24 +203,8 @@ export default function PrivacyPage() {
             <section className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-8 text-white">
               <h2 className="text-2xl font-bold mb-4">Contact Information</h2>
               <p className="text-gray-200 mb-6">
-                For questions regarding our Privacy Policy or Return Policy, please contact us:
+                For any questions or concerns regarding our Privacy or Return Policy, kindly contact us via our email: info@forbesdigitals.com
               </p>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-semibold mb-3">Privacy Concerns</h3>
-                  <div className="space-y-2 text-gray-200">
-                    <p>Email: info@forbesdigitals.com</p>
-                    <p>Telephone: +233 54 712 9636</p>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-3">Returns & Support</h3>
-                  <div className="space-y-2 text-gray-200">
-                    <p>WhatsApp: +233 54 712 9636</p>
-                    <p>Email: info@forbesdigitals.com</p>
-                  </div>
-                </div>
-              </div>
             </section>
           </div>
         </div>

@@ -86,7 +86,7 @@ export class CreateOrderDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsEnum(['cash_on_delivery', 'bank_transfer', 'mobile_money', 'paystack'])
+  @IsEnum(['cash', 'bank_transfer', 'mobile_money', 'cash_or_momo'])
   paymentMethod: string;
 
   @IsNumber()

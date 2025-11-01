@@ -631,12 +631,12 @@ export default function AdminOrdersPage() {
                       </div>
                     </td>
                     <td className="p-6">
-                      <span className={`px-3 py-1.5 text-xs font-semibold border rounded-lg ${
+                      <span className={`px-3 py-1.5 text-xs font-semibold border rounded-lg capitalize ${
                         order.deliveryMethod === 'delivery'
                           ? 'bg-green-50 text-green-700 border-green-200' 
                           : 'bg-amber-50 text-amber-700 border-amber-200'
                       }`}>
-                        {order.deliveryMethod === 'delivery' ? 'Cash' : 'Cash / Momo'}
+                        {order.paymentMethod}
                       </span>
                     </td>
                     <td className="p-6">

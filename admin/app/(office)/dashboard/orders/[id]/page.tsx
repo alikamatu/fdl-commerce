@@ -838,7 +838,6 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
                     {updating ? 'Updating...' : selectedStatus === order.status ? 'No Changes' : 'Update Status'}
                   </span>
                 </motion.button>
-{/* Smart Notification Buttons - Show correct button based on status and delivery method */}
 {order.status === 'delivering' && (
   <motion.button
     whileHover={{ scale: 1.05 }}
@@ -853,7 +852,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
       <Truck className="w-5 h-5" />
     )}
     <span>
-      {sendingNotification ? 'Sending...' : 'Send Delivery Notification'}
+      {sendingNotification ? 'Sending...' : 'Send Delivering Notification'}
     </span>
   </motion.button>
 )}
@@ -922,10 +921,10 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
         onChange={(e) => setSelectedPaymentMethod(e.target.value)}
         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black focus:border-black transition-all duration-200 bg-white appearance-none cursor-pointer"
       >
-        <option value="mobile_money">Mobile Money</option>
-        <option value="cash_on_delivery">Cash on Delivery</option>
+        <option value="mobile_money">Mobile Money (Momo)</option>
+        <option value="cash">Cash</option>
         <option value="bank_transfer">Bank Transfer</option>
-        <option value="paystack">Paystack</option>
+        <option value="cash_or_momo">Cash / Momo</option>
       </select>
     </div>
 
@@ -981,12 +980,12 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
           </p>
         </div>
         <div className={`p-2 rounded-lg ${
-          order.paymentMethod === 'paystack' ? 'bg-blue-100' :
+          order.paymentMethod === 'cash_or_momo' ? 'bg-blue-100' :
           order.paymentMethod === 'bank_transfer' ? 'bg-green-100' :
           'bg-amber-100'
         }`}>
           <CreditCard className={`w-5 h-5 ${
-            order.paymentMethod === 'paystack' ? 'text-blue-600' :
+            order.paymentMethod === 'cash_or_momo' ? 'text-blue-600' :
             order.paymentMethod === 'bank_transfer' ? 'text-green-600' :
             'text-amber-600'
           }`} />
@@ -1016,7 +1015,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
                 </div>
                 {order.shippedAt && (
                   <div className="flex justify-between items-center py-2">
-                    <span className="text-gray-600">{order.deliveryMethod === "delivery" ? "Delivery" : "Available for Pickup"}</span>
+                    <span className="text-gray-600">{order.deliveryMethod === "pickup" ? "Available for Pickup" : "Delivery"}</span>
                     <span className="font-medium text-gray-900">{formatDate(order.shippedAt)}</span>
                   </div>
                 )}
