@@ -370,6 +370,21 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
     setSendingNotification(false);
   };
 
+  const formatPaymentMethod = (method: string) => {
+  switch (method.toLowerCase()) {
+    case 'mobile_money':
+      return 'Mobile Money (MoMo)';
+    case 'cash':
+      return 'Cash';
+    case 'bank_transfer':
+      return 'Bank Transfer';
+    case 'cash_or_momo':
+      return 'N/A';
+    default:
+      return method.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  }
+};
+
     const handlePickupNotification = async () => {
       setSendingNotification(true);
       const success = await sendPickupNotification();
@@ -924,7 +939,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
         <option value="mobile_money">Mobile Money (Momo)</option>
         <option value="cash">Cash</option>
         <option value="bank_transfer">Bank Transfer</option>
-        <option value="cash_or_momo">Cash / Momo</option>
+        <option value="cash_or_momo">N/A</option>
       </select>
     </div>
 
@@ -950,18 +965,6 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
       </motion.button>
     )}
 
-    {/* Payment Status */}
-    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
-      <span className="font-medium text-gray-900">Payment Status</span>
-      <span className={`px-3 py-1.5 text-xs font-semibold border rounded-lg ${
-        order.paymentCompleted 
-          ? 'bg-green-50 text-green-700 border-green-200' 
-          : 'bg-amber-50 text-amber-700 border-amber-200'
-      }`}>
-        {order.paymentCompleted ? 'Completed' : 'Pending'}
-      </span>
-    </div>
-
     {/* Payment ID */}
     {order.paymentId && (
       <div className="p-3 bg-gray-50 rounded-xl">
@@ -970,13 +973,24 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
       </div>
     )}
 
+    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+      <span className="font-medium text-gray-900">Payment Status</span>
+      <span className={`px-3 py-1.5 text-xs font-semibold border rounded-lg ${
+        order.paymentCompleted 
+          ? 'bg-green-50 text-green-700 border-green-200' 
+          : 'bg-amber-50 text-amber-700 border-amber-200'
+      }`}>
+        {order.paymentMethod === 'cash_or_momo' ? 'Pending' : 'Completed'}
+      </span>
+    </div>
+
     {/* Payment Method Display */}
     <div className="p-3 border border-gray-200 rounded-xl bg-gradient-to-br from-gray-50 to-white">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs text-gray-500 mb-1">Current Payment Method</p>
+          <p className="text-xs text-gray-500 mb-1">Payment Method</p>
           <p className="font-semibold text-gray-900 capitalize">
-            {order.paymentMethod.replace(/_/g, ' ')}
+            {formatPaymentMethod(order.paymentMethod)}
           </p>
         </div>
         <div className={`p-2 rounded-lg ${

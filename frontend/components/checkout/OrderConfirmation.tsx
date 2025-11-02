@@ -115,28 +115,30 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order, del
         </div>
       </div>
 
-      {deliveryMethod === 'pickup' ? (
-  <div className="bg-foreground/5 border border-foreground/10 rounded-lg p-4 mb-8 text-left">
-    <h3 className="font-semibold text-foreground mb-2">Pickup Information</h3>
-    <p className="text-foreground/80 text-sm">
-      <strong>Location:</strong> UPSA - Madina Campus<br />
-      University of Professional Studies, Accra<br />
-      Madina Campus, Accra, Ghana<br />
-      <strong>Contact:</strong> {order.shippingAddress?.phone}
-    </p>
-  </div>
-) : (
-  <div className="bg-foreground/5 border border-foreground/10 rounded-lg p-4 mb-8 text-left">
-    <h3 className="font-semibold text-foreground mb-2">Delivery Address</h3>
-    <p className="text-foreground/80 text-sm">
-      {order.shippingAddress?.firstName} {order.shippingAddress?.lastName}<br />
-      {order.email}<br />
-      {order.shippingAddress?.address}<br />
-      {order.shippingAddress?.city}, {order.shippingAddress?.state} {order.shippingAddress?.zipCode}<br />
-      {order.shippingAddress?.phone}
-    </p>
-  </div>
-)}
+              {deliveryMethod === 'pickup' ? (
+          <div className="bg-foreground/5 border border-foreground/10 rounded-lg p-4 mb-8 text-left">
+            <h3 className="font-semibold text-foreground mb-2">Pickup Information</h3>
+            <p className="text-foreground/80 text-sm">
+              {order.shippingAddress?.firstName} {order.shippingAddress?.lastName}<br />
+              {order.email}<br />
+              {order.shippingAddress?.phone}
+              UPSA - Madina Campus<br />
+              University of Professional Studies, Accra<br />
+              Madina Campus, Accra, Ghana<br />
+            </p>
+          </div>
+        ) : (
+          <div className="bg-foreground/5 border border-foreground/10 rounded-lg p-4 mb-8 text-left">
+            <h3 className="font-semibold text-foreground mb-2">Delivery Address</h3>
+            <p className="text-foreground/80 text-sm">
+              {order.shippingAddress?.firstName} {order.shippingAddress?.lastName}<br />
+              {order.email}<br />
+              {order.shippingAddress?.phone}
+              {order.shippingAddress?.address}<br />
+              {order.shippingAddress?.city}, {order.shippingAddress?.state} {order.shippingAddress?.zipCode}<br />
+            </p>
+          </div>
+        )}
 
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         <Link

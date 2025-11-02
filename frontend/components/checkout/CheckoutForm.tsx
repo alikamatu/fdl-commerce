@@ -88,6 +88,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
         zipCode: '',
         country: 'GH',
         phone: formData.phone,
+        email: formData.email,
         pickupLocation: 'UPSA - Madina'
       },
       deliveryMethod: deliveryMethod, 

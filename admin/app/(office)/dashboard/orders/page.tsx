@@ -173,6 +173,21 @@ const fetchOrders = async () => {
   };
 }
 
+const formatPaymentMethod = (method: string) => {
+  switch (method.toLowerCase()) {
+    case 'mobile_money':
+      return 'Mobile Money (MoMo)';
+    case 'cash':
+      return 'Cash';
+    case 'bank_transfer':
+      return 'Bank Transfer';
+    case 'cash_or_momo':
+      return 'N/A';
+    default:
+      return method.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  }
+};
+
 export default function AdminOrdersPage() {
   const router = useRouter();
   const { addAlert } = useAlert();
@@ -632,11 +647,11 @@ export default function AdminOrdersPage() {
                     </td>
                     <td className="p-6">
                       <span className={`px-3 py-1.5 text-xs font-semibold border rounded-lg capitalize ${
-                        order.deliveryMethod === 'delivery'
+                        order.paymentCompleted 
                           ? 'bg-green-50 text-green-700 border-green-200' 
                           : 'bg-amber-50 text-amber-700 border-amber-200'
                       }`}>
-                        {order.paymentMethod}
+                        {formatPaymentMethod(order.paymentMethod)}
                       </span>
                     </td>
                     <td className="p-6">

@@ -413,7 +413,7 @@ export class EmailService {
     
     text += `${deliveryMethod.toUpperCase()} INFORMATION:\n`;
     text += `Method: ${deliveryMethod}\n`;
-    text += `Payment: ${deliveryMethod === "delivery" ? "Cash on Delivery" : "Cash or Momo"}\n`;
+    text += `Payment: ${deliveryMethod === "delivery" ? "Cash on Delivery" : "Cash/Momo"}\n`;
     
     if (emailType === 'delivered') {
       text += `Status: Completed\n\n`;
@@ -449,6 +449,7 @@ export class EmailService {
 
     return text;
   }
+  
 
   // Helper method to generate HTML version of order emails
   private generateOrderHTML(displayName: string, orderNumber: string, orderDetails: any, emailType: string): string {
@@ -468,6 +469,22 @@ export class EmailService {
     let buttonColor = '#000000';
     let buttonText = 'Track Your Order';
     let additionalInfo = '';
+
+      const formatPaymentMethod = (method: string) => {
+  switch (method.toLowerCase()) {
+    case 'mobile_money':
+      return 'Mobile Money (MoMo)';
+    case 'cash':
+      return 'Cash';
+    case 'bank_transfer':
+      return 'Bank Transfer';
+    case 'cash_or_momo':
+      return 'N/A';
+    default:
+      return method.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  }
+};
+
 
     switch (emailType) {
       case 'confirmed':
@@ -493,7 +510,7 @@ export class EmailService {
           additionalInfo = `
             <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin: 20px 0;">
               <p style="margin: 0; color: #856404; font-size: 14px;">
-              Please show your order details to pickup your order
+              <strong>✍️ Take Note</strong> Please show your order details to pickup your order
               </p>
             </div>
           `;
@@ -632,7 +649,7 @@ export class EmailService {
                             <h4 style="margin: 0 0 10px 0; font-size: 16px; color: #333; text-transform: capitalize;">${deliveryMethod} Information</h4>
                             <p style="margin: 0; color: #555; font-size: 14px;">
                               <strong>Method:</strong> <span style="text-transform: capitalize;">${deliveryMethod}</span><br>
-                              <strong>Payment:</strong> <span style="text-transform: capitalize;">${paymentMethod}</span> <br>
+                              <strong>Payment:</strong> <span style="text-transform: capitalize;">${formatPaymentMethod(paymentMethod)}</span> <br>
                               <strong>Status:</strong> <span style="color: ${statusColor};">${statusBadge}</span>
                             </p>
                           </div>
@@ -643,6 +660,8 @@ export class EmailService {
                             <p style="margin: 0; color: #555; font-size: 14px;">
                               ${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}<br>
                               ${shippingAddress.address || 'Address not available'}<br>
+                              ${deliveryMethod === 'delivery' ? `${shippingAddress.city || ''}, ${shippingAddress.state || ''} <br>` : ''}
+                              ${shippingAddress.country || ''}<br>
                               ${shippingAddress.phone || 'Not provided'}
                             </p>
                           </div>
@@ -696,7 +715,7 @@ export class EmailService {
                             </tr>
                             <tr>
                               <td style="padding-right: 15px; vertical-align: top;">
-                                <p style="margin: 0 0 5px 0; color: #555; font-size: 14px;"><strong></strong></p>
+                                <p style="margin: 0 0 5px 0; color: #555; font-size: 14px;"><strong>Phone:</strong></p>
                               </td>
                               <td>
                                 <p style="margin: 0 0 5px 0; font-size: 14px;"><a href="tel:+233547129636" style="color: #007bff; text-decoration: none;">+233 54 712 9636</a></p>

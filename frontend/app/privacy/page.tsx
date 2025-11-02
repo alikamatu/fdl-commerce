@@ -82,7 +82,7 @@ export default function PrivacyPage() {
                 <div>
                   <h3 className="text-2xl font-semibold text-gray-900 mb-4">Data Protection and Security</h3>
                   <p className="text-gray-700 leading-relaxed">
-                    We implement comprehensive security measures to protect your personal information from unauthorized access, alteration, disclosure, or destruction. Our security protocols include secure server infrastructure, data encryption, restricted access controls, and regular security audits.
+                    We implement comprehensive security measures to protect your personal information from unauthorized access, alteration, disclosure, or destruction. <br /> Our security protocols include secure server infrastructure, data encryption, restricted access controls, and regular security audits.
                   </p>
                 </div>
               </div>
