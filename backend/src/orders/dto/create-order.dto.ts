@@ -52,6 +52,12 @@ export class ShippingAddressDto {
   @IsNotEmpty()
   state: string;
 
+  
+
+  @IsString()
+  @IsNotEmpty()
+  email: string;
+
   @IsString()
   @IsNotEmpty()
   phone: string;

@@ -120,7 +120,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                     <span>{formatCurrency(order.subtotalCents)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Delivery:</span>
+                    <span className="text-gray-600">{order.deliveryMethod === 'delivery' ? 'Delivery:' : 'Pickup:'}</span>
                     <span>{formatCurrency(order.shippingCents)}</span>
                   </div>
                   <div className="flex justify-between font-medium border-t border-gray-200 pt-2">
@@ -139,12 +139,12 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                     <p>
                       {order.shippingAddress.firstName} {order.shippingAddress.lastName}
                     </p>
+                    <p>{order.shippingAddress.email}</p>
+                    <p>{order.shippingAddress.phone}</p>
                     <p>{order.shippingAddress.address}</p>
                     <p>
                       {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}
                     </p>
-                    <p>{order.shippingAddress.country}</p>
-                    <p>{order.shippingAddress.phone}</p>
                   </div>
                 </div>
               </div>

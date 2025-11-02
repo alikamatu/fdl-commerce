@@ -53,6 +53,9 @@ export class ShippingAddress {
   country: string;
 
   @Prop({ required: true })
+  email: string;
+
+  @Prop({ required: true })
   phone: string;
 
   @Prop({ required: false })

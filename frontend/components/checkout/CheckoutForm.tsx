@@ -79,6 +79,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
         zipCode: formData.zipCode,
         country: formData.country,
         phone: formData.phone,
+        email: formData.email,
       } : {
         firstName: formData.firstName,
         lastName: formData.lastName,

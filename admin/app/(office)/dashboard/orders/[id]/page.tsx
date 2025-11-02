@@ -835,8 +835,8 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
                   >
                     <option value="confirmed">Confirmed</option>
                     <option value="processing">Processing</option>
-                    <option value="delivering">Delivering</option>
-                    <option value="available">Available for Pickup</option>
+                    {order.deliveryMethod === 'delivery' && (<option value="delivering">Delivering</option>)}
+                    {order.deliveryMethod === 'pickup' && (<option value="available">Available for Pickup</option>)}
                     <option value="delivered">Delivered</option>
                     <option value="cancelled">Cancelled</option>
                   </select>
