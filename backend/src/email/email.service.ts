@@ -661,7 +661,6 @@ export class EmailService {
                               ${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}<br>
                               ${shippingAddress.address || 'Address not available'}<br>
                               ${deliveryMethod === 'delivery' ? `${shippingAddress.city || ''}, ${shippingAddress.state || ''} <br>` : ''}
-                              ${shippingAddress.country || ''}<br>
                               ${shippingAddress.phone || 'Not provided'}
                             </p>
                           </div>
@@ -938,8 +937,7 @@ export class EmailService {
                       <p style="margin: 0; color: #555; font-size: 14px; line-height: 1.8;">
                         ${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}<br>
                         ${shippingAddress.address || 'Address not available'}<br>
-                        ${shippingAddress.city || ''}, ${shippingAddress.state || ''} ${shippingAddress.zipCode || ''}<br>
-                        ${shippingAddress.country || ''}<br>
+                        ${order.deliveryMethod === 'delivery' ? `${shippingAddress.city || ''}, ${shippingAddress.state || ''} <br>` : ''}
                         <strong></strong> <a href="tel:${shippingAddress.phone}" style="color: #007bff; text-decoration: none;">${shippingAddress.phone || 'Not provided'}</a>
                       </p>
                     </div>

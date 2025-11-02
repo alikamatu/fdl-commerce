@@ -121,7 +121,7 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order, del
             <p className="text-foreground/80 text-sm">
               {order.shippingAddress?.firstName} {order.shippingAddress?.lastName}<br />
               {order.email}<br />
-              {order.shippingAddress?.phone}
+              {order.shippingAddress?.phone} <br />
               UPSA - Madina Campus<br />
               University of Professional Studies, Accra<br />
               Madina Campus, Accra, Ghana<br />
@@ -133,7 +133,7 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order, del
             <p className="text-foreground/80 text-sm">
               {order.shippingAddress?.firstName} {order.shippingAddress?.lastName}<br />
               {order.email}<br />
-              {order.shippingAddress?.phone}
+              {order.shippingAddress?.phone} <br />
               {order.shippingAddress?.address}<br />
               {order.shippingAddress?.city}, {order.shippingAddress?.state} {order.shippingAddress?.zipCode}<br />
             </p>

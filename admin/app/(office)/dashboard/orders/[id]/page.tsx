@@ -760,9 +760,14 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
                   <p className="font-semibold text-gray-900">{order.shippingAddress.fullName}</p>
                   <p className="text-gray-600">{order.shippingAddress.address}</p>
                   <p className="text-gray-600">
-                    {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.postalCode}
+                    {order.deliveryMethod === "delivery" ? (
+                      <>
+                        {order.shippingAddress.city}, {order.shippingAddress.state}
+                      </>
+                    ) : (
+                      <></>
+                    )}
                   </p>
-                  <p className="text-gray-600">{order.shippingAddress.country}</p>
                   {order.shippingAddress.phone && (
                     <div className="flex items-center gap-2 pt-3 border-t border-gray-200">
                       <Phone className="w-4 h-4 text-gray-400" />
@@ -936,7 +941,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
         onChange={(e) => setSelectedPaymentMethod(e.target.value)}
         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black focus:border-black transition-all duration-200 bg-white appearance-none cursor-pointer"
       >
-        <option value="mobile_money">Mobile Money (Momo)</option>
+        <option value="mobile_money">Mobile Money (MoMo)</option>
         <option value="cash">Cash</option>
         <option value="bank_transfer">Bank Transfer</option>
         <option value="cash_or_momo">N/A</option>

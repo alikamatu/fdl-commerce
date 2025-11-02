@@ -617,7 +617,7 @@ export default function AdminOrdersPage() {
                         <p className="text-sm text-gray-600 mb-1">{order.email}</p>
                         <div className="flex items-center gap-1 text-sm text-gray-500">
                           <MapPin className="w-3 h-3" />
-                          <span>{order.shippingAddress.city}, {order.shippingAddress.country}</span>
+                          <span>{order.shippingAddress.city}</span>
                         </div>
                       </div>
                     </td>

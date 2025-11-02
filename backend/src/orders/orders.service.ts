@@ -436,7 +436,7 @@ export class OrdersService {
     order.status = status;
 
     // Update timestamps based on status changes
-    if (status === 'delivering' && !order.shippedAt) {
+    if (status === 'delivering' || (status === 'available' && !order.shippedAt)) {
       order.shippedAt = new Date();
     } else if (status === 'delivered' && !order.deliveredAt) {
       order.deliveredAt = new Date();
