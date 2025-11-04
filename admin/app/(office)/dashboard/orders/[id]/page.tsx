@@ -754,7 +754,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
                   <div className="p-2 bg-gray-100 rounded-xl">
                     <MapPin className="w-5 h-5 text-gray-700" />
                   </div>
-                  <h2 className="text-xl font-semibold text-gray-900">{order.deliveryMethod === "delivery" ? "Delivey" : "Pickup"} Address</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">{order.deliveryMethod === "delivery" ? "Delivery" : "Pickup"} Address</h2>
                 </div>
                 <div className="space-y-3">
                   <p className="font-semibold text-gray-900">{order.shippingAddress.fullName}</p>
@@ -800,7 +800,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
                   <span className="font-medium text-gray-900">{formatPrice(order.subtotalCents)}</span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600">Delivery</span>
+                  <span className="text-gray-600">{order.deliveryMethod === "delivery" ? "Delivery" : "Pickup"} Fee</span>
                   <span className="font-medium text-gray-900">{formatPrice(order.shippingCents)}</span>
                 </div>
                 <div className="flex justify-between items-center py-3 border-t border-gray-200 font-semibold text-lg">

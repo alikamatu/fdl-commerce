@@ -143,7 +143,9 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                     <p>{order.shippingAddress.phone}</p>
                     <p>{order.shippingAddress.address}</p>
                     <p>
-                      {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}
+                      {order.deliveryMethod === 'delivery'
+                        ? `${order.shippingAddress.city}, ${order.shippingAddress.state} ${order.shippingAddress.zipCode}`
+                        : ''}
                     </p>
                   </div>
                 </div>
