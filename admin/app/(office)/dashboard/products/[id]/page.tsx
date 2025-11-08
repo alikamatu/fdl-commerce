@@ -553,7 +553,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               </div>
             </div>
 
-            {/* Ratings & Reviews */}
+            {/* Ratings & Reviews
             {(product.rating || product.reviewCount) && (
               <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
@@ -586,7 +586,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                   )}
                 </div>
               </div>
-            )}
+            )} */}
 
             {/* Metadata */}
             <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
