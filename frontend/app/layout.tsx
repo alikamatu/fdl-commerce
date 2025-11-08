@@ -28,14 +28,14 @@ const fontLato = Lato({
 
 export const metadata: Metadata = {
   title: "Forbes Digital Lifeline - Your Digital SOS.",
-  description: "Forbes Digital Lifeline is your go-to source for the latest insights, trends, and innovations in the digital world. Stay informed with expert articles, in-depth analyses, and cutting-edge news on technology, digital transformation, and more.",
+  description: "Forbes Digital Lifeline is your trusted source for all things tech. When your digital world throws you a curveball, we are your Digital SOS. We are the expert tech team ready to rescue your devices and get you back online, fast and reliably.",
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon-16x16.png",
   },
   openGraph: {
     title: "Forbes Digital Lifeline - Your Digital SOS.",
-    description: "Forbes Digital Lifeline is your go-to source for the latest insights, trends, and innovations in the digital world. Stay informed with expert articles, in-depth analyses, and cutting-edge news on technology, digital transformation, and more.",
+  description: "Forbes Digital Lifeline is your trusted source for all things tech. When your digital world throws you a curveball, we are your Digital SOS. We are the expert tech team ready to rescue your devices and get you back online, fast and reliably.",
   },
 };
 
