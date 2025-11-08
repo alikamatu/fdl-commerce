@@ -47,15 +47,17 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${fontPoppins.variable} ${fontMont.variable} ${fontLato.variable} antialiased transition-colors duration-500 overflow-x-hidden`}
+        className={`${fontPoppins.variable} ${fontMont.variable} ${fontLato.variable} antialiased transition-colors duration-500`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
           <CartProvider>
             <WishlistProvider>
-              <Navbar />
-              <main>{children}</main>
-              <Footer />
+              <div className="overflow-x-hidden">
+                <Navbar />
+                <main>{children}</main>
+                <Footer />
+              </div>
             </WishlistProvider>
           </CartProvider>
           </AuthProvider>

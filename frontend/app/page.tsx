@@ -4,11 +4,18 @@ import { RecommendedProducts } from "@/components/products/RecommendedProducts";
 import Products from "@/components/products/Products";
 import { BrandsSection } from "@/components/brands/BrandsSection";
 import { DealsSection } from "@/components/deals/DealsSection";
+import { CategoryScroll } from "@/components/categories/CategoryScroll";
+import { HeroCarousel } from "@/components/hero/HeroCarousel";
+import { FeaturesSection } from "@/components/hero/FeaturesSection";
 
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
-      <HeroSection />
+      <HeroCarousel />
+      
+      <CategoryScroll />
+      
+      <FeaturesSection />
 
       <Suspense fallback={<div className="py-12 text-center">Loading products...</div>}>
         <Products />

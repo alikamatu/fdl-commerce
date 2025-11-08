@@ -351,31 +351,6 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                         by <span className="font-semibold text-foreground/80">{product.brand}</span>
                       </div>
 
-                      {/* Rating */}
-                      <div className="flex items-center gap-3 flex-wrap">
-                        {hasReviews ? (
-                          <>
-                            <div className="flex items-center gap-1">
-                              <RatingStars rating={Math.round(averageRating)} size={18} />
-                              <span className="text-lg font-semibold text-foreground ml-1">
-                                {averageRating.toFixed(1)}
-                              </span>
-                            </div>
-                            <span className="text-foreground/30">•</span>
-                            <span className="text-foreground/60">
-                              {reviewCount} review{reviewCount !== 1 ? 's' : ''}
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            <RatingStars rating={0} size={18} />
-                            <span className="text-foreground/60 text-sm">No reviews yet</span>
-                          </>
-                        )}
-                        <span className="text-foreground/30">•</span>
-                        <span className="text-foreground/60 text-sm">SKU: {product.sku}</span>
-                      </div>
-
                       {/* Price */}
                       <div className="space-y-2">
                         <div className="flex items-baseline gap-2">
@@ -402,39 +377,6 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                           {product.description}
                         </p>
                       </div>
-
-                      {/* No Reviews State */}
-                      {!reviewsLoading && reviews.length === 0 && reviewCount === 0 && (
-                        <div className="text-center py-8 border border-foreground/10 rounded-lg">
-                          <Star size={32} className="mx-auto text-foreground/20 mb-2" />
-                          <h4 className="font-semibold text-foreground mb-1">No Reviews Yet</h4>
-                          <p className="text-foreground/60 text-sm">
-                            Be the first to review this product
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Specifications */}
-                      {product.specifications.length > 0 && (
-                        <div>
-                          <h3 className="font-semibold text-foreground mb-4">Specifications</h3>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {product.specifications.map((spec, index) => (
-                              <div 
-                                key={index} 
-                                className="flex items-center justify-between p-3 bg-foreground/5 rounded-lg"
-                              >
-                                <span className="font-medium text-foreground/80 text-sm">
-                                  {spec.key}
-                                </span>
-                                <span className="text-foreground/60 text-sm">
-                                  {spec.value}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
 
                       {/* Features */}
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-foreground/10">
