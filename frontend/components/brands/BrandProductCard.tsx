@@ -86,7 +86,7 @@ export const BrandProductCard: React.FC<BrandProductCardProps> = ({
           <motion.img
             src={mainImage}
             alt={product.images[0]?.alt || product.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.3 }}
           />

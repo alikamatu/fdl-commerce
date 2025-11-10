@@ -44,7 +44,7 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
           key={selectedImageIndex}
           src={mainImage.url}
           alt={mainImage.alt || title}
-          className="w-full h-full object-cover cursor-zoom-in"
+          className="w-full h-full object-contain cursor-zoom-in"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
@@ -101,7 +101,7 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
               <img
                 src={image.url}
                 alt={image.alt || `${title} ${index + 1}`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
               />
             </button>
           ))}
