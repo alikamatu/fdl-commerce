@@ -80,29 +80,41 @@ export default function InventoryPage() {
     generateStockTrends();
   }, [products, searchTerm, stockFilter, statusFilter]);
 
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products?include=category`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch products');
-      }
-
-      const data = await response.json();
-      const productsData = data.data || data;
-      setProducts(Array.isArray(productsData) ? productsData : []);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      addAlert({
-        type: 'error',
-        title: 'Error',
-        message: 'Failed to load inventory data'
-      });
-    } finally {
-      setLoading(false);
+const fetchProducts = async () => {
+  try {
+    setLoading(true);
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/products?limit=1000&include=category`
+    );
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch products');
     }
-  };
+
+    const data = await response.json();
+    
+    // Handle different response formats
+    let productsData;
+    if (data.data) {
+      productsData = data.data; // Paginated response
+    } else if (data.products) {
+      productsData = data.products; // Alternative format
+    } else {
+      productsData = data; // Direct array
+    }
+    
+    setProducts(Array.isArray(productsData) ? productsData : []);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    addAlert({
+      type: 'error',
+      title: 'Error',
+      message: 'Failed to load inventory data'
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleRefresh = async () => {
     setRefreshing(true);

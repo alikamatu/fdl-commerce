@@ -290,11 +290,9 @@ export const BrandProductListItem: React.FC<BrandProductListItemProps> = ({
             {/* Additional Info */}
             <div className="flex items-center justify-between pt-4 border-t border-foreground/10">
               <div className="flex items-center gap-4 text-xs text-foreground/50">
-                <span>Free shipping</span>
+                <span>Free delivery</span>
                 <span className="text-foreground/30">•</span>
-                <span>90-day returns</span>
-                <span className="text-foreground/30">•</span>
-                <span>Secure payment</span>
+                <span>7-day returns</span>
               </div>
               
               {/* View Full Details */}

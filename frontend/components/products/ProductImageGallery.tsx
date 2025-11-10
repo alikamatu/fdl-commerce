@@ -111,7 +111,7 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
       {/* Zoom Modal */}
       <AnimatePresence>
         {isZoomed && (
-          <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 bg-foreground/60 max-h-screen flex items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -121,7 +121,7 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
               <img
                 src={mainImage.url}
                 alt={mainImage.alt || title}
-                className="max-w-full max-h-full object-contain"
+                className="max-w-full max-h-[90vh] object-contain"
               />
               <button
                 onClick={() => setIsZoomed(false)}

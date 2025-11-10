@@ -9,6 +9,13 @@ export function useProducts() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    total: 0,
+    totalPages: 1,
+    limit: 100, // Increase limit to get more products
+    hasMore: false
+  });
 
   useEffect(() => {
     loadCategories();
@@ -62,19 +69,68 @@ export function useProducts() {
     }
   };
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (page: number = 1, limit: number = 100) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`);
+      // Build query parameters
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString()
+      });
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products?${params}`);
       if (!response.ok) {
         throw new Error('Failed to fetch products');
       }
       const data = await response.json();
-      setProducts(data.data || data);
+      
+      if (page === 1) {
+        // First page, replace products
+        setProducts(data.data || data.products || []);
+      } else {
+        // Subsequent pages, append products
+        setProducts(prev => [...prev, ...(data.data || data.products || [])]);
+      }
+
+      // Update pagination info
+      if (data.pagination) {
+        setPagination({
+          page: data.pagination.page || page,
+          total: data.pagination.total || 0,
+          totalPages: data.pagination.totalPages || 1,
+          limit: data.pagination.limit || limit,
+          hasMore: (data.pagination.page || page) < (data.pagination.totalPages || 1)
+        });
+      }
+
+      return data;
     } catch (err) {
       console.error('Error fetching products:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch products');
+      throw err;
     }
   };
+
+  // Load all products (with increased limit)
+  const loadAllProducts = async () => {
+    try {
+      setLoading(true);
+      await fetchProducts(1, 1000); // Load up to 1000 products
+    } catch (err) {
+      console.error('Error loading all products:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initial load - use loadAllProducts instead of fetchProducts
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([fetchCategories(), loadAllProducts()]);
+      setLoading(false);
+    };
+    loadData();
+  }, []);
 
   // Initial load
   useEffect(() => {
@@ -321,6 +377,8 @@ const createCategory = async (categoryData: { name: string; slug: string; image?
     updateProduct,
     deleteProduct,
     refreshCategories: fetchCategories,
-    refreshProducts: fetchProducts,
+    refreshProducts: loadAllProducts, // Use loadAllProducts for refresh
+    pagination,
+    fetchMoreProducts: () => fetchProducts(pagination.page + 1, pagination.limit)
   };
 }

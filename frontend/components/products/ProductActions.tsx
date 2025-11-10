@@ -154,7 +154,7 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
 
       {/* Stock Status */}
       <div className={`text-sm font-medium ${isOutOfStock ? 'text-red-500' : 'text-green-500'}`}>
-        {isOutOfStock ? 'Out of Stock' : `${product.stock} units available`}
+        {isOutOfStock ? 'Out of Stock' : `${product.stock} unit(s) available`}
       </div>
 
       {/* Quantity Selector */}

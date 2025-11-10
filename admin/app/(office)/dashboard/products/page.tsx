@@ -48,12 +48,14 @@ export default function ProductsPage() {
   const router = useRouter();
   const { addAlert } = useAlert();
   const { 
-    products, 
-    categories, 
-    loading, 
-    error,
-    deleteProduct, 
-    refreshProducts 
+  products, 
+  categories, 
+  loading, 
+  error,
+  deleteProduct, 
+  refreshProducts,
+  pagination,
+  fetchMoreProducts 
   } = useProducts();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -805,6 +807,19 @@ export default function ProductsPage() {
             })}
           </div>
         )}
+        {hasProducts && pagination.hasMore && (
+  <div className="flex justify-center mt-8">
+    <motion.button
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={fetchMoreProducts}
+      disabled={loading}
+      className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium shadow-sm disabled:opacity-50"
+    >
+      {loading ? 'Loading...' : `Load More (${pagination.total - products.length} remaining)`}
+    </motion.button>
+  </div>
+)}
       </div>
     </div>
   );

@@ -7,7 +7,6 @@ import {
   Package, 
   ShoppingCart, 
   Users, 
-  DollarSign,
   AlertTriangle,
   TrendingUp,
   RefreshCw,
@@ -184,7 +183,7 @@ export default function AdminHome() {
   }, []);
 
   const formatPrice = (priceCents: number) => {
-    return `$${(priceCents / 100).toFixed(2)}`;
+    return `GH₵ ${(priceCents / 100).toFixed(2)}`;
   };
 
   const formatTimeAgo = (timestamp: string) => {

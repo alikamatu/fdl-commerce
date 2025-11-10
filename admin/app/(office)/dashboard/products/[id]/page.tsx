@@ -517,7 +517,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     <span className="font-medium text-gray-700">Stock Level</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-lg font-semibold text-gray-900">{product.stock} units</span>
+                    <span className="text-lg font-semibold text-gray-900">{product.stock} unit(s)</span>
                     <div className="flex items-center gap-1 text-sm text-gray-600 mt-1">
                       <TrendingUp className="w-3 h-3" />
                       <span>{product.soldCount || 0} sold</span>
@@ -552,41 +552,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 </div>
               </div>
             </div>
-
-            {/* Ratings & Reviews
-            {(product.rating || product.reviewCount) && (
-              <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                  <Star className="w-5 h-5 mr-2 text-amber-500" />
-                  Customer Reviews
-                </h2>
-                <div className="space-y-4">
-                  {product.rating && (
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-gray-700">Average Rating</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl font-bold text-gray-900">{product.rating}</span>
-                        <div className="flex">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star
-                              key={star}
-                              size={16}
-                              className={star <= product.rating! ? "fill-amber-400 text-amber-400" : "text-gray-300"}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  {product.reviewCount && (
-                    <div className="flex justify-between items-center">
-                      <span className="font-medium text-gray-700">Total Reviews</span>
-                      <span className="text-gray-900 font-semibold">{product.reviewCount} reviews</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )} */}
 
             {/* Metadata */}
             <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
