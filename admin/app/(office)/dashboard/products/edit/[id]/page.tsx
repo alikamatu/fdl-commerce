@@ -823,7 +823,7 @@ export default function ProductEditPage() {
                   <img
                     src={imageFile.preview}
                     alt={`Preview ${index + 1}`}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                   />
                   
                   {/* Status Overlay */}

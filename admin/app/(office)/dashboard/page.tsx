@@ -316,7 +316,7 @@ export default function AdminHome() {
                             <img
                               src={product.images[0].url}
                               alt={product.images[0].alt || product.title}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                              className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200"
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">

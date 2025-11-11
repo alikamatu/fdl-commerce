@@ -878,7 +878,7 @@ export default function AddProductPage() {
                   <img
                     src={imageFile.preview}
                     alt={`Preview`}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                   />
                   
                   {/* Status Overlay */}

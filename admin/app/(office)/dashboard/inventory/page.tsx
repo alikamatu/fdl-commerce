@@ -608,7 +608,7 @@ const fetchProducts = async () => {
                             <img
                               src={product.images[0].url}
                               alt={product.images[0].alt || product.title}
-                              className="w-12 h-12 object-cover rounded-xl border border-gray-200"
+                              className="w-12 h-12 object-contain rounded-xl border border-gray-200"
                             />
                           ) : (
                             <div className="w-12 h-12 flex items-center justify-center border border-gray-200 rounded-xl bg-gray-100">

@@ -686,7 +686,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
                         <img
                           src={item.imageUrl}
                           alt={item.title}
-                          className="w-16 h-16 object-cover rounded-xl border border-gray-200"
+                          className="w-16 h-16 object-contain rounded-xl border border-gray-200"
                         />
                       ) : (
                         <div className="w-16 h-16 flex items-center justify-center border border-gray-200 rounded-xl bg-gray-100">

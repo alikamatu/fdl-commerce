@@ -374,7 +374,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                   <img
                     src={mainImage.url}
                     alt={mainImage.alt || product.title}
-                    className="w-full h-96 object-cover"
+                    className="w-full h-96 object-contain"
                   />
                 ) : (
                   <div className="w-full h-96 flex flex-col items-center justify-center text-gray-400">
@@ -402,7 +402,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                       <img
                         src={image.url}
                         alt={image.alt || `${product.title} ${index + 1}`}
-                        className="w-full h-20 object-cover"
+                        className="w-full h-20 object-contain"
                       />
                     </motion.button>
                   ))}

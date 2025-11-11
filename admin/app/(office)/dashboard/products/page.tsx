@@ -651,7 +651,7 @@ export default function ProductsPage() {
                       <img
                         src={productImages[0].url}
                         alt={productImages[0].alt || productTitle}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';
