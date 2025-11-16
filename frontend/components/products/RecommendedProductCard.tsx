@@ -45,11 +45,11 @@ export const RecommendedProductCard: React.FC<RecommendedProductCardProps> = ({
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     
     if (hours > 0) {
-      return `${hours}h`;
+      return `${hours}h ${minutes}m`;
     }
     return `${minutes}m`;
   };
-
+  
   const timeLeft = getTimeLeft();
 
   const handleAddToCart = async (e: React.MouseEvent) => {
@@ -146,10 +146,10 @@ export const RecommendedProductCard: React.FC<RecommendedProductCardProps> = ({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="absolute bottom-2 left-2"
+              className="absolute bottom-3 left-3"
             >
-              <div className="bg-black/80 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                <Clock size={10} />
+              <div className="bg-black/70 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full flex items-center gap-1">
+                <Clock size={12} />
                 <span>{timeLeft}</span>
               </div>
             </motion.div>

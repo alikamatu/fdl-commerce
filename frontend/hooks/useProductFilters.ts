@@ -20,13 +20,14 @@ export const useProductFilters = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   
+  // Convert URL params (in cents) to dollars for frontend display
   const [filters, setFilters] = useState<ProductFilters>({
     page: Number(searchParams.get('page')) || 1,
     limit: Number(searchParams.get('limit')) || 12,
     category: searchParams.get('category') || undefined,
     search: searchParams.get('search') || undefined,
-    minPrice: searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : undefined,
-    maxPrice: searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined,
+    minPrice: searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) / 100 : undefined,
+    maxPrice: searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) / 100 : undefined,
     inStock: searchParams.get('inStock') ? searchParams.get('inStock') === 'true' : undefined,
     sortBy: searchParams.get('sortBy') || 'newest',
     brand: searchParams.get('brand') || undefined,
@@ -41,9 +42,25 @@ export const useProductFilters = () => {
     
     Object.entries(newFilters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
-        params.set(key, value.toString());
+        // For price filters, convert dollars to cents for backend
+        if (key === 'minPrice' || key === 'maxPrice') {
+          // Only set if value is a valid number greater than 0
+          if (Number(value) > 0) {
+            params.set(key, (Number(value) * 100).toString());
+          }
+        } else if (key === 'inStock' || key === 'isDeal') {
+          // Convert boolean to string
+          params.set(key, value.toString());
+        } else {
+          params.set(key, value.toString());
+        }
       }
     });
+
+    // Always ensure page is set
+    if (!params.has('page')) {
+      params.set('page', '1');
+    }
 
     router.push(`/products?${params.toString()}`, { scroll: false });
   }, [router]);

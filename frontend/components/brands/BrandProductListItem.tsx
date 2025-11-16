@@ -249,13 +249,13 @@ export const BrandProductListItem: React.FC<BrandProductListItemProps> = ({
               {/* Price and Actions */}
               <div className="flex flex-col items-start lg:items-end gap-4">
                 {/* Price */}
-                <div className="text-right">
+                <div className="flex md:block items-center gap-3 text-right">
                   <div className="text-2xl font-bold text-foreground">
-                    ₵{price}
+                    GH₵{price}
                   </div>
                   {product.originalPriceCents && product.originalPriceCents > product.priceCents && (
                     <div className="text-sm text-foreground/40 line-through">
-                      ₵{(product.originalPriceCents / 100).toFixed(2)}
+                      GH₵{(product.originalPriceCents / 100).toFixed(2)}
                     </div>
                   )}
                 </div>

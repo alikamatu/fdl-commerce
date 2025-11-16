@@ -14,7 +14,6 @@ export class ProductsService {
   ) {}
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
-    // Check if SKU already exists
     const existingProduct = await this.productModel.findOne({ 
       sku: createProductDto.sku 
     });
@@ -42,7 +41,8 @@ export class ProductsService {
     minPrice,
     maxPrice,
     inStock,
-    isDeal // Add this parameter
+    isDeal,
+    sortBy = 'newest' // Add sortBy parameter with default
   }: {
     page?: number;
     limit?: number;
@@ -52,7 +52,8 @@ export class ProductsService {
     minPrice?: number;
     maxPrice?: number;
     inStock?: boolean;
-    isDeal?: boolean; // Add this
+    isDeal?: boolean;
+    sortBy?: string; // Add this
   } = {}) {
     const query: any = { isActive: true };
 
@@ -96,14 +97,43 @@ export class ProductsService {
 
     const skip = (page - 1) * limit;
 
+    // Determine sort order based on sortBy parameter
+    let sortOption: any = { createdAt: -1 }; // Default: newest first
+
+    switch (sortBy) {
+      case 'price-low':
+        sortOption = { priceCents: 1 }; // Price: Low to High
+        break;
+      case 'price-high':
+        sortOption = { priceCents: -1 }; // Price: High to Low
+        break;
+      case 'name':
+        sortOption = { title: 1 }; // Name: A to Z
+        break;
+      case 'stock':
+        sortOption = { stock: -1 }; // In Stock First (highest stock first)
+        break;
+      case 'discount':
+        sortOption = { discountPercent: -1, createdAt: -1 }; // Best Discount
+        break;
+      case 'rating':
+        sortOption = { averageRating: -1, createdAt: -1 }; // Highest Rated
+        break;
+      case 'newest':
+      default:
+        sortOption = { createdAt: -1 }; // Newest First
+        break;
+    }
+
     console.log('Query:', JSON.stringify(query)); // Debug log
     console.log('Skip:', skip, 'Limit:', limit); // Debug log
+    console.log('Sort:', sortOption); // Debug log
 
     const [products, total] = await Promise.all([
       this.productModel
         .find(query)
         .populate('categoryId', 'name slug imageUrl')
-        .sort({ createdAt: -1 })
+        .sort(sortOption) // Apply dynamic sorting
         .skip(skip)
         .limit(limit)
         .exec(),
@@ -227,7 +257,6 @@ export class ProductsService {
       .exec();
   }
 
-  // products.service.ts - Add this method
   async getSearchSuggestions(query: string, limit: number = 8): Promise<any[]> {
     if (!query || query.length < 2) {
       return [];

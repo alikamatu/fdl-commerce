@@ -42,14 +42,14 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
     onFiltersChange({ ...filters, category: categoryId, page: 1 });
   };
 
-  const handlePriceChange = (min?: number, max?: number) => {
-    onFiltersChange({
-      ...filters,
-      minPrice: min,
-      maxPrice: max,
-      page: 1,
-    });
-  };
+const handlePriceChange = (min?: number, max?: number) => {
+  onFiltersChange({
+    ...filters,
+    minPrice: min !== undefined && min > 0 ? min : undefined,
+    maxPrice: max !== undefined && max > 0 ? max : undefined,
+    page: 1,
+  });
+};
 
   const handleDealChange = (isDeal?: boolean) => {
     onFiltersChange({ ...filters, isDeal, page: 1 });
@@ -221,39 +221,37 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
                       <label className="text-xs text-foreground/60">Min Price</label>
-                      <input
-                        type="number"
-                        placeholder="0"
-                        value={filters.minPrice || ''}
-                        onChange={(e) => 
-                          handlePriceChange(
-                            e.target.value ? Number(e.target.value) : undefined,
-                            filters.maxPrice
-                          )
-                        }
-                        className="w-full px-3 py-2 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/30 bg-transparent text-sm"
-                        min="0"
-                      />
+<input
+  type="number"
+  placeholder="0"
+  value={filters.minPrice || ''}
+  onChange={(e) => {
+    const value = e.target.value ? Number(e.target.value) : undefined;
+    handlePriceChange(value, filters.maxPrice);
+  }}
+  className="w-full px-3 py-2 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/30 bg-transparent text-sm"
+  min="0"
+  step="0.01"
+/>
                     </div>
                     <div className="space-y-1">
                       <label className="text-xs text-foreground/60">Max Price</label>
-                      <input
-                        type="number"
-                        placeholder="99999"
-                        value={filters.maxPrice || ''}
-                        onChange={(e) => {
-                          let value = e.target.value ? Number(e.target.value) : undefined;
-
-                          if (value !== undefined && value > 99999) {
-                            value = 99999;
-                          }
-
-                          handlePriceChange(filters.minPrice, value);
-                        }}
-                        className="w-full px-3 py-2 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/30 bg-transparent text-sm"
-                        min="0"
-                        max="99999"
-                      />
+<input
+  type="number"
+  placeholder="99999"
+  value={filters.maxPrice || ''}
+  onChange={(e) => {
+    let value = e.target.value ? Number(e.target.value) : undefined;
+    if (value !== undefined && value > 99999) {
+      value = 99999;
+    }
+    handlePriceChange(filters.minPrice, value);
+  }}
+  className="w-full px-3 py-2 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/30 bg-transparent text-sm"
+  min="0"
+  max="99999"
+  step="0.01"
+/>
                     </div>
                   </div>
                 </div>

@@ -8,7 +8,6 @@ import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { CheckoutForm } from '@/components/checkout/CheckoutForm';
 import { OrderConfirmation } from '@/components/checkout/OrderConfirmation';
-import { AuthModal } from '@/components/auth/AuthModal';
 
 type CheckoutStep = 'method' | 'form' | 'confirmation';
 
@@ -19,19 +18,13 @@ export default function CheckoutPage() {
   const [step, setStep] = useState<CheckoutStep>('method');
   const [deliveryMethod, setDeliveryMethod] = useState<'delivery' | 'pickup'>('delivery');
   const [orderData, setOrderData] = useState<any>(null);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [isChecking, setIsChecking] = useState(true);
-  // Check authentication and cart on mount
+
+  // Redirect to cart if user is not authenticated
   useEffect(() => {
-    if (!authLoading) {
-      setIsChecking(false);
-      
-      // Show auth modal if user is not logged in
-      if (!user) {
-        setShowAuthModal(true);
-      }
+    if (!authLoading && !user) {
+      router.push('/cart');
     }
-  }, [authLoading, user, cart.items.length, router]);
+  }, [authLoading, user, router]);
 
   const handleOrderComplete = (order: any) => {
     setOrderData(order);
@@ -39,7 +32,7 @@ export default function CheckoutPage() {
   };
 
   // Show loading while checking authentication
-  if (authLoading || isChecking) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
@@ -50,20 +43,9 @@ export default function CheckoutPage() {
     );
   }
 
-  // Show auth modal if not logged in
+  // Don't render checkout if not authenticated
   if (!user) {
-    return (
-      <>
-        <AuthModal
-          isOpen={showAuthModal}
-          onClose={() => {
-            setShowAuthModal(false);
-            router.push('/checkout');
-          }}
-          defaultTab="login"
-        />
-      </>
-    );
+    return null;
   }
 
   return (

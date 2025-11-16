@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, Menu, X, ChevronDown } from "lucide-react";
+import { Search, Menu, X } from "lucide-react";
 import { CartIcon } from "../cart/CartIcon";
 import { WishlistIcon } from "../wishlist/WishlistIcon";
 import { UserMenu } from "./UserMenu";

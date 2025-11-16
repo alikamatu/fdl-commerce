@@ -55,65 +55,67 @@ export class ProductsController {
     };
   }
 
-@Get('products')
-@ApiOperation({ summary: 'Get all products with pagination and filtering' })
-@ApiResponse({ status: 200, description: 'Products retrieved successfully' })
-async findAll(
-  @Query('page') page: string,
-  @Query('limit') limit: string,
-  @Query('category') category: string,
-  @Query('q') search: string,
-  @Query('brand') brand: string,
-  @Query('minPrice') minPrice: string,
-  @Query('maxPrice') maxPrice: string,
-  @Query('inStock') inStock: string,
-  @Query('isDeal') isDeal: string, // Add this parameter
-) {
-  const result = await this.productsService.findAll({
-    page: page ? parseInt(page) : 1,
-    limit: limit ? parseInt(limit) : 10,
-    category,
-    search,
-    minPrice: minPrice ? parseInt(minPrice) : undefined,
-    maxPrice: maxPrice ? parseInt(maxPrice) : undefined,
-    inStock: inStock ? inStock === 'true' : undefined,
-    brand,
-    isDeal: isDeal ? isDeal === 'true' : undefined, // Add this
-  });
+  @Get('products')
+  @ApiOperation({ summary: 'Get all products with pagination and filtering' })
+  @ApiResponse({ status: 200, description: 'Products retrieved successfully' })
+  async findAll(
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+    @Query('category') category: string,
+    @Query('q') search: string,
+    @Query('brand') brand: string,
+    @Query('minPrice') minPrice: string,
+    @Query('maxPrice') maxPrice: string,
+    @Query('inStock') inStock: string,
+    @Query('isDeal') isDeal: string,
+    @Query('sortBy') sortBy: string, // Add sortBy parameter
+  ) {
+    const result = await this.productsService.findAll({
+      page: page ? parseInt(page) : 1,
+      limit: limit ? parseInt(limit) : 10,
+      category,
+      search,
+      minPrice: minPrice ? parseInt(minPrice) : undefined,
+      maxPrice: maxPrice ? parseInt(maxPrice) : undefined,
+      inStock: inStock ? inStock === 'true' : undefined,
+      brand,
+      isDeal: isDeal ? isDeal === 'true' : undefined,
+      sortBy: sortBy || 'newest', // Add sortBy with default
+    });
 
-  return {
-    success: true,
-    data: result.products, 
-    pagination: {
-      total: result.total,
-      page: result.page,
-      totalPages: result.totalPages,
-    },
-  };
-}
+    return {
+      success: true,
+      data: result.products, 
+      pagination: {
+        total: result.total,
+        page: result.page,
+        totalPages: result.totalPages,
+      },
+    };
+  }
 
-@Get('products/deals')
-@ApiOperation({ summary: 'Get deal products' })
-@ApiResponse({ status: 200, description: 'Deal products retrieved successfully' })
-async findDeals(
-  @Query('page') page: string,
-  @Query('limit') limit: string,
-) {
-  const result = await this.productsService.findDealProducts({
-    page: page ? parseInt(page) : 1,
-    limit: limit ? parseInt(limit) : 10,
-  });
+  @Get('products/deals')
+  @ApiOperation({ summary: 'Get deal products' })
+  @ApiResponse({ status: 200, description: 'Deal products retrieved successfully' })
+  async findDeals(
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+  ) {
+    const result = await this.productsService.findDealProducts({
+      page: page ? parseInt(page) : 1,
+      limit: limit ? parseInt(limit) : 10,
+    });
 
-  return {
-    success: true,
-    data: result.products,
-    pagination: {
-      total: result.total,
-      page: result.page,
-      totalPages: result.totalPages,
-    },
-  };
-}
+    return {
+      success: true,
+      data: result.products,
+      pagination: {
+        total: result.total,
+        page: result.page,
+        totalPages: result.totalPages,
+      },
+    };
+  }
 
   @Get('products/:id')
   @ApiOperation({ summary: 'Get product by ID' })
@@ -174,23 +176,23 @@ async findDeals(
     };
   }
   
-@Get('products/search/suggestions')
-@ApiOperation({ summary: 'Get search suggestions' })
-@ApiResponse({ status: 200, description: 'Search suggestions retrieved successfully' })
-async getSearchSuggestions(
-  @Query('q') query: string,
-  @Query('limit') limit: string,
-) {
-  const suggestions = await this.productsService.getSearchSuggestions(
-    query,
-    limit ? parseInt(limit) : 8,
-  );
+  @Get('products/search/suggestions')
+  @ApiOperation({ summary: 'Get search suggestions' })
+  @ApiResponse({ status: 200, description: 'Search suggestions retrieved successfully' })
+  async getSearchSuggestions(
+    @Query('q') query: string,
+    @Query('limit') limit: string,
+  ) {
+    const suggestions = await this.productsService.getSearchSuggestions(
+      query,
+      limit ? parseInt(limit) : 8,
+    );
 
-  return {
-    success: true,
-    data: suggestions,
-  };
-}
+    return {
+      success: true,
+      data: suggestions,
+    };
+  }
 
   @Post('admin/upload')
   @UseGuards(JwtAuthGuard, RolesGuard)

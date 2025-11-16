@@ -47,12 +47,17 @@ export function useProducts(filters?: ProductFilters) {
       if (filters?.limit) params.append('limit', String(filters.limit));
       if (filters?.category) params.append('category', filters.category);
       if (filters?.brand) params.append('brand', filters.brand);
-      if (filters?.minPrice) params.append('minPrice', String(filters.minPrice));
-      if (filters?.maxPrice) params.append('maxPrice', String(filters.maxPrice));
+      
+      // Convert dollar amounts to cents for backend
+      if (filters?.minPrice) params.append('minPrice', String(filters.minPrice * 100));
+      if (filters?.maxPrice) params.append('maxPrice', String(filters.maxPrice * 100));
+      
       if (filters?.search) params.append('q', encodeURIComponent(filters.search));
       if (filters?.inStock !== undefined) params.append('inStock', String(filters.inStock));
-      // Add isDeal parameter
       if (filters?.isDeal !== undefined) params.append('isDeal', String(filters.isDeal));
+      
+      // Add sortBy parameter - FIX: This was missing!
+      if (filters?.sortBy) params.append('sortBy', filters.sortBy);
 
       console.log('Fetching products with params:', params.toString());
 
@@ -91,10 +96,12 @@ export function useProducts(filters?: ProductFilters) {
     filters?.limit,
     filters?.category,
     filters?.search,
-    filters?.minPrice,
-    filters?.maxPrice,
+    filters?.minPrice,    // FIX: Add price dependencies
+    filters?.maxPrice,    // FIX: Add price dependencies
     filters?.inStock,
-    filters?.isDeal, // Add this dependency
+    filters?.isDeal,
+    filters?.sortBy,      // FIX: Add sortBy dependency
+    filters?.brand,       // FIX: Add brand dependency if missing
   ]);
 
   return {

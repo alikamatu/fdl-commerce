@@ -140,7 +140,7 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
             <span className="text-xl text-foreground/40 line-through">GH₵{originalPrice}</span>
           )}
           {discountPercent > 0 && (
-            <span className="bg-red-500 text-white text-sm font-bold px-2 py-1 rounded">
+            <span className="bg-red-500 text-white text-xs md:text-sm font-bold px-2 py-1 rounded">
               {discountPercent}% OFF
             </span>
           )}

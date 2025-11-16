@@ -55,21 +55,13 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ onCheckout }) => {
         {/* Checkout Button */}
         <button
           onClick={() => router.push('/checkout')}
-          disabled={cart.items.length === 0}
+          disabled={cart.items.length === 0 || !user}
           className="w-full mt-6 py-4 bg-foreground text-background cursor-pointer rounded-lg font-semibold hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
         >
-          Proceed to Checkout
+          {!user && ('Sign in to Proceed' )}
+          {user && ('Proceed to Checkout')}
           <ArrowRight size={16} />
         </button>
-
-        {/* Guest Checkout Notice */}
-        {!user && (
-          <div className="mt-4 p-3 bg-foreground/5 rounded-lg">
-            <p className="text-xs text-foreground/60 text-center">
-              You will be able to create an account at checkout
-            </p>
-          </div>
-        )}
 
         {/* Security Notice */}
         <div className="mt-4 text-center">

@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { HeroSection } from "@/components/hero/HeroSection";
 import { RecommendedProducts } from "@/components/products/RecommendedProducts";
 import Products from "@/components/products/Products";
 import { BrandsSection } from "@/components/brands/BrandsSection";
