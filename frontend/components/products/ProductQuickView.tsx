@@ -349,7 +349,7 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                       {/* Price */}
                       <div className="space-y-2">
                         <div className="flex items-baseline gap-2">
-                          <span className="text-xl lg:text-4xl font-bold text-foreground">
+                          <span className="text-lg lg:text-xl font-bold text-foreground">
                             GH₵{price}
                           </span>
                           {originalPrice && originalPrice !== price && (
