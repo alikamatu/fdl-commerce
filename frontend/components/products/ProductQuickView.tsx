@@ -366,7 +366,7 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                         </div>
                         {originalPrice && originalPrice !== price && (
                           <div className="text-green-600 font-medium">
-                            You save ₵{(parseFloat(originalPrice) - parseFloat(price)).toFixed(2)}
+                            You save GH₵{(parseFloat(originalPrice) - parseFloat(price)).toFixed(2)}
                           </div>
                         )}
                       </div>
