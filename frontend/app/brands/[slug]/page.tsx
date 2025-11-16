@@ -15,7 +15,7 @@ export default function BrandPage({ params }: BrandPageProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-foreground/5 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 bg-foreground/10 rounded-full animate-pulse mx-auto mb-4" />
           <div className="h-6 bg-foreground/10 rounded w-32 mx-auto animate-pulse" />

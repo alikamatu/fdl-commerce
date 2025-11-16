@@ -98,20 +98,20 @@ export const DealsSection: React.FC<DealsSectionProps> = ({
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      <div className="md:flex max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="flex flex-col items-start justify-between bg-[url('/images/2151995261.jpg')] bg-cover m-2 rounded-2xl p-6">
+      <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        {/* Header - Now in a separate row */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4 px-4 md:px-0">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-red-500 rounded-xl shadow-lg">
               <Zap size={28} className="text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-background">
+              <h2 className="text-2xl font-bold text-foreground">
                 {title}
               </h2>
               <div className="flex items-center gap-2 mt-1">
                 <Clock size={16} className="text-red-500" />
-                <p className="text-background/60 text-sm">
+                <p className="text-muted-foreground text-sm">
                   {subtitle}
                 </p>
               </div>
@@ -120,8 +120,8 @@ export const DealsSection: React.FC<DealsSectionProps> = ({
 
           {showViewAll && (
             <Link
-              href="/products?deal=true"
-              className="hidden sm:flex items-center gap-2 px-4 py-2 bg-foreground text-background rounded-lg font-medium hover:bg-foreground/90 transition-colors shadow-lg"
+              href="/products?page=1&limit=12&sortBy=newest&isDeal=true"
+              className="flex items-center gap-2 px-4 py-2 bg-foreground text-background rounded-lg font-medium hover:bg-foreground/90 transition-colors shadow-lg"
             >
               View All Deals
               <ArrowRight size={16} />
@@ -129,7 +129,7 @@ export const DealsSection: React.FC<DealsSectionProps> = ({
           )}
         </div>
 
-        {/* Scroll Container */}
+        {/* Scroll Container - Full width */}
         <div className="relative">
           {/* Left Arrow */}
           {showLeftArrow && (
@@ -138,7 +138,7 @@ export const DealsSection: React.FC<DealsSectionProps> = ({
               animate={{ opacity: 1, scale: 1 }}
               whileHover={{ scale: 1.1 }}
               onClick={() => scroll('left')}
-              className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 p-3 bg-background/80 backdrop-blur-sm border border-foreground/10 rounded-full shadow-lg hover:bg-background transition-all duration-200"
+              className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10 p-3 bg-background/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-background transition-all duration-200"
             >
               <ChevronLeft size={20} className="text-foreground" />
             </motion.button>
@@ -151,7 +151,7 @@ export const DealsSection: React.FC<DealsSectionProps> = ({
               animate={{ opacity: 1, scale: 1 }}
               whileHover={{ scale: 1.1 }}
               onClick={() => scroll('right')}
-              className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 p-3 bg-background/80 backdrop-blur-sm border border-foreground/10 rounded-full shadow-lg hover:bg-background transition-all duration-200"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 z-10 p-3 bg-background/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-background transition-all duration-200"
             >
               <ChevronRight size={20} className="text-foreground" />
             </motion.button>
@@ -168,13 +168,13 @@ export const DealsSection: React.FC<DealsSectionProps> = ({
               [...Array(limit)].map((_, index) => (
                 <div
                   key={index}
-                  className="flex-shrink-0 w-80 bg-background border border-foreground/10 rounded-lg overflow-hidden animate-pulse"
+                  className="flex-shrink-0 w-80 bg-background rounded-lg overflow-hidden animate-pulse"
                 >
-                  <div className="aspect-[4/3] bg-foreground/10" />
+                  <div className="aspect-[4/3] bg-muted" />
                   <div className="p-4 space-y-3">
-                    <div className="h-4 bg-foreground/10 rounded w-3/4" />
-                    <div className="h-4 bg-foreground/10 rounded w-1/2" />
-                    <div className="h-6 bg-foreground/10 rounded w-1/3" />
+                    <div className="h-4 bg-muted rounded w-3/4" />
+                    <div className="h-4 bg-muted rounded w-1/2" />
+                    <div className="h-6 bg-muted rounded w-1/3" />
                   </div>
                 </div>
               ))
@@ -193,35 +193,21 @@ export const DealsSection: React.FC<DealsSectionProps> = ({
               ))
             )}
           </div>
-                  {/* Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-center mt-6"
-        >
-          <div className="flex items-center justify-center gap-1">
-            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
-            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
-          </div>
-        </motion.div>
+
+          {/* Scroll Indicator */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="text-center mt-6"
+          >
+            <div className="flex items-center justify-center gap-1">
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
+            </div>
+          </motion.div>
         </div>
-
-        {/* Mobile View All Link */}
-        {showViewAll && (
-          <div className="sm:hidden text-center mt-6">
-            <Link
-              href="/products?deal=true"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background rounded-lg font-medium hover:bg-foreground/90 transition-colors shadow-lg"
-            >
-              View All Deals
-              <ArrowRight size={16} />
-            </Link>
-          </div>
-        )}
-
-
       </div>
 
       {/* Custom scrollbar hide */}

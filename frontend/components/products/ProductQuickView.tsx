@@ -235,12 +235,7 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                 {/* Product Images - Fixed height */}
                 <div className="relative bg-gray-50 flex items-center justify-center p-8 border-r border-foreground/5">
                   <div className="w-full max-w-md aspect-square relative">
-                    {/* Deal Badge */}
-                    {product.isDeal && discountPercent > 0 && (
-                      <div className="absolute top-4 left-4 z-10 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
-                        {discountPercent}% OFF
-                      </div>
-                    )}
+
 
                     {/* Main Image */}
                     <motion.img
@@ -362,6 +357,12 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                               ₵{originalPrice}
                             </span>
                           )}
+                    {/* Deal Badge */}
+                    {product.isDeal && discountPercent > 0 && (
+                      <div className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                        {discountPercent}% OFF
+                      </div>
+                    )}
                         </div>
                         {originalPrice && originalPrice !== price && (
                           <div className="text-green-600 font-medium">

@@ -67,6 +67,7 @@ async findAll(
   @Query('minPrice') minPrice: string,
   @Query('maxPrice') maxPrice: string,
   @Query('inStock') inStock: string,
+  @Query('isDeal') isDeal: string, // Add this parameter
 ) {
   const result = await this.productsService.findAll({
     page: page ? parseInt(page) : 1,
@@ -77,12 +78,12 @@ async findAll(
     maxPrice: maxPrice ? parseInt(maxPrice) : undefined,
     inStock: inStock ? inStock === 'true' : undefined,
     brand,
+    isDeal: isDeal ? isDeal === 'true' : undefined, // Add this
   });
 
-  // FIX: Return the correct structure
   return {
     success: true,
-    data: result.products,  // Make sure this line is correct
+    data: result.products, 
     pagination: {
       total: result.total,
       page: result.page,

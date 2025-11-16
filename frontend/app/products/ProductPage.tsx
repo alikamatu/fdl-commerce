@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useProducts } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
-import { useBrands } from '@/hooks/useBrands'; // Add this hook
+import { useBrands } from '@/hooks/useBrands';
 import { useProductFilters } from '@/hooks/useProductFilters';
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { Product } from '@/types/product';

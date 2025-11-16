@@ -107,19 +107,6 @@ export const DealCard: React.FC<DealCardProps> = ({
         </motion.div>
       )}
 
-      {/* Hot Deal Badge */}
-      {/* <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.1 }}
-        className="absolute top-3 right-3 z-10"
-      >
-        <div className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1">
-          <Zap size={12} />
-          <span>Hot Deal</span>
-        </div>
-      </motion.div> */}
-
       {/* Main Card */}
       <div className="bg-white rounded-2xl overflow-hidden transition-all duration-300 group-hover:bg-gray-50 h-full flex flex-col">
         {/* Product Image */}
@@ -128,7 +115,7 @@ export const DealCard: React.FC<DealCardProps> = ({
             <motion.img
               src={mainImage}
               alt={product.images[0]?.alt || product.title}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.4 }}
             />

@@ -34,83 +34,91 @@ export class ProductsService {
   }
 
   async findAll({
-  page = 1,
-  limit = 10,
-  category,
-  search,
-  brand,
-  minPrice,
-  maxPrice,
-  inStock
-}: {
-  page?: number;
-  limit?: number;
-  category?: string;
-  search?: string;
-  brand?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  inStock?: boolean;
-} = {}) {
-  const query: any = { isActive: true };
+    page = 1,
+    limit = 10,
+    category,
+    search,
+    brand,
+    minPrice,
+    maxPrice,
+    inStock,
+    isDeal // Add this parameter
+  }: {
+    page?: number;
+    limit?: number;
+    category?: string;
+    search?: string;
+    brand?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    inStock?: boolean;
+    isDeal?: boolean; // Add this
+  } = {}) {
+    const query: any = { isActive: true };
 
-   if (category) {
-    // Try both ObjectId and string comparison
-    query.$or = [
-      { categoryId: category },
-      { categoryId: new Types.ObjectId(category) }
-    ];
-  }
+    if (category) {
+      // Try both ObjectId and string comparison
+      query.$or = [
+        { categoryId: category },
+        { categoryId: new Types.ObjectId(category) }
+      ];
+    }
 
-  if (search) {
-    query.$or = [
-      { title: { $regex: search, $options: 'i' } },
-      { description: { $regex: search, $options: 'i' } },
-      { brand: { $regex: search, $options: 'i' } },
-    ];
-  }
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { brand: { $regex: search, $options: 'i' } },
+      ];
+    }
 
-  if (minPrice !== undefined) {
-    query.priceCents = { ...query.priceCents, $gte: minPrice };
-  }
+    if (minPrice !== undefined) {
+      query.priceCents = { ...query.priceCents, $gte: minPrice };
+    }
 
-  if (maxPrice !== undefined) {
-    query.priceCents = { ...query.priceCents, $lte: maxPrice };
-  }
+    if (maxPrice !== undefined) {
+      query.priceCents = { ...query.priceCents, $lte: maxPrice };
+    }
 
-  if (inStock !== undefined) {
-    query.stock = inStock ? { $gt: 0 } : { $lte: 0 };
-  }
+    if (inStock !== undefined) {
+      query.stock = inStock ? { $gt: 0 } : { $lte: 0 };
+    }
 
     if (brand) {
-    query.brand = { $regex: brand, $options: 'i' };
+      query.brand = { $regex: brand, $options: 'i' };
+    }
+
+    // Add isDeal filter - only show products that are marked as deals AND haven't expired
+    if (isDeal !== undefined && isDeal) {
+      query.isDeal = true;
+      query.dealExpiresAt = { $gt: new Date() }; // Only active deals
+    }
+
+    const skip = (page - 1) * limit;
+
+    console.log('Query:', JSON.stringify(query)); // Debug log
+    console.log('Skip:', skip, 'Limit:', limit); // Debug log
+
+    const [products, total] = await Promise.all([
+      this.productModel
+        .find(query)
+        .populate('categoryId', 'name slug imageUrl')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      this.productModel.countDocuments(query),
+    ]);
+
+    console.log('Found products:', products.length); // Debug log
+
+    return {
+      products,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    };
   }
-
-  const skip = (page - 1) * limit;
-
-  console.log('Query:', JSON.stringify(query)); // Debug log
-  console.log('Skip:', skip, 'Limit:', limit); // Debug log
-
-  const [products, total] = await Promise.all([
-    this.productModel
-      .find(query)
-      .populate('categoryId', 'name slug imageUrl')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .exec(),
-    this.productModel.countDocuments(query),
-  ]);
-
-  console.log('Found products:', products.length); // Debug log
-
-  return {
-    products,
-    total,
-    page,
-    totalPages: Math.ceil(total / limit),
-  };
-}
 
   async findOne(id: string): Promise<Product> {
     const product = await this.productModel
@@ -169,7 +177,7 @@ export class ProductsService {
     return updatedProduct;
   }
 
-    async findDealProducts({
+  async findDealProducts({
     page = 1,
     limit = 10,
   }: {
@@ -219,41 +227,41 @@ export class ProductsService {
       .exec();
   }
 
-// products.service.ts - Add this method
-async getSearchSuggestions(query: string, limit: number = 8): Promise<any[]> {
-  if (!query || query.length < 2) {
-    return [];
-  }
+  // products.service.ts - Add this method
+  async getSearchSuggestions(query: string, limit: number = 8): Promise<any[]> {
+    if (!query || query.length < 2) {
+      return [];
+    }
 
-  try {
-    const products = await this.productModel
-      .find({
-        isActive: true,
-        $or: [
-          { title: { $regex: query, $options: 'i' } },
-          { brand: { $regex: query, $options: 'i' } },
-          { description: { $regex: query, $options: 'i' } },
-        ],
-      })
-      .select('title brand images priceCents categoryId')
-      .populate('categoryId', 'name')
-      .limit(limit)
-      .exec();
+    try {
+      const products = await this.productModel
+        .find({
+          isActive: true,
+          $or: [
+            { title: { $regex: query, $options: 'i' } },
+            { brand: { $regex: query, $options: 'i' } },
+            { description: { $regex: query, $options: 'i' } },
+          ],
+        })
+        .select('title brand images priceCents categoryId')
+        .populate('categoryId', 'name')
+        .limit(limit)
+        .exec();
 
-    return products.map(product => ({
-      type: 'product',
-      id: product._id,
-      name: product.title,
-      image: product.images[0]?.url,
-      category: (product.categoryId as any)?.name,
-      priceCents: product.priceCents,
-      brand: product.brand,
-    }));
-  } catch (error) {
-    console.error('Error fetching search suggestions:', error);
-    return [];
+      return products.map(product => ({
+        type: 'product',
+        id: product._id,
+        name: product.title,
+        image: product.images[0]?.url,
+        category: (product.categoryId as any)?.name,
+        priceCents: product.priceCents,
+        brand: product.brand,
+      }));
+    } catch (error) {
+      console.error('Error fetching search suggestions:', error);
+      return [];
+    }
   }
-}
 
   async remove(id: string): Promise<void> {
     const result = await this.productModel.findByIdAndUpdate(

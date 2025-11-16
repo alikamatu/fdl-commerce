@@ -135,7 +135,7 @@ export const RecommendedProductCard: React.FC<RecommendedProductCardProps> = ({
           <motion.img
             src={mainImage}
             alt={product.images[0]?.alt || product.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
             whileHover={{ scale: 1.08 }}
             transition={{ type: "spring", duration: 0.5, bounce: 0.2 }}
           />

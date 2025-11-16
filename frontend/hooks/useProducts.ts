@@ -12,6 +12,8 @@ interface ProductFilters {
   maxPrice?: number;
   inStock?: boolean;
   brand?: string;
+  isDeal?: boolean;
+  sortBy?: string;
 }
 
 interface ProductsResponse {
@@ -49,6 +51,8 @@ export function useProducts(filters?: ProductFilters) {
       if (filters?.maxPrice) params.append('maxPrice', String(filters.maxPrice));
       if (filters?.search) params.append('q', encodeURIComponent(filters.search));
       if (filters?.inStock !== undefined) params.append('inStock', String(filters.inStock));
+      // Add isDeal parameter
+      if (filters?.isDeal !== undefined) params.append('isDeal', String(filters.isDeal));
 
       console.log('Fetching products with params:', params.toString());
 
@@ -90,6 +94,7 @@ export function useProducts(filters?: ProductFilters) {
     filters?.minPrice,
     filters?.maxPrice,
     filters?.inStock,
+    filters?.isDeal, // Add this dependency
   ]);
 
   return {

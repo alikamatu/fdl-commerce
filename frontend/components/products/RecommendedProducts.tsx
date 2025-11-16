@@ -83,7 +83,7 @@ export const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
                 {title}
               </h2>
               <p className="text-foreground/60 text-sm">
-                Curated selection of top-performing laptops
+                Curated selection of latest top-performing laptops
               </p>
             </div>
           </div>
