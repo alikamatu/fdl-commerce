@@ -337,7 +337,7 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                       </div>
 
                       {/* Product Title */}
-                      <h1 className="text-2xl lg:text-3xl font-bold text-foreground leading-tight">
+                      <h1 className="text-md lg:text-xl font-bold text-foreground leading-tight">
                         {product.title}
                       </h1>
 
@@ -349,12 +349,12 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                       {/* Price */}
                       <div className="space-y-2">
                         <div className="flex items-baseline gap-2">
-                          <span className="text-3xl lg:text-4xl font-bold text-foreground">
-                            ₵{price}
+                          <span className="text-xl lg:text-4xl font-bold text-foreground">
+                            GH₵{price}
                           </span>
                           {originalPrice && originalPrice !== price && (
-                            <span className="text-xl text-foreground/40 line-through">
-                              ₵{originalPrice}
+                            <span className="text-md text-foreground/40 line-through">
+                              GH₵{originalPrice}
                             </span>
                           )}
                     {/* Deal Badge */}
