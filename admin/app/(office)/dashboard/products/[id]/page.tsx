@@ -473,7 +473,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                   </div>
                   <div className="text-right">
                     <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-bold text-gray-900">
+                      <span className="text-xl font-bold text-gray-900">
                         {formatPrice(product.priceCents)}
                       </span>
                       {activeDeal && product.originalPriceCents && (
