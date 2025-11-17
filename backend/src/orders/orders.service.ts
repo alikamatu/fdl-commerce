@@ -418,35 +418,80 @@ export class OrdersService {
     return stats[0] || { totalOrders: 0, totalRevenue: 0, averageOrderValue: 0 };
   }
 
-  async updateStatus(id: string, status: string): Promise<Order> {
-    const order = await this.orderModel.findById(id);
+ async updateStatus(id: string, status: string): Promise<Order> {
+  const order = await this.orderModel.findById(id);
 
-    if (!order) {
-      throw new NotFoundException('Order not found');
-    }
-
-    // Validate status
-    const validStatuses = ['pending', 'confirmed', 'processing', 'delivering', 'available', 'delivered', 'cancelled'];
-    if (!validStatuses.includes(status)) {
-      throw new BadRequestException(`Invalid status: ${status}`);
-    }
-
-    console.log(`Updating order ${id} from ${order.status} to ${status}`);
-
-    order.status = status;
-
-    // Update timestamps based on status changes
-    if (status === 'delivering' || (status === 'available' && !order.shippedAt)) {
-      order.shippedAt = new Date();
-    } else if (status === 'delivered' && !order.deliveredAt) {
-      order.deliveredAt = new Date();
-    }
-
-    const updatedOrder = await order.save();
-    console.log('Order updated successfully:', updatedOrder._id);
-    
-    return updatedOrder;
+  if (!order) {
+    throw new NotFoundException('Order not found');
   }
+
+  // Validate status
+  const validStatuses = ['pending', 'confirmed', 'processing', 'delivering', 'available', 'delivered', 'cancelled'];
+  if (!validStatuses.includes(status)) {
+    throw new BadRequestException(`Invalid status: ${status}`);
+  }
+
+  console.log(`Updating order ${id} from ${order.status} to ${status}`);
+
+  // Handle cancellation - restore stock and decrease soldCount
+  if (status === 'cancelled' && order.status !== 'cancelled') {
+    console.log('Order is being cancelled, restoring product stock and soldCount...');
+    
+    for (const item of order.items) {
+      const product = await this.productModel.findById(item.productId);
+      if (product) {
+        console.log(`Updating product ${product.title}: stock +${item.quantity}, soldCount -${item.quantity}`);
+        
+        // Use atomic update to ensure consistency
+        await this.productModel.findByIdAndUpdate(
+          item.productId,
+          {
+            $inc: { 
+              stock: item.quantity,
+              soldCount: -item.quantity
+            }
+          }
+        );
+      }
+    }
+  }
+
+  // Handle status change from cancelled to another status (un-cancellation)
+  if (order.status === 'cancelled' && status !== 'cancelled') {
+    console.log('Order is being un-cancelled, updating product stock and soldCount...');
+    
+    for (const item of order.items) {
+      const product = await this.productModel.findById(item.productId);
+      if (product) {
+        console.log(`Updating product ${product.title}: stock -${item.quantity}, soldCount +${item.quantity}`);
+        
+        await this.productModel.findByIdAndUpdate(
+          item.productId,
+          {
+            $inc: { 
+              stock: -item.quantity,
+              soldCount: item.quantity
+            }
+          }
+        );
+      }
+    }
+  }
+
+  order.status = status;
+
+  // Update timestamps based on status changes
+  if (status === 'delivering' || (status === 'available' && !order.shippedAt)) {
+    order.shippedAt = new Date();
+  } else if (status === 'delivered' && !order.deliveredAt) {
+    order.deliveredAt = new Date();
+  }
+
+  const updatedOrder = await order.save();
+  console.log('Order updated successfully:', updatedOrder._id);
+  
+  return updatedOrder;
+}
 
   async updatePaymentMethod(id: string, paymentMethod: string): Promise<Order> {
     const order = await this.orderModel.findById(id);
@@ -474,7 +519,6 @@ export class OrdersService {
 async cancelOrder(id: string, userId?: string, isAdmin: boolean = false): Promise<Order> {
   const query: any = { _id: id };
   
-  // Only filter by userId if NOT admin
   if (!isAdmin && userId) {
     query.userId = new Types.ObjectId(userId);
   }
@@ -485,52 +529,24 @@ async cancelOrder(id: string, userId?: string, isAdmin: boolean = false): Promis
     throw new NotFoundException('Order not found');
   }
 
-  // Check if order can be cancelled (only pending or confirmed orders)
   if (!['pending', 'confirmed'].includes(order.status)) {
     throw new BadRequestException(`Cannot cancel order with status: ${order.status}`);
   }
 
-  console.log(`Cancelling order ${id}, restoring stock for ${order.items.length} items`);
-
-  // Restore product stock and decrement soldCount
-  const session = await this.orderModel.db.startSession();
-  session.startTransaction();
-
-  try {
-    for (const item of order.items) {
-      console.log(`Processing item: ${item.productId}, quantity: ${item.quantity}`);
-      
-      const product = await this.productModel.findById(item.productId);
-      
-      if (!product) {
-        console.log(`Product ${item.productId} not found, skipping`);
-        continue;
+  // Use atomic updates for products
+  for (const item of order.items) {
+    await this.productModel.findByIdAndUpdate(
+      item.productId,
+      {
+        $inc: { 
+          stock: item.quantity,
+          soldCount: -item.quantity
+        }
       }
-
-      console.log(`Before update - Product: ${product.title}, Stock: ${product.stock}, SoldCount: ${product.soldCount}`);
-      
-      product.stock += item.quantity;
-      product.soldCount = Math.max(0, product.soldCount - item.quantity);
-      
-      console.log(`After update - Product: ${product.title}, Stock: ${product.stock}, SoldCount: ${product.soldCount}`);
-      
-      await product.save({ session });
-      console.log(`Product ${product.title} saved successfully`);
-    }
-
-    order.status = 'cancelled';
-    const updatedOrder = await order.save({ session });
-
-    await session.commitTransaction();
-    console.log('Transaction committed successfully');
-    
-    return updatedOrder;
-  } catch (error) {
-    await session.abortTransaction();
-    console.error('Error in cancelOrder transaction:', error);
-    throw error;
-  } finally {
-    session.endSession();
+    );
   }
+
+  order.status = 'cancelled';
+  return order.save();
 }
 }
