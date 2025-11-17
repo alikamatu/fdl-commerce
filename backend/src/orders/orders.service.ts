@@ -490,28 +490,44 @@ async cancelOrder(id: string, userId?: string, isAdmin: boolean = false): Promis
     throw new BadRequestException(`Cannot cancel order with status: ${order.status}`);
   }
 
+  console.log(`Cancelling order ${id}, restoring stock for ${order.items.length} items`);
+
   // Restore product stock and decrement soldCount
   const session = await this.orderModel.db.startSession();
   session.startTransaction();
 
   try {
     for (const item of order.items) {
+      console.log(`Processing item: ${item.productId}, quantity: ${item.quantity}`);
+      
       const product = await this.productModel.findById(item.productId);
-      if (product) {
-        product.stock += item.quantity;
-        // Properly decrement soldCount, ensuring it doesn't go below 0
-        product.soldCount = Math.max(0, product.soldCount - item.quantity);
-        await product.save({ session });
+      
+      if (!product) {
+        console.log(`Product ${item.productId} not found, skipping`);
+        continue;
       }
+
+      console.log(`Before update - Product: ${product.title}, Stock: ${product.stock}, SoldCount: ${product.soldCount}`);
+      
+      product.stock += item.quantity;
+      product.soldCount = Math.max(0, product.soldCount - item.quantity);
+      
+      console.log(`After update - Product: ${product.title}, Stock: ${product.stock}, SoldCount: ${product.soldCount}`);
+      
+      await product.save({ session });
+      console.log(`Product ${product.title} saved successfully`);
     }
 
     order.status = 'cancelled';
     const updatedOrder = await order.save({ session });
 
     await session.commitTransaction();
+    console.log('Transaction committed successfully');
+    
     return updatedOrder;
   } catch (error) {
     await session.abortTransaction();
+    console.error('Error in cancelOrder transaction:', error);
     throw error;
   } finally {
     session.endSession();
