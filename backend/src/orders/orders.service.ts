@@ -471,49 +471,50 @@ export class OrdersService {
     return updatedOrder;
   }
 
-  async cancelOrder(id: string, userId?: string, isAdmin: boolean = false): Promise<Order> {
-    const query: any = { _id: id };
-    
-    // Only filter by userId if NOT admin
-    if (!isAdmin && userId) {
-      query.userId = new Types.ObjectId(userId);
-    }
-
-    const order = await this.orderModel.findOne(query);
-
-    if (!order) {
-      throw new NotFoundException('Order not found');
-    }
-
-    // Check if order can be cancelled (only pending or confirmed orders)
-    if (!['pending', 'confirmed'].includes(order.status)) {
-      throw new BadRequestException(`Cannot cancel order with status: ${order.status}`);
-    }
-
-    // Restore product stock
-    const session = await this.orderModel.db.startSession();
-    session.startTransaction();
-
-    try {
-      for (const item of order.items) {
-        const product = await this.productModel.findById(item.productId);
-        if (product) {
-          product.stock += item.quantity;
-          product.soldCount = Math.max(0, product.soldCount - item.quantity);
-          await product.save({ session });
-        }
-      }
-
-      order.status = 'cancelled';
-      const updatedOrder = await order.save({ session });
-
-      await session.commitTransaction();
-      return updatedOrder;
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      session.endSession();
-    }
+async cancelOrder(id: string, userId?: string, isAdmin: boolean = false): Promise<Order> {
+  const query: any = { _id: id };
+  
+  // Only filter by userId if NOT admin
+  if (!isAdmin && userId) {
+    query.userId = new Types.ObjectId(userId);
   }
+
+  const order = await this.orderModel.findOne(query);
+
+  if (!order) {
+    throw new NotFoundException('Order not found');
+  }
+
+  // Check if order can be cancelled (only pending or confirmed orders)
+  if (!['pending', 'confirmed'].includes(order.status)) {
+    throw new BadRequestException(`Cannot cancel order with status: ${order.status}`);
+  }
+
+  // Restore product stock and decrement soldCount
+  const session = await this.orderModel.db.startSession();
+  session.startTransaction();
+
+  try {
+    for (const item of order.items) {
+      const product = await this.productModel.findById(item.productId);
+      if (product) {
+        product.stock += item.quantity;
+        // Properly decrement soldCount, ensuring it doesn't go below 0
+        product.soldCount = Math.max(0, product.soldCount - item.quantity);
+        await product.save({ session });
+      }
+    }
+
+    order.status = 'cancelled';
+    const updatedOrder = await order.save({ session });
+
+    await session.commitTransaction();
+    return updatedOrder;
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
+  }
+}
 }

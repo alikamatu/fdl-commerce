@@ -82,7 +82,15 @@ reviewCount: number;
   @Prop({ default: null })
   dealExpiresAt: Date;
 
-  @Prop({ default: 0 })
+  @Prop({ 
+    default: 0,
+    validate: {
+      validator: function(v: number) {
+        return v >= 0;
+      },
+      message: 'soldCount cannot be negative'
+    }
+  })
   soldCount: number;
 }
 
