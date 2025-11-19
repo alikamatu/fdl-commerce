@@ -57,6 +57,22 @@ export class ProductsService {
   } = {}) {
     const query: any = { isActive: true };
 
+      query.$or = [
+    { isDeal: false },
+    { 
+      isDeal: true,
+      dealExpiresAt: { $gt: new Date() }
+    },
+    { 
+      isDeal: true,
+      dealExpiresAt: null
+    },
+    { 
+      isDeal: true,
+      dealExpiresAt: { $exists: false }
+    }
+  ];
+
     if (category) {
       // Try both ObjectId and string comparison
       query.$or = [
@@ -193,9 +209,15 @@ export class ProductsService {
       if (!category) {
         throw new NotFoundException('Category not found');
       }
-    }
-
-    const updatedProduct = await this.productModel
+  }
+  
+  if (updateProductDto.isDeal === false) {
+    updateProductDto.originalPriceCents = undefined;
+    updateProductDto.discountPercent = 0;
+    updateProductDto.dealExpiresAt = undefined;
+  }
+  
+  const updatedProduct = await this.productModel
       .findByIdAndUpdate(id, updateProductDto, { new: true })
       .populate('categoryId', 'name slug')
       .exec();

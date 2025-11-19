@@ -350,13 +350,16 @@ export default function ProductEditPage() {
           position: index,
         })),
         specifications: specifications.filter(spec => spec.key && spec.value),
-        isDeal: data.isDeal,
-        ...(data.isDeal && {
-          originalPriceCents: data.originalPrice ? Math.round(parseFloat(data.originalPrice) * 100) : undefined,
-          discountPercent: data.discountPercent ? parseFloat(data.discountPercent) : undefined,
-          dealExpiresAt: data.dealExpiresAt ? new Date(data.dealExpiresAt) : undefined,
-        }),
-      };
+       ...(data.isDeal ? {
+      originalPriceCents: data.originalPrice ? Math.round(parseFloat(data.originalPrice) * 100) : undefined,
+      discountPercent: data.discountPercent ? parseFloat(data.discountPercent) : undefined,
+      dealExpiresAt: data.dealExpiresAt ? new Date(data.dealExpiresAt) : undefined,
+    } : {
+      originalPriceCents: null,
+      discountPercent: 0,
+      dealExpiresAt: null,
+    }),
+  };
 
       const token = getAuthToken();
 
