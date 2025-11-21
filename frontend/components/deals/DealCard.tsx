@@ -205,10 +205,10 @@ export const DealCard: React.FC<DealCardProps> = ({
 
           {/* Stock Progress Bar */}
           <div className="mb-5">
-            <div className="flex justify-between text-xs text-gray-600 mb-2">
+            {/* <div className="flex justify-between text-xs text-gray-600 mb-2">
               <span>Sold: {product.soldCount || 0}</span>
               <span>{product.stock} left</span>
-            </div>
+            </div> */}
             <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
               <motion.div 
                 className="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full"

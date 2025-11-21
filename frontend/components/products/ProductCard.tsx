@@ -211,7 +211,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </div>
 
           {/* Stock Progress Bar for Hot Deals */}
-          {product.isDeal && product.stock > 0 && (
+          {/* {product.isDeal && product.stock > 0 && (
             <div className="mb-4">
               <div className="flex justify-between text-xs text-foreground/60 mb-1">
                 <span>Sold: {product.soldCount || 0}</span>
@@ -226,7 +226,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 />
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Action Buttons */}
           <div className="flex gap-2 mt-auto">

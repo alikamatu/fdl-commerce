@@ -19,8 +19,8 @@ const defaultSlides: HeroSlide[] = [
   {
     id: '1',
     image: '/images/253832.jpg',
-    title: 'Build an Elite Collection',
-    description: 'Choose your next adventure from thousands of finds',
+    title: 'Cash on Delivery / Pickup @ UPSA Campus',
+    description: 'Free Delivery',
     ctaText: 'Shop Now',
     ctaLink: '/products',
   },
