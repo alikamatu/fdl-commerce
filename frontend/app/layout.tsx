@@ -7,6 +7,7 @@ import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { Footer } from "@/components/home/Footer";
+import Script from "next/script";
 
 const fontPoppins = Poppins({
   variable: "--font-poppins",
@@ -55,6 +56,10 @@ export default function RootLayout({
             <WishlistProvider>
               <div className="overflow-x-hidden">
                 <Navbar />
+                      <Script
+        src="https://js.paystack.co/v1/inline.js"
+        strategy="lazyOnload"
+      />
                 <main>{children}</main>
                 <Footer />
               </div>

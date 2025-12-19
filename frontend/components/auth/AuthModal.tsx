@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Mail, Lock, User, Eye, EyeOff, ArrowLeft, CheckCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import GoogleLoginButton from "./GoogleLoginButton";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -490,11 +491,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
       )}
 
+<div className="w-full grid grid-cols-1 gap-2 items-center justify-center">
       {/* Submit Button */}
       <button
         type="submit"
         disabled={isLoading || authLoading || (currentView === 'register' && !acceptedTerms)}
-        className="w-full bg-foreground text-background py-3 px-4 rounded-lg font-medium hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+        className="w-full bg-foreground text-background py-2 px-4 rounded-lg font-medium hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
       >
         {(isLoading || authLoading) && (
           <div className="w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin" />
@@ -504,6 +506,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         {currentView === 'forgot-password' && 'Send Reset Instructions'}
         {currentView === 'reset-password' && 'Reset Password'}
       </button>
+
+      <div className="w-full flex items-center justify-center">
+        <GoogleLoginButton
+          onSuccess={(data) => {
+            console.log('Google login success:', data);
+            onClose();
+          }}
+          onError={(error) => {
+            console.error('Google login error:', error);
+            setErrors({ submit: error.message || 'Google login failed' });
+          }}
+        />
+      </div>
+    </div>
+
 
       {/* Additional Links */}
       <div className="mt-6 text-center text-sm text-foreground/60 space-y-3">

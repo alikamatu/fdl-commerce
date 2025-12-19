@@ -100,19 +100,20 @@ export class Order {
   })
   deliveryMethod: string;
 
-  @Prop({ 
-    required: true, 
-    enum: ['pending', 'confirmed', 'processing', 'delivering', 'available', 'delivered', 'cancelled'],
-    default: 'confirmed'
-  })
-  status: string;
+@Prop({ 
+  required: true, 
+  enum: ['pending_payment', 'pending', 'confirmed', 'processing', 'delivering', 'available', 'delivered', 'cancelled'],
+  default: 'confirmed'
+})
+status: string;
 
   @Prop({ 
-    required: true,
-    enum: ['cash', 'bank_transfer', 'mobile_money', 'cash_or_momo'],
-    default: 'mobile_money'
-  })
-  paymentMethod: string;
+  required: true,
+  enum: ['cash', 'bank_transfer', 'mobile_money', 'cash_or_momo', 'paystack', 'cash_on_delivery', 'cash_on_pickup'],
+  default: 'mobile_money'
+})
+paymentMethod: string;
+
 
   @Prop({ default: false })
   paymentCompleted: boolean;

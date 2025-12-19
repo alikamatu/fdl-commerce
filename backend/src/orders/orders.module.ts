@@ -6,6 +6,7 @@ import { Order, OrderSchema } from '../schemas/order.schema';
 import { Product, ProductSchema } from '../schemas/product.schema';
 import { AuthModule } from 'src/auth/auth.module';
 import { EmailModule } from 'src/email/email.module';
+import { PaystackService } from 'src/paystack/paystack.service';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { EmailModule } from 'src/email/email.module';
     EmailModule
   ],
   controllers: [OrdersController],
-  providers: [OrdersService],
+  providers: [OrdersService, PaystackService],
   exports: [OrdersService],
 })
 export class OrdersModule {}

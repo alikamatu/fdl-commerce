@@ -29,3 +29,14 @@ export interface CartContextType {
   getItemCount: () => number;
   getTotalPrice: () => number;
 }
+
+// Payment related types
+export type PaymentMethod = 'paystack' | 'cash_on_delivery' | 'cash_on_pickup';
+export type DeliveryMethod = 'delivery' | 'pickup';
+
+export interface PaymentDetails {
+  method: PaymentMethod;
+  reference?: string;
+  status?: 'pending' | 'completed' | 'failed';
+  metadata?: Record<string, any>;
+}

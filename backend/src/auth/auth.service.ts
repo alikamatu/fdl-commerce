@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, ConflictException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, BadRequestException, ForbiddenException, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
@@ -8,14 +8,192 @@ import { User, UserDocument } from '../schemas/user.schema';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { EmailService } from '../email/email.service';
+import { OAuth2Client } from 'google-auth-library';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
-    private jwtService: JwtService,
-    private emailService: EmailService,
-  ) {}
+constructor(
+  @InjectModel(User.name) private userModel: Model<UserDocument>,
+  private jwtService: JwtService,
+  private emailService: EmailService,
+  @Inject('GOOGLE_OAUTH2_CLIENT') private googleClient: OAuth2Client,
+) {
+  this.googleClient = new OAuth2Client(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+  );
+}
+
+async validateGoogleUser(googleUser: {
+  googleId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  picture?: string;
+}): Promise<any> {
+  try {
+    console.log('Validating Google user:', googleUser.email);
+
+    // First, try to find by googleId
+    let user = await this.userModel.findOne({ googleId: googleUser.googleId });
+
+    if (!user) {
+      // Try to find by email (in case user registered with email first)
+      user = await this.userModel.findOne({ email: googleUser.email });
+      
+      if (user) {
+        // Link Google account to existing user
+        console.log('Linking Google account to existing user:', user.email);
+        user.googleId = googleUser.googleId;
+        await user.save();
+      } else {
+        // Create displayName from first and last name, or use email
+        const displayName = `${googleUser.firstName} ${googleUser.lastName}`.trim() || 
+                          googleUser.email.split('@')[0];
+        
+        console.log('Creating new Google OAuth user:', googleUser.email);
+        
+        user = await this.userModel.create({
+          googleId: googleUser.googleId,
+          email: googleUser.email,
+          displayName: displayName,
+          firstName: googleUser.firstName,
+          lastName: googleUser.lastName,
+          role: 'user',
+          isEmailVerified: true,
+          isActive: true,
+          // No passwordHash for Google users
+        });
+      }
+    }
+
+    // Generate JWT token
+    const token = this.jwtService.sign({
+      userId: user._id,
+      email: user.email,
+      role: user.role,
+      isEmailVerified: user.isEmailVerified,
+    });
+
+    // Return user without sensitive data
+    const userObj = user.toObject();
+    delete userObj.passwordHash;
+    if (userObj.resetPasswordToken) delete userObj.resetPasswordToken;
+    if (userObj.emailVerificationToken) delete userObj.emailVerificationToken;
+
+    return { user: userObj, token };
+  } catch (error) {
+    console.error('Google user validation error:', error);
+    throw error;
+  }
+}
+
+async linkGoogleAccount(userId: string, googleId: string): Promise<void> {
+  const user = await this.userModel.findById(userId);
+  if (!user) {
+    throw new BadRequestException('User not found');
+  }
+
+  // Check if another user already linked this Google account
+  const existingUser = await this.userModel.findOne({ googleId });
+  if (existingUser && existingUser.id.toString() !== userId) {
+    throw new ConflictException('This Google account is already linked to another user');
+  }
+
+  user.googleId = googleId;
+  await user.save();
+}
+
+async unlinkGoogleAccount(userId: string): Promise<void> {
+  const user = await this.userModel.findById(userId);
+  if (!user) {
+    throw new BadRequestException('User not found');
+  }
+
+  user.googleId = undefined;
+  await user.save();
+}
+
+async googleLogin(idToken: string): Promise<{ user: any; token: string }> {
+  try {
+    console.log('Google login attempt with ID token');
+    
+    // Verify the ID token
+    const ticket = await this.googleClient.verifyIdToken({
+      idToken: idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    
+    if (!payload) {
+      console.error('Google token verification failed: No payload');
+      throw new UnauthorizedException('Invalid Google token');
+    }
+
+    console.log('Google token verified:', {
+      email: payload.email,
+      sub: payload.sub,
+      name: payload.name,
+    });
+
+    const googleUser = {
+      googleId: payload.sub,
+      email: payload.email!,
+      firstName: payload.given_name || '',
+      lastName: payload.family_name || '',
+      picture: payload.picture,
+    };
+
+    // Find or create user
+    let user = await this.userModel.findOne({ googleId: googleUser.googleId });
+
+    if (!user) {
+      // Check if user exists with email
+      user = await this.userModel.findOne({ email: googleUser.email });
+      
+      if (user) {
+        // Link Google account to existing user
+        user.googleId = googleUser.googleId;
+        await user.save();
+      } else {
+        // Create new user
+        user = await this.userModel.create({
+          googleId: googleUser.googleId,
+          email: googleUser.email,
+          displayName: googleUser.firstName + ' ' + googleUser.lastName,
+          firstName: googleUser.firstName,
+          lastName: googleUser.lastName,
+          role: 'user',
+          isEmailVerified: true,
+          isActive: true,
+        });
+      }
+    }
+
+    // Generate JWT token
+    const token = this.jwtService.sign({
+      userId: user._id,
+      email: user.email,
+      role: user.role,
+      isEmailVerified: user.isEmailVerified,
+    });
+
+    // Return user without sensitive data
+    const userObj = user.toObject();
+    delete userObj.passwordHash;
+
+    console.log('Google login successful for user:', user.email);
+    
+    return { user: userObj, token };
+  } catch (error) {
+    console.error('Google login error details:', error);
+    if (error instanceof UnauthorizedException) {
+      throw error;
+    }
+    throw new UnauthorizedException('Google authentication failed: ' + error.message);
+  }
+}
 
 // In your register method, wrap email sending in try-catch
 async register(registerDto: RegisterDto): Promise<{ user: any; token: string }> {
@@ -71,54 +249,65 @@ async register(registerDto: RegisterDto): Promise<{ user: any; token: string }> 
   return { user: userObj, token };
 }
 
-  async login(loginDto: LoginDto): Promise<{ user: any; token: string }> {
-    const { email, password } = loginDto;
+async login(loginDto: LoginDto): Promise<{ user: any; token: string }> {
+  const { email, password } = loginDto;
 
-    // Check if account is locked
-    const lockedUser = await this.userModel.findOne({
-      email,
-      lockUntil: { $gt: new Date() }
-    });
-    if (lockedUser) {
-      throw new ForbiddenException('Account is temporarily locked due to too many failed attempts');
-    }
-
-    // Find user
-    const user = await this.userModel.findOne({ email, isActive: true });
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    // Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-    if (!isPasswordValid) {
-      // Increment login attempts
-      await this.incrementLoginAttempts(user);
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    // Reset login attempts on successful login
-    await this.resetLoginAttempts(user);
-
-    // Check if email is verified
-    if (!user.isEmailVerified) {
-      throw new ForbiddenException('Please verify your email address before logging in');
-    }
-
-    // Generate token
-    const token = this.jwtService.sign({ 
-      userId: user._id, 
-      email: user.email,
-      role: user.role,
-      isEmailVerified: user.isEmailVerified
-    });
-
-    // Return user without password
-    const userObj = user.toObject();
-    delete userObj.passwordHash;
-
-    return { user: userObj, token };
+  // Check if account is locked
+  const lockedUser = await this.userModel.findOne({
+    email,
+    lockUntil: { $gt: new Date() }
+  });
+  if (lockedUser) {
+    throw new ForbiddenException('Account is temporarily locked due to too many failed attempts');
   }
+
+  // Find user (including Google OAuth users)
+  const user = await this.userModel.findOne({ email, isActive: true });
+  if (!user) {
+    throw new UnauthorizedException('Invalid credentials');
+  }
+
+  // Check if this is a Google OAuth user (has googleId but no password)
+  if (user.googleId && (!user.passwordHash || user.passwordHash === '')) {
+    throw new ForbiddenException('Please use Google to sign in with this account');
+  }
+
+  // Verify password (skip for Google users)
+  if (!user.passwordHash) {
+    throw new UnauthorizedException('Invalid credentials');
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+  if (!isPasswordValid) {
+    // Increment login attempts
+    await this.incrementLoginAttempts(user);
+    throw new UnauthorizedException('Invalid credentials');
+  }
+
+  // Reset login attempts on successful login
+  await this.resetLoginAttempts(user);
+
+  // Check if email is verified
+  if (!user.isEmailVerified) {
+    throw new ForbiddenException('Please verify your email address before logging in');
+  }
+
+  // Generate token
+  const token = this.jwtService.sign({ 
+    userId: user._id, 
+    email: user.email,
+    role: user.role,
+    isEmailVerified: user.isEmailVerified
+  });
+
+  // Return user without password
+  const userObj = user.toObject();
+  delete userObj.passwordHash;
+  if (userObj.resetPasswordToken) delete userObj.resetPasswordToken;
+  if (userObj.emailVerificationToken) delete userObj.emailVerificationToken;
+
+  return { user: userObj, token };
+}
 
   async verifyEmail(token: string): Promise<{ message: string }> {
     const user = await this.userModel.findOne({
@@ -164,26 +353,6 @@ async register(registerDto: RegisterDto): Promise<{ user: any; token: string }> 
     return { message: 'Verification email sent successfully' };
   }
 
-  async forgotPassword(email: string): Promise<{ message: string }> {
-    const user = await this.userModel.findOne({ email, isActive: true, isEmailVerified: true });
-    if (!user) {
-      // Don't reveal whether email exists or not
-      return { message: 'If the email exists, a reset link has been sent' };
-    }
-
-    // Generate reset token
-    const resetToken = crypto.randomBytes(32).toString('hex');
-    const resetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-
-    user.resetPasswordToken = resetToken;
-    user.resetPasswordExpires = resetExpires;
-    await user.save();
-
-    await this.emailService.sendPasswordResetEmail(email, resetToken, user.displayName);
-
-    return { message: 'If the email exists, a reset link has been sent' };
-  }
-
   async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
     const user = await this.userModel.findOne({
       resetPasswordToken: token,
@@ -211,25 +380,63 @@ async register(registerDto: RegisterDto): Promise<{ user: any; token: string }> 
     return { message: 'Password reset successfully' };
   }
 
-  async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<{ message: string }> {
-    const user = await this.userModel.findById(userId);
-    if (!user) {
-      throw new BadRequestException('User not found');
-    }
+  async forgotPassword(email: string): Promise<{ message: string }> {
+  const user = await this.userModel.findOne({ 
+    email, 
+    isActive: true, 
+    isEmailVerified: true 
+  });
+  
+  if (!user) {
+    // Don't reveal whether email exists or not
+    return { message: 'If the email exists, a reset link has been sent' };
+  }
 
-    // Verify current password
+  // Check if it's a Google OAuth user
+  if (user.googleId && (!user.passwordHash || user.passwordHash === '')) {
+    throw new BadRequestException('Google OAuth users cannot reset password. Please use Google to sign in.');
+  }
+
+  // Generate reset token
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  const resetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+  user.resetPasswordToken = resetToken;
+  user.resetPasswordExpires = resetExpires;
+  await user.save();
+
+  await this.emailService.sendPasswordResetEmail(email, resetToken, user.displayName);
+
+  return { message: 'If the email exists, a reset link has been sent' };
+}
+
+async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<{ message: string }> {
+  const user = await this.userModel.findById(userId);
+  if (!user) {
+    throw new BadRequestException('User not found');
+  }
+
+  // Check if it's a Google OAuth user
+  if (user.googleId && (!user.passwordHash || user.passwordHash === '')) {
+    // Allow Google users to set a password for the first time
+    if (currentPassword !== '') {
+      throw new BadRequestException('Google OAuth users cannot change password. Please set a new password.');
+    }
+  } else {
+    // For regular users, verify current password
     const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.passwordHash);
     if (!isCurrentPasswordValid) {
       throw new UnauthorizedException('Current password is incorrect');
     }
-
-    // Hash new password
-    const saltRounds = 12;
-    user.passwordHash = await bcrypt.hash(newPassword, saltRounds);
-    await user.save();
-
-    return { message: 'Password changed successfully' };
   }
+
+  // Hash new password
+  const saltRounds = 12;
+  user.passwordHash = await bcrypt.hash(newPassword, saltRounds);
+  await user.save();
+
+  return { message: 'Password changed successfully' };
+}
 
   private async incrementLoginAttempts(user: UserDocument) {
     const MAX_LOGIN_ATTEMPTS = 5;

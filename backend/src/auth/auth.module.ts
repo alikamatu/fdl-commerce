@@ -8,6 +8,8 @@ import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 import { User, UserSchema } from '../schemas/user.schema';
 import { EmailModule } from '../email/email.module'; // Import EmailModule (not EmailService!)
+import { GoogleOAuth2Provider } from 'src/google/google-oauth2.provider';
+import { GoogleStrategy } from './google.strategy';
 
 @Module({
   imports: [
@@ -24,7 +26,7 @@ import { EmailModule } from '../email/email.module'; // Import EmailModule (not 
     EmailModule, // Module goes in imports
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy], // Services go in providers
+  providers: [AuthService, JwtStrategy, GoogleOAuth2Provider, GoogleStrategy], // Services go in providers
   exports: [JwtStrategy, PassportModule],
 })
 export class AuthModule {}

@@ -8,7 +8,8 @@ export class User {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ required: true })
+  // Remove required: true - Google OAuth users don't have passwords
+  @Prop()
   passwordHash?: string;
 
   @Prop({ required: true })
@@ -27,6 +28,9 @@ export class User {
   emailVerificationToken?: string;
 
   @Prop()
+  googleId?: string;
+
+  @Prop()
   emailVerificationExpires?: Date;
 
   @Prop()
@@ -43,3 +47,5 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.index({ googleId: 1 }, { unique: true, sparse: true });

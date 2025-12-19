@@ -9,6 +9,7 @@ import { FileUploadModule } from './file-upload/file-upload.module';
 import { OrdersModule } from './orders/orders.module';
 import { BlogsModule } from './blog/blogs.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { GoogleStrategy } from './auth/google.strategy';
 
 @Module({
   imports: [
@@ -40,4 +41,5 @@ import { ReviewsModule } from './reviews/reviews.module';
     ReviewsModule
   ],
 })
+
 export class AppModule {}

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
 
 interface ProductsPaginationProps {
   currentPage: number;
@@ -46,7 +46,7 @@ export const ProductsPagination: React.FC<ProductsPaginationProps> = ({
       transition={{ duration: 0.4 }}
       className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8"
     >
-      <div className="text-sm text-foreground/60">
+      {/* <div className="text-sm text-foreground/60">
         Showing {startItem}-{endItem} of {totalItems} products
       </div>
       
@@ -80,7 +80,8 @@ export const ProductsPagination: React.FC<ProductsPaginationProps> = ({
         >
           <ChevronRight size={16} />
         </button>
-      </div>
+      </div> */}
+      <Link href='/products' className='p-2 border border-foreground/20 rounded-md hover:bg-foreground/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors'>View All Products</Link>
     </motion.div>
   );
 };

@@ -22,6 +22,7 @@ interface AuthContextType {
   forgotPassword: (email: string) => Promise<void>;
   resetPassword: (token: string, newPassword: string) => Promise<void>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+  googleLogin: (token: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -108,6 +109,48 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(false);
     }
   };
+
+const googleLogin = async (idToken: string) => {
+  try {
+    setLoading(true);
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/google/login`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: idToken }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Google login failed');
+    }
+
+    const data = await response.json();
+    const userData: User = {
+      id: data.user._id,
+      email: data.user.email,
+      name: data.user.displayName || data.user.firstName + ' ' + data.user.lastName,
+      token: data.token,
+      isEmailVerified: data.user.isEmailVerified || true,
+    };
+
+    setUser(userData);
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('token', data.token);
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Google login error:', error);
+    throw error;
+  } finally {
+    setLoading(false);
+  }
+};
 
   const verifyEmail = async (token: string) => {
     try {
@@ -244,6 +287,7 @@ const resetPassword = async (token: string, newPassword: string) => {
       resendVerification,
       forgotPassword,
       resetPassword,
+      googleLogin,
       changePassword
     }}>
       {children}

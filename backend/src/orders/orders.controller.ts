@@ -7,11 +7,15 @@ import {
   Param, 
   UseGuards, 
   Request,
-  Query
+  UseInterceptors,
+  Req,
+  BadRequestException,
+  Headers
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { RawBodyInterceptor } from './raw-body.interceptor';
 
 @Controller('orders')
 export class OrdersController {
@@ -111,6 +115,105 @@ async sendShippingNotification(
   
   return this.ordersService.sendShippingNotification(id);
 }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/initialize-paystack')
+  async initializePaystackPayment(
+    @Param('id') id: string,
+    @Request() req
+  ) {
+    const order = await this.ordersService.findOne(id, req.user._id, false);
+    
+    if (order.paymentMethod !== 'paystack') {
+      return { 
+        success: false, 
+        message: 'Order payment method is not Paystack' 
+      };
+    }
+
+    if (order.paymentCompleted) {
+      return { 
+        success: false, 
+        message: 'Payment already completed for this order' 
+      };
+    }
+
+    const result = await this.ordersService.initializePaystackPayment(
+      id,
+      order.email,
+      order.totalCents,
+      {
+        userId: req.user._id,
+        userName: req.user.name,
+        deliveryMethod: order.deliveryMethod,
+      }
+    );
+
+    return {
+      success: true,
+      data: {
+        authorizationUrl: result.authorizationUrl,
+        reference: result.reference,
+      },
+    };
+  }
+  @Post('paystack/webhook')
+  @UseInterceptors(RawBodyInterceptor) // You need to create this interceptor to get raw body
+  async handlePaystackWebhook(
+    @Body() body: any,
+    @Headers('x-paystack-signature') signature: string,
+    @Req() request: any
+  ) {
+    // Verify the webhook signature
+    const crypto = require('crypto');
+    const hash = crypto
+      .createHmac('sha512', process.env.PAYSTACK_SECRET_KEY)
+      .update(request.rawBody)
+      .digest('hex');
+
+    if (hash !== signature) {
+      throw new BadRequestException('Invalid webhook signature');
+    }
+
+    const event = body.event;
+    
+    if (event === 'charge.success') {
+      const reference = body.data.reference;
+      
+      // Complete the payment
+      await this.ordersService.completePaystackPayment(reference, undefined, true);
+      
+      return { success: true, message: 'Payment completed successfully' };
+    }
+
+    return { success: true, message: 'Webhook received' };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('paystack/verify')
+  async verifyPaystackPayment(
+    @Body() body: { reference: string },
+    @Request() req
+  ) {
+    try {
+      const order = await this.ordersService.completePaystackPayment(
+        body.reference,
+        req.user._id,
+        req.user.role === 'admin'
+      );
+
+      return {
+        success: true,
+        data: order,
+        message: 'Payment verified and completed successfully',
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || 'Payment verification failed',
+      };
+    }
+  }
 
 @UseGuards(JwtAuthGuard)
 @Patch(':id/payment-method')

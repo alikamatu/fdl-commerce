@@ -24,7 +24,6 @@ export class BlogsService {
       throw new ConflictException('Blog with this title already exists');
     }
 
-    // Calculate reading time (approx 200 words per minute)
     const wordCount = createBlogDto.content.split(/\s+/).length;
     const readingTime = Math.ceil(wordCount / 200);
 

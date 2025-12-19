@@ -6,6 +6,8 @@ import { Product, ProductDocument } from '../schemas/product.schema';
 import { CreateOrderDto } from './dto/create-order.dto';
 import axios from 'axios';
 import { EmailService } from '../email/email.service';
+import { PaystackService } from '../paystack/paystack.service';
+import { PaystackTransaction } from '../paystack/paystack.service';
 
 @Injectable()
 export class OrdersService {
@@ -13,25 +15,33 @@ export class OrdersService {
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
     private readonly emailService: EmailService,
+    private readonly paystackService: PaystackService,
   ) {}
 
   async verifyPaystackPayment(reference: string): Promise<any> {
     try {
-      const response = await axios.get(
-        `https://api.cash_or_momo.co/transaction/verify/${reference}`,
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
-          },
-        }
-      );
+      const verificationResult = await this.paystackService.verifyTransaction(reference);
+      
+      if (!verificationResult.status || verificationResult.data.status !== 'success') {
+        throw new BadRequestException('Payment verification failed or payment not successful');
+      }
 
-      return response.data;
+      return {
+        success: true,
+        data: {
+          amount: verificationResult.data.amount,
+          currency: verificationResult.data.currency,
+          paidAt: verificationResult.data.paid_at,
+          reference: verificationResult.data.reference,
+          channel: verificationResult.data.channel,
+          metadata: verificationResult.data.metadata,
+        },
+      };
     } catch (error) {
+      console.error('Paystack verification error:', error);
       throw new BadRequestException('Payment verification failed');
     }
   }
-
   async findAll(userId?: string, includeAll: boolean = false) {
     let query = {};
     
@@ -45,6 +55,52 @@ export class OrdersService {
       .exec();
 
     return orders;
+  }
+
+    async initializePaystackPayment(
+    orderId: string,
+    email: string,
+    amountCents: number,
+    metadata?: any
+  ): Promise<{ authorizationUrl: string; reference: string }> {
+    const order = await this.orderModel.findById(orderId);
+    
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    if (order.paymentMethod !== 'paystack') {
+      throw new BadRequestException('Order payment method is not Paystack');
+    }
+
+    const reference = this.paystackService.generateReference();
+    
+    // Convert amount to smallest unit (pesewas for GHS)
+    const amountInPesewas = this.paystackService.convertToSmallestUnit(amountCents / 100, 'GHS');
+    
+    const transaction: PaystackTransaction = {
+      reference,
+      amount: amountInPesewas,
+      email,
+      currency: 'GHS',
+      metadata: {
+        orderId: order.id.toString(),
+        orderNumber: order.orderNumber,
+        userId: order.userId?.toString(),
+        ...metadata,
+      },
+    };
+
+    const response = await this.paystackService.initializeTransaction(transaction);
+    
+    // Update order with payment reference
+    order.paymentId = reference;
+    await order.save();
+
+    return {
+      authorizationUrl: response.data.authorization_url,
+      reference: response.data.reference,
+    };
   }
 
   // New method to find orders by userId OR email (includes legacy guest orders)
@@ -247,7 +303,7 @@ export class OrdersService {
     }
   }
 
-  async create(createOrderDto: CreateOrderDto, userId: string): Promise<Order> {
+    async create(createOrderDto: CreateOrderDto, userId: string): Promise<Order> {
     if (!userId) {
       throw new BadRequestException('User authentication required to place order');
     }
@@ -259,6 +315,7 @@ export class OrdersService {
       const orderCount = await this.orderModel.countDocuments();
       const orderNumber = `ORD-${(orderCount + 1).toString().padStart(6, '0')}`;
 
+      // Stock validation and update...
       for (const item of createOrderDto.items) {
         const product = await this.productModel.findById(item.productId);
         
@@ -277,6 +334,23 @@ export class OrdersService {
         await product.save({ session });
       }
 
+      // In the create method, update this section:
+      let initialStatus = 'confirmed';
+      let paymentCompleted = false;
+
+      if (createOrderDto.paymentMethod === 'paystack') {
+        paymentCompleted = false;
+        initialStatus = 'pending_payment'; // Order awaits payment
+      } else if (createOrderDto.paymentMethod === 'cash_on_delivery' || 
+                createOrderDto.paymentMethod === 'cash_on_pickup') {
+        paymentCompleted = false;
+        initialStatus = 'confirmed'; // Confirmed but payment pending on delivery/pickup
+      } else {
+        // For other payment methods (cash, mobile_money, etc.)
+        paymentCompleted = false;
+        initialStatus = 'confirmed';
+      }
+
       const orderData: any = {
         orderNumber,
         userId: new Types.ObjectId(userId),
@@ -288,12 +362,10 @@ export class OrdersService {
         shippingCents: createOrderDto.shippingCents,
         taxCents: createOrderDto.taxCents || 0,
         totalCents: createOrderDto.totalCents,
-        paymentMethod: createOrderDto.paymentMethod || 'cash',
-        paymentCompleted: createOrderDto.paymentMethod === 'cash',
-        status: createOrderDto.paymentMethod === 'cash' ? 'confirmed' : 'confirmed',
+        paymentMethod: createOrderDto.paymentMethod,
+        paymentCompleted,
+        status: initialStatus,
       };
-
-      console.log('Creating order with deliveryMethod:', createOrderDto.deliveryMethod);
 
       const order = new this.orderModel(orderData);
       await order.save({ session });
@@ -307,40 +379,9 @@ export class OrdersService {
       
       console.log('Order created successfully:', savedOrder._id, 'for user:', userId);
 
-      // // Send order confirmation email to customer
-      // try {
-      //   const fullName = `${savedOrder.shippingAddress.firstName} ${savedOrder.shippingAddress.lastName}`;
+      // Send notifications...
+      // (Keep existing email notification code)
 
-      //   await this.emailService.sendOrderConfirmationEmail(
-      //     savedOrder.email,
-      //     fullName,
-      //     savedOrder.orderNumber,
-      //     {
-      //       items: savedOrder.items,
-      //       subtotalCents: savedOrder.subtotalCents,
-      //       shippingCents: savedOrder.shippingCents,
-      //       taxCents: savedOrder.taxCents,
-      //       totalCents: savedOrder.totalCents,
-      //       paymentMethod: savedOrder.paymentMethod,
-      //       deliveryMethod: savedOrder.deliveryMethod,
-      //       shippingAddress: savedOrder.shippingAddress,
-      //       email: savedOrder.email
-      //     }
-      //   );
-      // } catch (emailError) {
-      //   console.error('Failed to send order confirmation email:', emailError);
-      //   // Don't throw error - email failure shouldn't break order creation
-      // }
-
-      // Send new order notification to admin
-      try {
-        const adminEmail = process.env.ADMIN_EMAIL || 'admin@forbesdigitallifeline.com';
-        await this.emailService.sendNewOrderNotificationToAdmin(savedOrder, adminEmail);
-      } catch (adminEmailError) {
-        console.error('Failed to send admin notification:', adminEmailError);
-        // Don't throw error - admin notification failure shouldn't break order creation
-      }
-      
       return savedOrder;
     } catch (error) {
       await session.abortTransaction();
@@ -349,6 +390,84 @@ export class OrdersService {
       session.endSession();
     }
   }
+
+  async completePaystackPayment(
+  reference: string,
+  userId?: string,
+  isAdmin: boolean = false
+): Promise<Order> {
+  try {
+    // Verify payment with Paystack
+    const verificationResult = await this.paystackService.verifyTransaction(reference);
+
+    if (!verificationResult.status || verificationResult.data.status !== 'success') {
+      throw new BadRequestException('Payment verification failed or payment not successful');
+    }
+
+    // Extract orderId from metadata
+    const orderId = verificationResult.data.metadata?.orderId;
+    
+    if (!orderId) {
+      throw new BadRequestException('Order ID not found in payment metadata');
+    }
+
+    // Find order by ID (not by paymentId reference)
+    const query: any = { _id: orderId };
+    if (!isAdmin && userId) {
+      query.userId = new Types.ObjectId(userId);
+    }
+
+    const order = await this.orderModel.findOne(query);
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    // Verify amount matches (Paystack returns amount in pesewas)
+    const expectedAmount = Math.round(order.totalCents); // Already in pesewas
+    const paidAmount = verificationResult.data.amount;
+
+    if (Math.abs(paidAmount - expectedAmount) > 1) { // Allow 1 pesewa difference for rounding
+      console.error('Amount mismatch:', { expected: expectedAmount, paid: paidAmount });
+      throw new BadRequestException('Payment amount mismatch');
+    }
+
+    // Update order
+    order.paymentCompleted = true;
+    order.status = 'confirmed';
+    order.paymentId = reference;
+
+    const updatedOrder = await order.save();
+
+    // Send confirmation email (optional)
+    try {
+      const fullName = `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`;
+      await this.emailService.sendOrderConfirmationEmail(
+        order.email,
+        fullName,
+        order.orderNumber,
+        {
+          items: order.items,
+          subtotalCents: order.subtotalCents,
+          shippingCents: order.shippingCents,
+          taxCents: order.taxCents,
+          totalCents: order.totalCents,
+          paymentMethod: 'paystack',
+          deliveryMethod: order.deliveryMethod,
+          shippingAddress: order.shippingAddress,
+        }
+      );
+    } catch (emailError) {
+      console.error('Failed to send confirmation email:', emailError);
+      // Don't throw - payment is complete even if email fails
+    }
+
+    return updatedOrder;
+  } catch (error) {
+    console.error('Paystack payment completion error:', error);
+    throw error;
+  }
+}
 
   async findOne(id: string, userId?: string, isAdmin: boolean = false) {
     const query: any = { _id: id };

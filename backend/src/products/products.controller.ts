@@ -185,7 +185,7 @@ export class ProductsController {
   ) {
     const suggestions = await this.productsService.getSearchSuggestions(
       query,
-      limit ? parseInt(limit) : 8,
+      limit ? parseInt(limit) : 100,
     );
 
     return {

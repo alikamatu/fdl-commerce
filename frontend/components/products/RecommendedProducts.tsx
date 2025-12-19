@@ -93,7 +93,7 @@ export const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
               href={`/products?category=${category}`}
               className="hidden sm:flex items-center gap-2 px-4 py-2 border border-foreground/20 rounded-lg font-medium hover:bg-foreground/5 transition-colors"
             >
-              View All
+              View All Laptops
               <ArrowRight size={16} />
             </a>
           )}

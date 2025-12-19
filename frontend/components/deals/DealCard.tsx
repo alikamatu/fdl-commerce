@@ -209,7 +209,7 @@ export const DealCard: React.FC<DealCardProps> = ({
               <span>Sold: {product.soldCount || 0}</span>
               <span>{product.stock} left</span>
             </div> */}
-            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+            {/* <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
               <motion.div 
                 className="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full"
                 initial={{ width: 0 }}
@@ -219,7 +219,7 @@ export const DealCard: React.FC<DealCardProps> = ({
             </div>
             <div className="text-xs text-gray-500 mt-1 text-center">
               {stockPercentage > 70 ? 'Almost gone!' : stockPercentage > 40 ? 'Selling fast!' : 'Limited stock'}
-            </div>
+            </div> */}
           </div>
 
           {/* Action Button */}

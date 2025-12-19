@@ -229,7 +229,7 @@ export const RecommendedProductCard: React.FC<RecommendedProductCardProps> = ({
           </div>
 
           {/* Stock Progress for Hot Deals */}
-          {product.isDeal && product.stock > 0 && product.stock < 20 && (
+          {/* {product.isDeal && product.stock > 0 && product.stock < 20 && (
             <div className="mt-2">
               <div className="flex justify-between text-xs text-gray-500 mb-1">
                 <span>Only {product.stock} left</span>
@@ -244,7 +244,7 @@ export const RecommendedProductCard: React.FC<RecommendedProductCardProps> = ({
                 />
               </div>
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Hover Effect Overlay */}

@@ -83,7 +83,7 @@ export const useSearchSuggestions = () => {
   const fallbackSearchSuggestions = useCallback(async (query: string) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/products?q=${encodeURIComponent(query)}&limit=8`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/products?q=${encodeURIComponent(query)}&limit=100`
       );
       
       if (response.ok) {
@@ -122,7 +122,7 @@ export const useSearchSuggestions = () => {
     try {
       // Try the search suggestions endpoint first
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/products/search/suggestions?q=${encodeURIComponent(query)}&limit=8`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/products/search/suggestions?q=${encodeURIComponent(query)}&limit=100`
       );
       
       if (response.ok) {
