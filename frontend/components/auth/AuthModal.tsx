@@ -314,7 +314,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       {/* Name Field (Register only) */}
       {currentView === 'register' && (
         <div className="mb-4">
-          <label htmlFor="name" className="block text-sm font-medium text-foreground/80 mb-2">
+          <label htmlFor="name" className="hidden text-sm font-medium text-foreground/80 mb-2">
             Full Name
           </label>
           <div className="relative">
@@ -339,7 +339,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       {/* Email Field (All views except reset-password) */}
       {currentView !== 'reset-password' && (
         <div className="mb-4">
-          <label htmlFor="email" className="block text-sm font-medium text-foreground/80 mb-2">
+          <label htmlFor="email" className="hidden text-sm font-medium text-foreground/80 mb-2">
             Email Address
           </label>
           <div className="relative">
@@ -364,7 +364,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       {/* Reset Token Field (Reset password only) */}
       {currentView === 'reset-password' && (
         <div className="mb-4">
-          <label htmlFor="resetToken" className="block text-sm font-medium text-foreground/80 mb-2">
+          <label htmlFor="resetToken" className="hidden text-sm font-medium text-foreground/80 mb-2">
             Reset Token
           </label>
           <div className="relative">
@@ -384,7 +384,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       {/* Password Field (Login, Register, Reset-password) */}
       {(currentView === 'login' || currentView === 'register' || currentView === 'reset-password') && (
         <div className="mb-4">
-          <label htmlFor="password" className="block text-sm font-medium text-foreground/80 mb-2">
+          <label htmlFor="password" className="hidden text-sm font-medium text-foreground/80 mb-2">
             {currentView === 'reset-password' ? 'New Password' : 'Password'}
           </label>
           <div className="relative">
@@ -416,7 +416,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       {/* Confirm Password (Register and Reset-password) */}
       {(currentView === 'register' || currentView === 'reset-password') && (
         <div className="mb-4">
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground/80 mb-2">
+          <label htmlFor="confirmPassword" className="hidden text-sm font-medium text-foreground/80 mb-2">
             Confirm Password
           </label>
           <div className="relative">
