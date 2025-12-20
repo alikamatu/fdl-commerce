@@ -15,6 +15,7 @@ import { ProductsGrid } from './ProductsGrid';
 import { ProductsPagination } from './ProductsPagination';
 import { ProductQuickView } from './ProductQuickView';
 import { useSearchParams } from 'next/navigation'; // Add this import
+import { HomeProductsPagination } from './HomeproductPagination';
 
 export default function Products() {
   const searchParams = useSearchParams();
@@ -125,7 +126,7 @@ export default function Products() {
 
         {/* Pagination - Only show if there are products */}
         {products.length > 0 && (
-          <ProductsPagination
+          <HomeProductsPagination
             currentPage={pagination.page}
             totalPages={pagination.totalPages}
             totalItems={pagination.total}
