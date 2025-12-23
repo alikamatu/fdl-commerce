@@ -227,7 +227,7 @@ const MobileSearchButton = ({ onClick }: { onClick: () => void }) => (
   </button>
 );
 
-const AuthButtons = ({ onLoginClick }: { onLoginClick: () => void }) => (
+export const AuthButtons = ({ onLoginClick }: { onLoginClick: () => void }) => (
   <div className="hidden md:flex items-center space-x-2">
     <button
       onClick={onLoginClick}

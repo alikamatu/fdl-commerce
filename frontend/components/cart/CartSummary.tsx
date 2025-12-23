@@ -6,6 +6,9 @@ import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { AuthButtons } from '../home/Navbar';
+import { useState } from 'react';
+import { AuthModal } from '../auth/AuthModal';
 
 interface CartSummaryProps {
   onCheckout?: () => void;
@@ -15,9 +18,17 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ onCheckout }) => {
   const { cart } = useCart();
   const { user } = useAuth();
   const router = useRouter();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>('login');
+  
 
   const subtotal = (cart.subtotal / 100).toFixed(2);
   const total = (cart.total / 100).toFixed(2);
+
+    const openAuthModal = (tab: 'login' | 'register' = 'login') => {
+    setAuthModalTab(tab);
+    setIsAuthModalOpen(true);
+  };
 
   return (
     <motion.div
@@ -53,15 +64,24 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ onCheckout }) => {
         </div>
 
         {/* Checkout Button */}
-        <button
-          onClick={() => router.push('/checkout')}
-          disabled={cart.items.length === 0 || !user}
-          className="w-full mt-6 py-4 bg-foreground text-background cursor-pointer rounded-lg font-semibold hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
-        >
-          {!user && ('Sign in to Proceed' )}
-          {user && ('Proceed to Checkout')}
-          <ArrowRight size={16} />
-        </button>
+        {user ? (
+          <button
+            onClick={onCheckout ? onCheckout : () => router.push('/checkout')}
+            disabled={cart.items.length === 0}
+            className="w-full mt-6 py-4 bg-foreground text-background cursor-pointer rounded-lg font-semibold hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+          >
+            Proceed to Checkout
+            <ArrowRight size={16} />
+          </button>
+        ) : (
+          <button
+            onClick={() => openAuthModal('login')}
+            className="w-full mt-6 py-4 bg-foreground text-background cursor-pointer rounded-lg font-semibold hover:bg-foreground/90 transition-colors flex items-center justify-center gap-2"
+          >
+            Sign in to Proceed
+            <ArrowRight size={16} />
+          </button>
+        )}
 
         {/* Security Notice */}
         <div className="mt-4 text-center">
@@ -83,6 +103,12 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ onCheckout }) => {
           </span>
         </div>
       </div>
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        defaultTab={authModalTab}
+      />
     </motion.div>
   );
 };

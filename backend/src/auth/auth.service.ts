@@ -116,26 +116,15 @@ async unlinkGoogleAccount(userId: string): Promise<void> {
 
 async googleLogin(idToken: string): Promise<{ user: any; token: string }> {
   try {
-    console.log('Google login attempt with ID token');
-    
-    // Verify the ID token
     const ticket = await this.googleClient.verifyIdToken({
-      idToken: idToken,
+      idToken,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
 
     const payload = ticket.getPayload();
-    
     if (!payload) {
-      console.error('Google token verification failed: No payload');
       throw new UnauthorizedException('Invalid Google token');
     }
-
-    console.log('Google token verified:', {
-      email: payload.email,
-      sub: payload.sub,
-      name: payload.name,
-    });
 
     const googleUser = {
       googleId: payload.sub,
@@ -145,33 +134,45 @@ async googleLogin(idToken: string): Promise<{ user: any; token: string }> {
       picture: payload.picture,
     };
 
-    // Find or create user
     let user = await this.userModel.findOne({ googleId: googleUser.googleId });
+    let isNewUser = false;
 
     if (!user) {
-      // Check if user exists with email
       user = await this.userModel.findOne({ email: googleUser.email });
-      
+
       if (user) {
-        // Link Google account to existing user
+        // Existing email user → link Google
         user.googleId = googleUser.googleId;
         await user.save();
       } else {
-        // Create new user
+        // ✅ Brand new Google user
         user = await this.userModel.create({
           googleId: googleUser.googleId,
           email: googleUser.email,
-          displayName: googleUser.firstName + ' ' + googleUser.lastName,
+          displayName: `${googleUser.firstName} ${googleUser.lastName}`.trim(),
           firstName: googleUser.firstName,
           lastName: googleUser.lastName,
           role: 'user',
           isEmailVerified: true,
           isActive: true,
         });
+
+        isNewUser = true;
       }
     }
 
-    // Generate JWT token
+    // ✅ Send welcome email ONLY for new Google users
+    if (isNewUser) {
+      try {
+        await this.emailService.sendWelcomeEmail(
+          user.email,
+          user.displayName,
+        );
+      } catch (err) {
+        console.error('Failed to send welcome email (Google user):', err.message);
+      }
+    }
+
     const token = this.jwtService.sign({
       userId: user._id,
       email: user.email,
@@ -179,21 +180,17 @@ async googleLogin(idToken: string): Promise<{ user: any; token: string }> {
       isEmailVerified: user.isEmailVerified,
     });
 
-    // Return user without sensitive data
     const userObj = user.toObject();
     delete userObj.passwordHash;
 
-    console.log('Google login successful for user:', user.email);
-    
     return { user: userObj, token };
   } catch (error) {
-    console.error('Google login error details:', error);
-    if (error instanceof UnauthorizedException) {
-      throw error;
-    }
-    throw new UnauthorizedException('Google authentication failed: ' + error.message);
+    throw new UnauthorizedException(
+      'Google authentication failed: ' + error.message,
+    );
   }
 }
+
 
 // In your register method, wrap email sending in try-catch
 async register(registerDto: RegisterDto): Promise<{ user: any; token: string }> {

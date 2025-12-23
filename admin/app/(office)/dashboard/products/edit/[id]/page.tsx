@@ -773,7 +773,7 @@ export default function ProductEditPage() {
                           max="99"
                           {...register('discountPercent')}
                           className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
-                          placeholder="20"
+                          placeholder="20" 
                         />
                       </div>
                       {watchDiscountPercent && watchPrice && calculatedOriginalPrice() > 0 && (

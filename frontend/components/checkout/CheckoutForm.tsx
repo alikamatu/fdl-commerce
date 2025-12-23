@@ -604,7 +604,7 @@ const initializePaystackPayment = (order: any) => {
                       <img 
                         src={item.image} 
                         alt={item.title}
-                        className="w-16 h-16 object-cover rounded"
+                        className="w-16 h-16 object-contain rounded"
                       />
                       <div className="flex-1">
                         <p className="font-medium">{item.title}</p>
