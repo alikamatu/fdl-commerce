@@ -191,7 +191,7 @@ export const RecommendedProductCard: React.FC<RecommendedProductCardProps> = ({
 
           {/* Price Section */}
           <div className="mt-auto">
-            <div className="flex items-baseline gap-2">
+            <div className="flex flex-col items-baseline gap-2">
               {/* Current Price */}
               <span className="text-md font-bold ">
                 GH₵ {currentPrice}

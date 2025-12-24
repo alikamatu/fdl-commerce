@@ -431,7 +431,7 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                         ) : (
                           <>
                             <ShoppingCart size={20} />
-                            <span>{isOutOfStock ? 'Out of Stock' : `Add to Cart - ₵${price}`}</span>
+                            <span>{isOutOfStock ? 'Out of Stock' : `Add to Cart - GH₵ ${price}`}</span>
                           </>
                         )}
                         

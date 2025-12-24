@@ -93,7 +93,7 @@ export const BrandsSection: React.FC = () => {
                   )}
                 </div>
 
-                <span className="text-[10px] md:text-xs text-muted-foreground whitespace-nowrap">
+                <span className="hidden text-[10px] md:text-xs text-muted-foreground whitespace-nowrap">
                   {brand.name}
                 </span>
               </Link>
