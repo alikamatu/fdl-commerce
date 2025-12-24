@@ -4,7 +4,6 @@ import { Model, Types } from 'mongoose';
 import { Order, OrderDocument } from '../schemas/order.schema';
 import { Product, ProductDocument } from '../schemas/product.schema';
 import { CreateOrderDto } from './dto/create-order.dto';
-import axios from 'axios';
 import { EmailService } from '../email/email.service';
 import { PaystackService } from '../paystack/paystack.service';
 import { PaystackTransaction } from '../paystack/paystack.service';
@@ -303,93 +302,130 @@ export class OrdersService {
     }
   }
 
-    async create(createOrderDto: CreateOrderDto, userId: string): Promise<Order> {
-    if (!userId) {
-      throw new BadRequestException('User authentication required to place order');
-    }
-
-    const session = await this.orderModel.db.startSession();
-    session.startTransaction();
-
-    try {
-      const orderCount = await this.orderModel.countDocuments();
-      const orderNumber = `ORD-${(orderCount + 1).toString().padStart(6, '0')}`;
-
-      // Stock validation and update...
-      for (const item of createOrderDto.items) {
-        const product = await this.productModel.findById(item.productId);
-        
-        if (!product) {
-          throw new NotFoundException(`Product ${item.title} not found`);
-        }
-
-        if (product.stock < item.quantity) {
-          throw new BadRequestException(
-            `Insufficient stock for ${item.title}. Available: ${product.stock}`
-          );
-        }
-
-        product.stock -= item.quantity;
-        product.soldCount += item.quantity;
-        await product.save({ session });
-      }
-
-      // In the create method, update this section:
-      let initialStatus = 'confirmed';
-      let paymentCompleted = false;
-
-      if (createOrderDto.paymentMethod === 'paystack') {
-        paymentCompleted = false;
-        initialStatus = 'pending_payment'; // Order awaits payment
-      } else if (createOrderDto.paymentMethod === 'cash_on_delivery' || 
-                createOrderDto.paymentMethod === 'cash_on_pickup') {
-        paymentCompleted = false;
-        initialStatus = 'confirmed'; // Confirmed but payment pending on delivery/pickup
-      } else {
-        // For other payment methods (cash, mobile_money, etc.)
-        paymentCompleted = false;
-        initialStatus = 'confirmed';
-      }
-
-      const orderData: any = {
-        orderNumber,
-        userId: new Types.ObjectId(userId),
-        email: createOrderDto.email,
-        items: createOrderDto.items,
-        shippingAddress: createOrderDto.shippingAddress,
-        deliveryMethod: createOrderDto.deliveryMethod || 'delivery',
-        subtotalCents: createOrderDto.subtotalCents,
-        shippingCents: createOrderDto.shippingCents,
-        taxCents: createOrderDto.taxCents || 0,
-        totalCents: createOrderDto.totalCents,
-        paymentMethod: createOrderDto.paymentMethod,
-        paymentCompleted,
-        status: initialStatus,
-      };
-
-      const order = new this.orderModel(orderData);
-      await order.save({ session });
-
-      await session.commitTransaction();
-
-      const savedOrder = await this.orderModel.findById(order._id);
-      if (!savedOrder) {
-        throw new NotFoundException('Order not found after creation');
-      }
-      
-      console.log('Order created successfully:', savedOrder._id, 'for user:', userId);
-
-      // Send notifications...
-      // (Keep existing email notification code)
-
-      return savedOrder;
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      session.endSession();
-    }
+ async create(createOrderDto: CreateOrderDto, userId: string): Promise<Order> {
+  if (!userId) {
+    throw new BadRequestException('User authentication required to place order');
   }
+
+  const session = await this.orderModel.db.startSession();
+  session.startTransaction();
+
+  let savedOrder: Order | null = null;
+
+  try {
+    // 1️⃣ Generate order number
+    const orderCount = await this.orderModel.countDocuments().session(session);
+    const orderNumber = `ORD-${(orderCount + 1).toString().padStart(6, '0')}`;
+
+    // 2️⃣ Validate stock & update products
+    for (const item of createOrderDto.items) {
+      const product = await this.productModel.findById(item.productId).session(session);
+
+      if (!product) {
+        throw new NotFoundException(`Product ${item.title} not found`);
+      }
+
+      if (product.stock < item.quantity) {
+        throw new BadRequestException(
+          `Insufficient stock for ${item.title}. Available: ${product.stock}`,
+        );
+      }
+
+      product.stock -= item.quantity;
+      product.soldCount += item.quantity;
+      await product.save({ session });
+    }
+
+    // 3️⃣ Determine initial payment + order status
+    let status: string;
+    let paymentCompleted = false;
+
+    switch (createOrderDto.paymentMethod) {
+      case 'paystack':
+        status = 'pending_payment';
+        paymentCompleted = false;
+        break;
+
+      case 'cash_on_delivery':
+      case 'cash_on_pickup':
+        status = 'confirmed';
+        paymentCompleted = false;
+        break;
+
+      default:
+        status = 'confirmed';
+        paymentCompleted = false;
+        break;
+    }
+
+    // 4️⃣ Create order
+    const order = new this.orderModel({
+      orderNumber,
+      userId: new Types.ObjectId(userId),
+      email: createOrderDto.email,
+      items: createOrderDto.items,
+      shippingAddress: createOrderDto.shippingAddress,
+      deliveryMethod: createOrderDto.deliveryMethod || 'delivery',
+      subtotalCents: createOrderDto.subtotalCents,
+      shippingCents: createOrderDto.shippingCents,
+      taxCents: createOrderDto.taxCents || 0,
+      totalCents: createOrderDto.totalCents,
+      paymentMethod: createOrderDto.paymentMethod,
+      paymentCompleted,
+      status,
+    });
+
+    await order.save({ session });
+
+    // 5️⃣ Commit transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    // 6️⃣ Reload saved order (clean instance)
+    savedOrder = await this.orderModel.findById(order._id);
+
+    if (!savedOrder) {
+      throw new NotFoundException('Order not found after creation');
+    }
+
+    console.log('Order created successfully:', savedOrder.orderNumber);
+
+    // 7️⃣ Send order confirmation email (ALL orders)
+    try {
+      const fullName = `${savedOrder.shippingAddress.firstName} ${savedOrder.shippingAddress.lastName}`;
+
+      await this.emailService.sendOrderConfirmationEmail(
+        savedOrder.email,
+        fullName,
+        savedOrder.orderNumber,
+        {
+          items: savedOrder.items,
+          subtotalCents: savedOrder.subtotalCents,
+          shippingCents: savedOrder.shippingCents,
+          taxCents: savedOrder.taxCents,
+          totalCents: savedOrder.totalCents,
+          paymentMethod: savedOrder.paymentMethod,
+          deliveryMethod: savedOrder.deliveryMethod,
+          shippingAddress: savedOrder.shippingAddress,
+          paymentStatus: savedOrder.paymentCompleted ? 'paid' : 'pending',
+        },
+      );
+    } catch (emailError) {
+      console.error(
+        'Failed to send order confirmation email:',
+        emailError.message,
+      );
+      // ❗ Never fail order creation because of email
+    }
+
+    return savedOrder;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+}
+
 
   async completePaystackPayment(
   reference: string,
@@ -438,29 +474,6 @@ export class OrdersService {
     order.paymentId = reference;
 
     const updatedOrder = await order.save();
-
-    // Send confirmation email (optional)
-    try {
-      const fullName = `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`;
-      await this.emailService.sendOrderConfirmationEmail(
-        order.email,
-        fullName,
-        order.orderNumber,
-        {
-          items: order.items,
-          subtotalCents: order.subtotalCents,
-          shippingCents: order.shippingCents,
-          taxCents: order.taxCents,
-          totalCents: order.totalCents,
-          paymentMethod: 'paystack',
-          deliveryMethod: order.deliveryMethod,
-          shippingAddress: order.shippingAddress,
-        }
-      );
-    } catch (emailError) {
-      console.error('Failed to send confirmation email:', emailError);
-      // Don't throw - payment is complete even if email fails
-    }
 
     return updatedOrder;
   } catch (error) {
