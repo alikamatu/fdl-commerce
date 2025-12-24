@@ -9,8 +9,6 @@ import { useCategories } from "@/hooks/useCategories";
 import { SearchSuggestions } from "./SearchSuggestions";
 import { RecentSearches } from "./RecentSearches";
 import { PopularCategories } from "./PopularCategories";
-import { TrendingProducts } from "./TrendingProducts";
-// import { QuickActions } from "./QuickActions";
 
 interface SearchModalProps {
   isOpen: boolean;

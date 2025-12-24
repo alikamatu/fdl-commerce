@@ -50,7 +50,7 @@ export const CartItem: React.FC<CartItemProps> = ({ item }) => {
           <img
             src={item.image}
             alt={item.title}
-            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
           />
         </a>
       </div>

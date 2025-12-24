@@ -59,7 +59,7 @@ export const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
                 <img
                   src={suggestion.image}
                   alt={suggestion.name}
-                  className="w-10 h-10 object-cover rounded"
+                  className="w-10 h-10 object-contain rounded"
                 />
               ) : (
                 <div className="w-10 h-10 bg-foreground/10 rounded flex items-center justify-center">

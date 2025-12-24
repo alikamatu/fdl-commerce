@@ -28,7 +28,7 @@ const features = [
 
 export const FeaturesSection: React.FC = () => {
   return (
-    <section className="hidden md:block py-16 border-t border-foreground/10">
+    <section className="md:block py-16 border-t border-foreground/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -37,15 +37,15 @@ export const FeaturesSection: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl font-light text-foreground mb-4">
+          <h2 className="text-2xl md:text-3xl font-light text-foreground mb-4">
             Shopping Made Easy
           </h2>
-          <p className="text-lg text-foreground/60">
+          <p className="text-md text-foreground/60">
             Enjoy reliability, secure deliveries and hassle-free returns
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-4 gap-8">
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}
@@ -57,13 +57,13 @@ export const FeaturesSection: React.FC = () => {
             >
               <div className="flex justify-center mb-4">
                 <div className="p-3 bg-foreground/5 rounded-full">
-                  <feature.icon size={32} className="text-foreground" />
+                  <feature.icon size={24} className="text-foreground font-semibold" />
                 </div>
               </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">
+              <h3 className="text-xs md:text-lg font-semibold text-foreground mb-2">
                 {feature.title}
               </h3>
-              <p className="text-foreground/60">
+              <p className="hidden md:block text-foreground/60">
                 {feature.description}
               </p>
             </motion.div>

@@ -87,7 +87,7 @@ export const RecommendedProductCard: React.FC<RecommendedProductCardProps> = ({
       animate={{ opacity: 1, scale: 1 }}
       whileHover={{ scale: 1.02, y: -2 }}
       transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
-      className="group relative"
+      className="group relative w-52 md:64 lg:80 h-auto"
     >
       {/* Discount Badge */}
       {discountPercent > 0 && (
@@ -101,21 +101,6 @@ export const RecommendedProductCard: React.FC<RecommendedProductCardProps> = ({
           </div>
         </motion.div>
       )}
-
-      {/* Hot Deal Badge */}
-      {/* {product.isDeal && (
-        <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.1 }}
-          className="absolute top-2 right-2 z-10"
-        >
-          <div className="bg-gradient-to-r from-amber-500 to-yellow-500 text-xs font-bold px-2 py-1 rounded-full shadow-lg flex items-center gap-1">
-            <Zap size={10} />
-            <span>Deal</span>
-          </div>
-        </motion.div>
-      )} */}
 
       {/* Main Card */}
       <div 

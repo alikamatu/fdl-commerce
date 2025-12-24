@@ -156,7 +156,7 @@ export const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.4, delay: index * 0.1 }}
-                  className="flex-shrink-0 w-80"
+                  className="flex-shrink-0 w-52 md:w-64 lg:w-80"
                 >
                   <RecommendedProductCard
                     product={product}

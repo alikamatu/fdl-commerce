@@ -18,7 +18,7 @@ export const OrderItems: React.FC<OrderItemsProps> = ({ items }) => {
               <img
                 src={item.image}
                 alt={item.title}
-                className="w-10 h-10 object-cover rounded"
+                className="w-10 h-10 object-contain rounded"
               />
             ) : (
               <Package size={20} className="text-foreground/40" />
