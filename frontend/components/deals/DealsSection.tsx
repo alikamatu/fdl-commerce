@@ -159,7 +159,6 @@ export const DealsSection: React.FC<DealsSectionProps> = ({
 
           {/* Products Scroll */}
           <div
-            ref={scrollContainerRef}
             className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth py-4 px-2"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
