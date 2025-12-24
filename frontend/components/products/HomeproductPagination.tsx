@@ -21,7 +21,7 @@ export const HomeProductsPagination: React.FC<HomeProductsPaginationProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="w-full flex items-end justify-end gap-4 mt-8"
+      className="w-full flex items-center md:items-end justify-center md:justify-end gap-4 mt-8"
     >
       {/* <div className="text-sm text-foreground/60">
         Showing {startItem}-{endItem} of {totalItems} products

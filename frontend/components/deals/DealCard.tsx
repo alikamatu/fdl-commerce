@@ -92,7 +92,7 @@ export const DealCard: React.FC<DealCardProps> = ({
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className="group relative"
+      className="group relative w-48 md:w-64 lg:w-80 h-auto"
     >
       {/* Discount Badge */}
       {discountPercent > 0 && (

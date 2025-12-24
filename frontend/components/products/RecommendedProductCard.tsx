@@ -87,7 +87,7 @@ export const RecommendedProductCard: React.FC<RecommendedProductCardProps> = ({
       animate={{ opacity: 1, scale: 1 }}
       whileHover={{ scale: 1.02, y: -2 }}
       transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
-      className="group relative w-52 md:64 lg:80 h-auto"
+      className="group relative w-48 md:w-64 lg:w-80 h-auto"
     >
       {/* Discount Badge */}
       {discountPercent > 0 && (

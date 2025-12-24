@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Brand } from '../types/brand';
 
 // Mock brands data - in real app, this would come from your API
@@ -79,38 +79,61 @@ const MOCK_BRANDS: Brand[] = [
   },
 ];
 
-export const useBrands = () => {
+interface UseBrandsOptions {
+  autoRefresh?: boolean;
+  refreshInterval?: number;
+}
+
+export const useBrands = (options: UseBrandsOptions = {}) => {
+  const { autoRefresh = false, refreshInterval = 30000 } = options;
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+// Update the useBrands hook fetchBrands function to fix the type issue:
+const fetchBrands = useCallback(async (): Promise<void> => {
+  try {
+    setLoading(true);
+    setError(null);
+    
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    setBrands(MOCK_BRANDS);
+    setLastUpdated(new Date());
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'An error occurred');
+    console.error('Error fetching brands:', err);
+  } finally {
+    setLoading(false);
+  }
+}, []);
 
   useEffect(() => {
-    // Simulate API call
-    const fetchBrands = async () => {
-      try {
-        setLoading(true);
-        // In real app: const response = await fetch('/api/brands');
-        // const data = await response.json();
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate loading
-        setBrands(MOCK_BRANDS);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchBrands();
-  }, []);
+  }, [fetchBrands]);
 
-  const getBrandBySlug = (slug: string) => {
+  useEffect(() => {
+    if (!autoRefresh) return;
+
+    const interval = setInterval(fetchBrands, refreshInterval);
+    return () => clearInterval(interval);
+  }, [autoRefresh, refreshInterval, fetchBrands]);
+
+  const getBrandBySlug = useCallback((slug: string) => {
     return brands.find(brand => brand.slug === slug);
-  };
+  }, [brands]);
+
+  const refetch = useCallback(() => {
+    fetchBrands();
+  }, [fetchBrands]);
 
   return {
     brands,
     loading,
     error,
+    lastUpdated,
     getBrandBySlug,
+    refetch,
   };
 };
