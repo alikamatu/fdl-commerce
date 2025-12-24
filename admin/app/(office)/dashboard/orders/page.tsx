@@ -56,7 +56,7 @@ interface Order {
   paymentMethod: string;
   paymentCompleted: boolean;
   paymentId?: string;
-  status: 'pending' | 'confirmed' | 'processing' | 'delivering' | 'available' | 'delivered' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'processing' | 'delivering' | 'available' | 'delivered' | 'cancelled' | 'pending_payment';
   createdAt: string;
   updatedAt: string;
   deliveringAt?: string;
@@ -300,15 +300,11 @@ export default function AdminOrdersPage() {
     });
   };
 
-  const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  const formatStatusLabel = (status: Order['status']) => {
+  return status
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+};
 
   const getStatusColor = (status: Order['status']) => {
     switch (status) {
@@ -318,6 +314,8 @@ export default function AdminOrdersPage() {
         return 'bg-blue-50 text-blue-700 border-blue-200';
       case 'processing':
         return 'bg-purple-50 text-purple-700 border-purple-200';
+      case 'pending_payment':
+        return 'bg-gray-50 text-gray-700 border-gray-200';
       case 'delivering':
         return 'bg-indigo-50 text-indigo-700 border-indigo-200';
       case 'available':
@@ -339,6 +337,8 @@ export default function AdminOrdersPage() {
         return <CheckCircle className="w-4 h-4" />;
       case 'processing':
         return <Package className="w-4 h-4" />;
+      case 'pending_payment':
+        return <CreditCard className="w-4 h-4" />;
       case 'delivering':
         return <Truck className="w-4 h-4" />;
       case 'available':
@@ -485,7 +485,7 @@ export default function AdminOrdersPage() {
         >
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Status Overview</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {['confirmed', 'processing', 'delivering', 'available', 'delivered', 'cancelled'].map((status) => (
+            {['pending_payment', 'confirmed', 'processing', 'delivering', 'available', 'delivered', 'cancelled'].map((status) => (
               <div
                 key={status}
                 className={`p-4 rounded-xl border-2 text-center cursor-pointer transition-all duration-200 ${
@@ -500,7 +500,7 @@ export default function AdminOrdersPage() {
                 }`}>
                   {getStatusIcon(status as Order['status'])}
                 </div>
-                <p className="text-sm font-medium text-gray-900 capitalize">{status}</p>
+                <p className="text-sm font-medium text-gray-900 capitalize">{formatStatusLabel(status as Order['status'])}</p>
                 <p className="text-2xl font-bold text-gray-900 mt-1">{getStatusCount(status as Order['status'])}</p>
               </div>
             ))}
@@ -536,6 +536,7 @@ export default function AdminOrdersPage() {
                 <option value="all">All Statuses</option>
                 <option value="confirmed">Confirmed</option>
                 <option value="processing">Processing</option>
+                <option value="pending_payment">Pending Payment</option>
                 <option value="delivering">Delivering</option>
                 <option value="available">Available for Pickup</option>
                 <option value="delivered">Delivered</option>
@@ -657,7 +658,7 @@ export default function AdminOrdersPage() {
                     <td className="p-6">
                       <span className={`px-3 py-1.5 text-xs font-semibold border rounded-lg flex items-center gap-2 w-fit ${getStatusColor(order.status)}`}>
                         {getStatusIcon(order.status)}
-                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                        {formatStatusLabel(order.status)}
                       </span>
                     </td>
                     <td className="p-6">

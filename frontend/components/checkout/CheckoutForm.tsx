@@ -411,6 +411,7 @@ const initializePaystackPayment = (order: any) => {
                 <input
                   type="tel"
                   name="phone"
+                  maxLength={10}
                   value={formData.phone}
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
@@ -554,7 +555,7 @@ const initializePaystackPayment = (order: any) => {
                       <h4 className="font-semibold">
                         {deliveryMethod === 'delivery' ? 'Cash on Delivery' : 'Cash on Pickup'}
                       </h4>
-                      <p className="text-sm text-gray-600">Pay later with cash/MoMo</p>
+                      <p className="text-sm text-gray-600">Pay later with Cash/MoMo</p>
                     </div>
                   </div>
                   <p className="text-sm text-gray-700 ml-10">

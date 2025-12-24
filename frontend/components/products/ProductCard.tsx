@@ -197,17 +197,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               {/* Original Price */}
               {originalPrice && originalPrice !== currentPrice && (
                 <span className="text-xs text-foreground/40 line-through">
-                  GH₵{originalPrice}
+                  GH₵ {originalPrice}
                 </span>
               )}
             </div>
             
-            {/* You Save
+            {/* You Save */}
             {originalPrice && originalPrice !== currentPrice && (
               <div className="text-sm text-green-600 font-medium mt-1">
-                Save ${(parseFloat(originalPrice) - parseFloat(currentPrice)).toFixed(2)}
+                Save GH₵ {(parseFloat(originalPrice) - parseFloat(currentPrice)).toFixed(2)}
               </div>
-            )} */}
+            )}
           </div>
 
           {/* Stock Progress Bar for Hot Deals */}

@@ -200,7 +200,7 @@ export const RecommendedProductCard: React.FC<RecommendedProductCardProps> = ({
               {/* Original Price */}
               {originalPrice && originalPrice !== currentPrice && (
                 <span className="text-xs text-gray-400 line-through">
-                  GH₵{originalPrice}
+                  GH₵ {originalPrice}
                 </span>
               )}
             </div>
@@ -208,7 +208,7 @@ export const RecommendedProductCard: React.FC<RecommendedProductCardProps> = ({
             {/* You Save - Only show for significant discounts */}
             {originalPrice && originalPrice !== currentPrice && discountPercent > 1 && (
               <div className="text-xs text-green-600 font-medium mt-1">
-                Save GH₵{(parseFloat(originalPrice) - parseFloat(currentPrice)).toFixed(2)}
+                Save GH₵ {(parseFloat(originalPrice) - parseFloat(currentPrice)).toFixed(2)}
               </div>
             )}
           </div>

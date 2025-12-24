@@ -47,7 +47,7 @@ export const BrandsSection: React.FC = () => {
     <section className="w-full py-6 md:py-10">
       <div className="max-w-7xl mx-auto px-2 sm:px-4">
         <div className="mb-4 md:mb-6 text-center">
-          <h2 className="text-base md:text-xl font-medium text-foreground">
+          <h2 className="text-2xl lg:text-3xl font-medium text-foreground">
             Shop by Brand
           </h2>
         </div>

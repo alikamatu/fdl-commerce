@@ -973,7 +973,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
     {/* Payment ID */}
     {order.paymentId && (
       <div className="p-3 bg-gray-50 rounded-xl">
-        <p className="text-sm font-medium text-gray-900 mb-1">Payment ID</p>
+        <p className="text-sm font-medium text-gray-900 mb-1">Paystack Payment ID</p>
         <p className="text-sm font-mono text-gray-700 break-all">{order.paymentId}</p>
       </div>
     )}
