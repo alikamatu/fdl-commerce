@@ -24,8 +24,8 @@ export default function Home() {
 
       <Suspense fallback={<div className="py-12 text-center">Loading recommendations...</div>}>
         <RecommendedProducts 
-          title="Latest Windows Laptops"
-          category="690de23b60cfb97993bc099d"
+          title="Latest Game Consoles & Controllers"
+          category="690dfea4f32eaafbd2a3ca58"
           limit={10}
           showViewAll={true}
         />

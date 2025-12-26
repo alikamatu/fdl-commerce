@@ -2,6 +2,7 @@ import { Package, Truck, CheckCircle, Clock, AlertCircle, XCircle } from 'lucide
 import { Order } from '@/types/order';
 
 export const ORDER_STATUSES = {
+  pending_payment: { label: 'Pending Payment', color: 'yellow' },
   confirmed: { label: 'Confirmed', color: 'blue' },
   processing: { label: 'Processing', color: 'orange' },
   delivering: { label: 'Delivering', color: 'blue'},
@@ -22,6 +23,8 @@ export const getStatusIcon = (status: Order['status']) => {
       return Clock;
     case 'available':
       return CheckCircle;
+    case 'pending_payment':
+      return Clock;
     case 'pending':
       return Clock;
     case 'cancelled':
@@ -39,13 +42,14 @@ export const getStatusColor = (status: Order['status']) => {
     processing: 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900 dark:text-orange-200 dark:border-orange-800',
     confirmed: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-800',
     pending: 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900 dark:text-yellow-200 dark:border-yellow-800',
+    pending_payment: 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900 dark:text-yellow-200 dark:border-yellow-800',
     cancelled: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900 dark:text-red-200 dark:border-red-800',
   };
   return colors[status];
 };
 
 export const canCancelOrder = (status: Order['status']) => {
-  return ['pending', 'confirmed'].includes(status);
+  return ['pending', 'confirmed', 'pending_payment'].includes(status);
 };
 
 export const formatOrderDate = (dateString: string) => {
@@ -58,4 +62,11 @@ export const formatOrderDate = (dateString: string) => {
 
 export const formatCurrency = (cents: number) => {
   return 'GH₵ ' + (cents / 100).toFixed(2);
+};
+
+export const formatStatusDisplay = (status: Order['status']) => {
+  if (status === 'pending_payment') {
+    return 'Pending Payment';
+  }
+  return status.charAt(0).toUpperCase() + status.slice(1);
 };

@@ -1,9 +1,39 @@
-# *
+# Robots.txt for Forbes Digital Lifeline
+# Allow all web crawlers to access the site
+
 User-agent: *
 Allow: /
 
-# Host
+# Disallow access to admin and API routes
+Disallow: /admin/
+Disallow: /api/
+Disallow: /checkout/
+Disallow: /cart/
+Disallow: /wishlist/
+Disallow: /login/
+Disallow: /register/
+Disallow: /forgot-password/
+Disallow: /reset-password/
+Disallow: /verify-email/
+
+# Allow access to CSS, JS, and image files
+Allow: *.css
+Allow: *.js
+Allow: *.png
+Allow: *.jpg
+Allow: *.jpeg
+Allow: *.gif
+Allow: *.svg
+Allow: *.ico
+
+# Crawl delay (optional)
+Crawl-delay: 1
+
+# Host directive
 Host: https://forbesdigitals.com
 
-# Sitemaps
+# Sitemap location
 Sitemap: https://forbesdigitals.com/sitemap.xml
+
+# Additional sitemaps (if any)
+Sitemap: https://forbesdigitals.com/server-sitemap.xml

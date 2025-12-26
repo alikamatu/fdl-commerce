@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Product } from '@/types/product';
 import { RecommendedProductCard } from '@/components/products/RecommendedProductCard';
+import { ProductCard } from './ProductCard';
 
 interface SimilarProductsProps {
   products: Product[];
@@ -73,7 +74,9 @@ export const SimilarProducts: React.FC<SimilarProductsProps> = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: index * 0.1 }}
           >
-            <RecommendedProductCard product={product} />
+            <ProductCard product={product} 
+                  onViewDetails={() => {}}
+             />
           </motion.div>
         ))}
       </div>

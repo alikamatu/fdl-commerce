@@ -1,72 +1,120 @@
 "use client";
 
+import { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Image as ImageIcon } from "lucide-react";
 import { useCategories } from "@/hooks/useCategories";
-import useEmblaCarousel from "embla-carousel-react";
-import Autoplay from "embla-carousel-autoplay";
-import { useCallback, useEffect, useState } from "react";
+
+const MOBILE_BREAKPOINT = 768;
+const AUTO_SCROLL_SPEED = 0.4; // px per frame (~24px/sec)
 
 export const CategoryScroll: React.FC = () => {
   const { categories, loading, error } = useCategories();
+
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const isPausedRef = useRef(false);
+
   const [isMobile, setIsMobile] = useState(false);
 
-  // -------------------- Detect mobile --------------------
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+  const items = [...categories, ...categories, ...categories];
+
+  const startAutoScroll = useCallback(() => {
+    if (rafRef.current) return;
+
+    const step = () => {
+      const el = containerRef.current;
+      if (!el || isPausedRef.current) {
+        rafRef.current = null;
+        return;
+      }
+
+      el.scrollLeft += AUTO_SCROLL_SPEED;
+      handleInfiniteBounds();
+
+      rafRef.current = requestAnimationFrame(step);
+    };
+
+    rafRef.current = requestAnimationFrame(step);
   }, []);
 
-  // -------------------- Embla setup --------------------
-  const [emblaRef, emblaApi] = useEmblaCarousel(
-    {
-      loop: true,
-      dragFree: true,
-      align: "start",
-      containScroll: "trimSnaps",
-    },
-    [
-      Autoplay({
-        delay: 1500, // delay between scrolls in milliseconds
-        stopOnInteraction: true,
-        stopOnMouseEnter: true,
-      }),
-    ]
-  );
+  const stopAutoScroll = useCallback(() => {
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+  }, []);
 
-  // -------------------- Arrow visibility --------------------
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(false);
+  const handleInfiniteBounds = useCallback(() => {
+    const el = containerRef.current;
+    if (!el) return;
 
-  const updateArrows = useCallback(() => {
-    if (!emblaApi) return;
-    setCanScrollPrev(emblaApi.canScrollPrev());
-    setCanScrollNext(emblaApi.canScrollNext());
-  }, [emblaApi]);
+    const singleSetWidth = el.scrollWidth / 3;
+
+    if (el.scrollLeft < singleSetWidth * 0.5) {
+      el.scrollLeft += singleSetWidth;
+    }
+
+    if (el.scrollLeft > singleSetWidth * 1.5) {
+      el.scrollLeft -= singleSetWidth;
+    }
+  }, []);
+
+  const manualScroll = (dir: "left" | "right") => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    stopAutoScroll();
+
+    el.scrollBy({
+      left: dir === "left" ? -el.clientWidth * 0.6 : el.clientWidth * 0.6,
+      behavior: "smooth",
+    });
+
+    setTimeout(startAutoScroll, 800);
+  };
 
   useEffect(() => {
-    if (!emblaApi) return;
-    updateArrows();
-    emblaApi.on("select", updateArrows);
-    emblaApi.on("reInit", updateArrows);
-  }, [emblaApi, updateArrows]);
+    const detectMobile = () => {
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    };
+
+    detectMobile();
+    window.addEventListener("resize", detectMobile);
+    return () => window.removeEventListener("resize", detectMobile);
+  }, []);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || categories.length === 0) return;
+
+    const singleSetWidth = el.scrollWidth / 3;
+    el.scrollLeft = singleSetWidth;
+
+    startAutoScroll();
+
+    const onScroll = () => handleInfiniteBounds();
+    el.addEventListener("scroll", onScroll);
+
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      stopAutoScroll();
+    };
+  }, [categories.length, handleInfiniteBounds, startAutoScroll, stopAutoScroll]);
 
   if (loading || error || categories.length === 0) return null;
 
   return (
-    <section className="py-8 md:py-12 bg-background w-full">
+    <section className="py-10 bg-background w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="text-center mb-6 md:mb-8"
+          transition={{ duration: 0.6 }}
+          className="text-center mb-8"
         >
-          <h2 className="text-2xl lg:text-3xl font-light text-foreground mb-2">
+          <h2 className="text-xl md:text-2xl lg:text-3xl font-light">
             Shop by Category
           </h2>
           <p className="text-sm md:text-base text-foreground/60">
@@ -75,67 +123,78 @@ export const CategoryScroll: React.FC = () => {
         </motion.div>
 
         <div className="relative">
-          {/* Left Arrow */}
-          {canScrollPrev && !isMobile && (
+          {!isMobile && (
             <button
-              onClick={() => emblaApi?.scrollPrev()}
-              className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 z-10 p-2 bg-background/90 backdrop-blur border border-foreground/10 rounded-full shadow hover:scale-110 transition"
-              aria-label="Scroll left"
+              onClick={() => manualScroll("left")}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-2 bg-background  rounded-full shadow"
             >
               <ChevronLeft size={20} />
             </button>
           )}
 
-          {/* Right Arrow */}
-          {canScrollNext && !isMobile && (
+          {!isMobile && (
             <button
-              onClick={() => emblaApi?.scrollNext()}
-              className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 z-10 p-2 bg-background/90 backdrop-blur border border-foreground/10 rounded-full shadow hover:scale-110 transition"
-              aria-label="Scroll right"
+              onClick={() => manualScroll("right")}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-2 bg-background  rounded-full shadow"
             >
               <ChevronRight size={20} />
             </button>
           )}
 
-          {/* Embla viewport */}
-          <div ref={emblaRef} className="overflow-hidden">
-            <div className="flex gap-4 md:gap-6 lg:gap-8 py-4">
-              {categories.map((category) => (
-                <a
-                  key={category._id}
-                  href={`/products?category=${category._id}`}
-                  className="group flex-shrink-0 w-20 sm:w-24 md:w-32 lg:w-40 flex flex-col items-center text-center scroll-snap-align-start"
-                >
-                  <div className="relative mb-3">
-                    <div className="absolute inset-0 rounded-full bg-foreground/5 scale-0 group-hover:scale-110 transition-transform" />
-                    <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 rounded-full border border-foreground/10 overflow-hidden bg-foreground/5">
-                      {category.imageUrl ? (
-                        <img
-                          src={category.imageUrl}
-                          alt={category.name}
-                          className="w-full h-full object-cover scale-110 group-hover:scale-115 transition-transform p-2"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <ImageIcon
-                            size={isMobile ? 18 : 24}
-                            className="text-foreground/30"
-                          />
-                        </div>
-                      )}
+          <div
+            ref={containerRef}
+            className="flex gap-4 md:gap-6 overflow-x-scroll scrollbar-hide py-4"
+            onMouseEnter={() => (isPausedRef.current = true)}
+            onMouseLeave={() => {
+              isPausedRef.current = false;
+              startAutoScroll();
+            }}
+            onTouchStart={() => (isPausedRef.current = true)}
+            onTouchEnd={() => {
+              isPausedRef.current = false;
+              startAutoScroll();
+            }}
+          >
+            {items.map((category, index) => (
+              <motion.a
+                key={`${category._id}-${index}`}
+                href={`/products?category=${category._id}`}
+                className="flex-shrink-0 w-24 md:w-32 lg:w-40 flex flex-col items-center"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <div className="w-20 h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 rounded-full  overflow-hidden bg-foreground/5 mb-2">
+                  {category.imageUrl ? (
+                    <img
+                      src={category.imageUrl}
+                      alt={category.name}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <ImageIcon className="text-foreground/30" />
                     </div>
-                  </div>
+                  )}
+                </div>
 
-                  <span className="text-xs md:text-sm font-medium text-foreground/80 group-hover:text-foreground transition">
-                    {category.name}
-                  </span>
-                </a>
-              ))}
-            </div>
+                <span className="text-xs md:text-sm text-center text-foreground/80">
+                  {category.name}
+                </span>
+              </motion.a>
+            ))}
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .scrollbar-hide {
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </section>
   );
 };

@@ -16,8 +16,11 @@ import { Snackbar } from '@/components/Snackbar';
 import { Product } from '@/types/product';
 import { useSimilarProducts } from '@/hooks/useSimilarProducts';
 import { SimilarProducts } from '@/components/products/SimilarProducts';
-import { ProductReviews } from '@/components/reviews/ProductReviews';
+import { BreadcrumbSEO, generateProductBreadcrumbs as generateBreadcrumbs } from '@/components/seo/BreadcrumbSEO';
+import Head from 'next/head';
+import { generateProductTitle, generateProductDescription, PRODUCT_SEO_KEYWORDS, SITE_CONFIG } from '@/utils/seo';
 import Link from 'next/link';
+import { ProductReviews } from '@/components/reviews/ProductReviews';
 
 interface ProductDetailsPageProps {
   params: Promise<{ id: string }>;
@@ -92,6 +95,23 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
+      <Head>
+        <title>{generateProductTitle(product.title, product.brand)}</title>
+        <meta name="description" content={generateProductDescription(product)} />
+        <meta name="keywords" content={[...PRODUCT_SEO_KEYWORDS, product.title, product.brand].filter(Boolean).join(', ')} />
+        <link rel="canonical" href={`${process.env.NEXT_PUBLIC_FRONTEND_URL || 'https://forbesdigitals.com'}/products/${product._id}`} />
+        <meta property="og:title" content={generateProductTitle(product.title, product.brand)} />
+        <meta property="og:description" content={generateProductDescription(product)} />
+        <meta property="og:image" content={product.images?.[0]?.url || SITE_CONFIG.ogImage} />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={generateProductTitle(product.title, product.brand)} />
+        <meta name="twitter:description" content={generateProductDescription(product)} />
+        <meta name="twitter:image" content={product.images?.[0]?.url || SITE_CONFIG.ogImage} />
+      </Head>
+      <BreadcrumbSEO
+        items={generateBreadcrumbs(product, product.categoryId)}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-foreground/60 mb-8">

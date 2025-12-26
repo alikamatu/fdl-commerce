@@ -12,7 +12,6 @@ import { useProducts } from '@/hooks/useProducts';
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { ProductsFilters as Filters, Product } from '@/types/product';
 import { ProductsGrid } from './ProductsGrid';
-import { ProductsPagination } from './ProductsPagination';
 import { ProductQuickView } from './ProductQuickView';
 import { useSearchParams } from 'next/navigation'; // Add this import
 import { HomeProductsPagination } from './HomeproductPagination';

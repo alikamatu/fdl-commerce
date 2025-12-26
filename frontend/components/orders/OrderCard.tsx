@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Calendar, MapPin, Truck } from "lucide-react";
 import { Order } from "@/types/order";
-import { getStatusIcon, getStatusColor, formatOrderDate, formatCurrency } from "@/utils/orderStatus";
+import { getStatusIcon, getStatusColor, formatOrderDate, formatCurrency, formatStatusDisplay } from "@/utils/orderStatus";
 import { OrderActions } from "./OrderActions";
 import { OrderDetailsModal } from "./OrderDetailsModal";
 import { OrderItems } from "./OrderItems";
@@ -32,9 +32,9 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, index, onCancelOrde
           <div className="flex items-center space-x-4 mb-3 sm:mb-0">
             <div className="flex items-center space-x-2">
               <StatusIcon className="w-4 h-4" />
-              <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
-                {order.status.charAt(0).toUpperCase() + order.status.slice(1)} {order.status === "available" ? "for Pickup" : ""}
-              </span>
+            <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
+              {formatStatusDisplay(order.status)} {order.status === "available" ? "for Pickup" : ""}
+            </span>
             </div>
             <div className="text-sm text-gray-600 font-mono">
               Order #{order.orderNumber}

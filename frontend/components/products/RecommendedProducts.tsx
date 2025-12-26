@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Laptop, ArrowRight } from 'lucide-react';
 import { useRecommendedProducts } from '@/hooks/useRecommendedProducts';
-import { RecommendedProductCard } from './RecommendedProductCard';
+import { ProductCard } from './ProductCard';
 
 interface RecommendedProductsProps {
   title?: string;
@@ -14,8 +14,8 @@ interface RecommendedProductsProps {
 }
 
 export const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
-  title = "Recommended Laptops",
-  category = "laptops", // You'll need to update this with your actual laptop category ID
+  title = "Game Consoles & Controllers",
+  category = "game-consoles-controllers", // You'll need to update this with your actual laptop category ID
   limit = 10,
   showViewAll = true,
 }) => {
@@ -93,7 +93,7 @@ export const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
               href={`/products?category=${category}`}
               className="hidden sm:flex items-center gap-2 px-4 py-2 border border-foreground/20 rounded-lg font-medium hover:bg-foreground/5 transition-colors"
             >
-              View All Laptops
+              View All
               <ArrowRight size={16} />
             </a>
           )}
@@ -156,10 +156,11 @@ export const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.4, delay: index * 0.1 }}
-                  className="flex-shrink-0 w-48 md:w-64 lg:w-80"
+                  className="flex-shrink-0 w-48 md:w-64 lg:w-72"
                 >
-                  <RecommendedProductCard
+                  <ProductCard
                     product={product}
+                    onViewDetails={() => {}}
                   />
                 </motion.div>
               ))
