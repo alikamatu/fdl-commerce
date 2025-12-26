@@ -109,7 +109,7 @@ status: string;
 
   @Prop({ 
   required: true,
-  enum: ['cash', 'bank_transfer', 'mobile_money', 'cash_or_momo', 'paystack', 'cash_on_delivery', 'cash_on_pickup'],
+  enum: ['cash', 'bank_transfer', 'mobile_money', 'cash_or_momo', 'paystack', 'cash_on_delivery', 'cash_on_pickup', 'bank_card'],
   default: 'mobile_money'
 })
 paymentMethod: string;

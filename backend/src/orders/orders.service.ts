@@ -418,6 +418,22 @@ export class OrdersService {
       // ❗ Never fail order creation because of email
     }
 
+    // 8️⃣ Send new order notification to admin
+    try {
+      const adminEmail = process.env.ADMIN_EMAIL;
+      if (adminEmail) {
+        await this.emailService.sendNewOrderNotificationToAdmin(savedOrder, adminEmail);
+      } else {
+        console.warn('ADMIN_EMAIL not set, skipping admin notification');
+      }
+    } catch (emailError) {
+      console.error(
+        'Failed to send admin notification email:',
+        emailError.message,
+      );
+      // ❗ Never fail order creation because of email
+    }
+
     return savedOrder;
   } catch (error) {
     await session.abortTransaction();
@@ -558,7 +574,7 @@ export class OrdersService {
   }
 
   // Validate status
-  const validStatuses = ['pending', 'confirmed', 'processing', 'delivering', 'available', 'delivered', 'cancelled'];
+  const validStatuses = ['pending_payment', 'pending', 'confirmed', 'processing', 'delivering', 'available', 'delivered', 'cancelled'];
   if (!validStatuses.includes(status)) {
     throw new BadRequestException(`Invalid status: ${status}`);
   }
@@ -633,7 +649,7 @@ export class OrdersService {
     }
 
     // Validate payment method
-    const validPaymentMethods = ['cash', 'bank_transfer', 'mobile_money', 'cash_or_momo'];
+    const validPaymentMethods = ['cash', 'bank_transfer', 'mobile_money', 'cash_or_momo', 'paystack', 'cash_on_delivery', 'cash_on_pickup', 'bank_card'];
     if (!validPaymentMethods.includes(paymentMethod)) {
       throw new BadRequestException(`Invalid payment method: ${paymentMethod}`);
     }

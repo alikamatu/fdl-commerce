@@ -61,7 +61,7 @@ interface Order {
   paymentMethod: string;
   paymentCompleted: boolean;
   paymentId?: string;
-  status:  'confirmed' | 'processing' | 'delivering' | 'available' | 'delivered' | 'cancelled';
+  status: 'pending_payment' | 'confirmed' | 'processing' | 'delivering' | 'available' | 'delivered' | 'cancelled';
   createdAt: string;
   updatedAt: string;
   shippedAt?: string;
@@ -331,6 +331,12 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
   }
 };
 
+  const formatStatusLabel = (status: Order['status']) => {
+  return status
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
   const handleStatusUpdate = async () => {
     if (!order || selectedStatus === order.status) return;
 
@@ -376,6 +382,8 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
       return 'Mobile Money (MoMo)';
     case 'cash':
       return 'Cash';
+    case 'bank_card':
+      return 'Bank Card';
     case 'bank_transfer':
       return 'Bank Transfer';
     case 'cash_or_momo':
@@ -441,6 +449,8 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
     switch (status) {
       case 'confirmed':
         return 'bg-blue-50 text-blue-700 border-blue-200';
+      case 'pending_payment':
+        return 'bg-yellow-50 text-yellow-700 border-yellow-200';
       case 'processing':
         return 'bg-purple-50 text-purple-700 border-purple-200';
       case 'delivering':
@@ -460,6 +470,8 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
     switch (status) {
       case 'confirmed':
         return <CheckCircle className="w-4 h-4" />;
+      case 'pending_payment':
+        return <CreditCard className="w-4 h-4" />;
       case 'processing':
         return <Package className="w-4 h-4" />;
       case 'delivering':
@@ -654,7 +666,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
                   </div>
                 </div>
                 <span className={`px-4 py-2 text-sm font-semibold border rounded-xl ${getStatusColor(order.status)}`}>
-                  {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                  {formatStatusLabel(order.status)}
                 </span>
               </div>
             </motion.div>
@@ -833,6 +845,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
                     onChange={(e) => setSelectedStatus(e.target.value as Order['status'])}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black focus:border-black transition-all duration-200 bg-white appearance-none cursor-pointer"
                   >
+                    <option value="pending_payment">Pending Payment</option>
                     <option value="confirmed">Confirmed</option>
                     <option value="processing">Processing</option>
                     {order.deliveryMethod === 'delivery' && (<option value="delivering">Delivering</option>)}
@@ -944,6 +957,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
         <option value="mobile_money">Mobile Money (MoMo)</option>
         <option value="cash">Cash</option>
         <option value="bank_transfer">Bank Transfer</option>
+        <option value="bank_card">Bank Card</option>
         <option value="cash_or_momo">N/A</option>
       </select>
     </div>
@@ -1001,11 +1015,13 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
         <div className={`p-2 rounded-lg ${
           order.paymentMethod === 'cash_or_momo' ? 'bg-blue-100' :
           order.paymentMethod === 'bank_transfer' ? 'bg-green-100' :
+          order.paymentMethod === 'bank_card' ? 'bg-purple-100' :
           'bg-amber-100'
         }`}>
           <CreditCard className={`w-5 h-5 ${
             order.paymentMethod === 'cash_or_momo' ? 'text-blue-600' :
             order.paymentMethod === 'bank_transfer' ? 'text-green-600' :
+            order.paymentMethod === 'bank_card' ? 'text-purple-600' :
             'text-amber-600'
           }`} />
         </div>

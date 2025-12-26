@@ -179,6 +179,8 @@ const formatPaymentMethod = (method: string) => {
       return 'Mobile Money (MoMo)';
     case 'cash':
       return 'Cash';
+    case 'bank_card':
+      return 'Bank Card';
     case 'bank_transfer':
       return 'Bank Transfer';
     case 'cash_or_momo':
@@ -534,9 +536,9 @@ export default function AdminOrdersPage() {
                 className="w-full pl-12 pr-10 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white appearance-none cursor-pointer"
               >
                 <option value="all">All Statuses</option>
+                <option value="pending_payment">Pending Payment</option>
                 <option value="confirmed">Confirmed</option>
                 <option value="processing">Processing</option>
-                <option value="pending_payment">Pending Payment</option>
                 <option value="delivering">Delivering</option>
                 <option value="available">Available for Pickup</option>
                 <option value="delivered">Delivered</option>
