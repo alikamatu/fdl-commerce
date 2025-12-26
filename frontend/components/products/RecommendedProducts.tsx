@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Laptop, ArrowRight } from 'lucide-react';
 import { useRecommendedProducts } from '@/hooks/useRecommendedProducts';
 import { ProductCard } from './ProductCard';
+import { ProductQuickView } from './ProductQuickView';
+import { Product } from '@/types/product';
 
 interface RecommendedProductsProps {
   title?: string;
@@ -22,7 +24,10 @@ export const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
   const { products, loading, error } = useRecommendedProducts(category, limit);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [quickViewOpen, setQuickViewOpen] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  
 
   const scroll = (direction: 'left' | 'right') => {
     if (!scrollContainerRef.current) return;
@@ -38,6 +43,16 @@ export const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
       behavior: 'smooth'
     });
   };
+
+    const handleCloseQuickView = () => {
+    setQuickViewOpen(false);
+    setSelectedProduct(null);
+  };
+
+    const handleViewDetails = (product: Product) => {
+      setSelectedProduct(product);
+      setQuickViewOpen(true);
+    };
 
   const checkScrollButtons = () => {
     if (!scrollContainerRef.current) return;
@@ -83,7 +98,7 @@ export const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
                 {title}
               </h2>
               <p className="text-foreground/60 text-sm">
-                Curated selection of latest top-performing laptops
+                Curated selection of latest top-performing game consoles and controllers
               </p>
             </div>
           </div>
@@ -160,7 +175,13 @@ export const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
                 >
                   <ProductCard
                     product={product}
-                    onViewDetails={() => {}}
+                    onViewDetails={handleViewDetails}
+                  />
+
+                  <ProductQuickView
+                    product={selectedProduct}
+                    open={quickViewOpen}
+                    onClose={handleCloseQuickView}
                   />
                 </motion.div>
               ))

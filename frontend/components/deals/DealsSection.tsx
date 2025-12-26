@@ -12,6 +12,8 @@ import {
 import { useDealProducts } from "@/hooks/useDealProducts";
 import Link from "next/link";
 import { ProductCard } from "../products/ProductCard";
+import { Product } from "@/types/product";
+import { ProductQuickView } from "../products/ProductQuickView";
 
 interface DealsSectionProps {
   title?: string;
@@ -28,6 +30,8 @@ export const DealsSection: React.FC<DealsSectionProps> = ({
 }) => {
   const { products, loading, error } = useDealProducts(limit);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [quickViewOpen, setQuickViewOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
@@ -54,6 +58,16 @@ export const DealsSection: React.FC<DealsSectionProps> = ({
       container.scrollLeft <
         container.scrollWidth - container.clientWidth - tolerance
     );
+  };
+
+    const handleCloseQuickView = () => {
+    setQuickViewOpen(false);
+    setSelectedProduct(null);
+  };
+
+    const handleViewDetails = (product: Product) => {
+    setSelectedProduct(product);
+    setQuickViewOpen(true);
   };
 
   useEffect(() => {
@@ -154,7 +168,13 @@ export const DealsSection: React.FC<DealsSectionProps> = ({
                   >
                     <ProductCard
                       product={product}
-                      onViewDetails={() => {}}
+                      onViewDetails={handleViewDetails}
+                    />
+
+                    <ProductQuickView
+                      product={selectedProduct}
+                      open={quickViewOpen}
+                      onClose={handleCloseQuickView}
                     />
                   </motion.div>
                 ))}
