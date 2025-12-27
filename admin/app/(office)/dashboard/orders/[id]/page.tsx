@@ -958,7 +958,6 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
         <option value="cash">Cash</option>
         <option value="bank_transfer">Bank Transfer</option>
         <option value="bank_card">Bank Card</option>
-        <option value="cash_or_momo">N/A</option>
       </select>
     </div>
 

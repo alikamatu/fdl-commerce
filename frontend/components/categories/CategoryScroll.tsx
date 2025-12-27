@@ -6,21 +6,43 @@ import { ChevronLeft, ChevronRight, Image as ImageIcon } from "lucide-react";
 import { useCategories } from "@/hooks/useCategories";
 
 const MOBILE_BREAKPOINT = 768;
-const AUTO_SCROLL_SPEED = 0.4; // px per frame (~24px/sec)
+const DESKTOP_SPEED = 0.4; // px/frame
+const MOBILE_SPEED = 0.25;
 
 export const CategoryScroll: React.FC = () => {
   const { categories, loading, error } = useCategories();
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const rafRef = useRef<number | null>(null);
-  const isPausedRef = useRef(false);
+  const scrollEndTimer = useRef<NodeJS.Timeout | null>(null);
 
+  const isPausedRef = useRef(false);
   const [isMobile, setIsMobile] = useState(false);
 
+  // Repeat categories for seamless infinite scroll
   const items = [...categories, ...categories, ...categories];
+
+  /* -------------------- Utils -------------------- */
+
+  const handleInfiniteBounds = useCallback(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const setWidth = el.scrollWidth / 3;
+
+    if (el.scrollLeft < setWidth * 0.5) {
+      el.scrollLeft += setWidth;
+    } else if (el.scrollLeft > setWidth * 1.5) {
+      el.scrollLeft -= setWidth;
+    }
+  }, []);
+
+  /* ---------------- Auto Scroll ------------------ */
 
   const startAutoScroll = useCallback(() => {
     if (rafRef.current) return;
+
+    const speed = isMobile ? MOBILE_SPEED : DESKTOP_SPEED;
 
     const step = () => {
       const el = containerRef.current;
@@ -29,14 +51,14 @@ export const CategoryScroll: React.FC = () => {
         return;
       }
 
-      el.scrollLeft += AUTO_SCROLL_SPEED;
+      el.scrollLeft += speed;
       handleInfiniteBounds();
 
       rafRef.current = requestAnimationFrame(step);
     };
 
     rafRef.current = requestAnimationFrame(step);
-  }, []);
+  }, [handleInfiniteBounds, isMobile]);
 
   const stopAutoScroll = useCallback(() => {
     if (rafRef.current) {
@@ -45,20 +67,22 @@ export const CategoryScroll: React.FC = () => {
     }
   }, []);
 
-  const handleInfiniteBounds = useCallback(() => {
-    const el = containerRef.current;
-    if (!el) return;
+  /* ------------- User Interaction ---------------- */
 
-    const singleSetWidth = el.scrollWidth / 3;
+  const handleUserScroll = () => {
+    isPausedRef.current = true;
+    stopAutoScroll();
 
-    if (el.scrollLeft < singleSetWidth * 0.5) {
-      el.scrollLeft += singleSetWidth;
+    if (scrollEndTimer.current) {
+      clearTimeout(scrollEndTimer.current);
     }
 
-    if (el.scrollLeft > singleSetWidth * 1.5) {
-      el.scrollLeft -= singleSetWidth;
-    }
-  }, []);
+    // Restart only after momentum stops (mobile-safe)
+    scrollEndTimer.current = setTimeout(() => {
+      isPausedRef.current = false;
+      startAutoScroll();
+    }, 120);
+  };
 
   const manualScroll = (dir: "left" | "right") => {
     const el = containerRef.current;
@@ -71,13 +95,14 @@ export const CategoryScroll: React.FC = () => {
       behavior: "smooth",
     });
 
-    setTimeout(startAutoScroll, 800);
+    setTimeout(startAutoScroll, 400);
   };
 
+  /* ----------------- Effects --------------------- */
+
   useEffect(() => {
-    const detectMobile = () => {
+    const detectMobile = () =>
       setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
-    };
 
     detectMobile();
     window.addEventListener("resize", detectMobile);
@@ -88,21 +113,20 @@ export const CategoryScroll: React.FC = () => {
     const el = containerRef.current;
     if (!el || categories.length === 0) return;
 
-    const singleSetWidth = el.scrollWidth / 3;
-    el.scrollLeft = singleSetWidth;
+    // Start from middle set
+    const setWidth = el.scrollWidth / 3;
+    el.scrollLeft = setWidth;
 
     startAutoScroll();
 
-    const onScroll = () => handleInfiniteBounds();
-    el.addEventListener("scroll", onScroll);
+    return () => stopAutoScroll();
+  }, [categories.length, startAutoScroll, stopAutoScroll]);
 
-    return () => {
-      el.removeEventListener("scroll", onScroll);
-      stopAutoScroll();
-    };
-  }, [categories.length, handleInfiniteBounds, startAutoScroll, stopAutoScroll]);
+  /* ----------------- Guards ---------------------- */
 
   if (loading || error || categories.length === 0) return null;
+
+  /* ------------------ JSX ------------------------ */
 
   return (
     <section className="py-10 bg-background w-full">
@@ -126,7 +150,7 @@ export const CategoryScroll: React.FC = () => {
           {!isMobile && (
             <button
               onClick={() => manualScroll("left")}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-2 bg-background  rounded-full shadow"
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-2 bg-background rounded-full shadow"
             >
               <ChevronLeft size={20} />
             </button>
@@ -135,7 +159,7 @@ export const CategoryScroll: React.FC = () => {
           {!isMobile && (
             <button
               onClick={() => manualScroll("right")}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-2 bg-background  rounded-full shadow"
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-2 bg-background rounded-full shadow"
             >
               <ChevronRight size={20} />
             </button>
@@ -144,13 +168,13 @@ export const CategoryScroll: React.FC = () => {
           <div
             ref={containerRef}
             className="flex gap-4 md:gap-6 overflow-x-scroll scrollbar-hide py-4"
+            style={{
+              WebkitOverflowScrolling: "touch",
+              touchAction: "pan-x",
+            }}
+            onScroll={handleUserScroll}
             onMouseEnter={() => (isPausedRef.current = true)}
             onMouseLeave={() => {
-              isPausedRef.current = false;
-              startAutoScroll();
-            }}
-            onTouchStart={() => (isPausedRef.current = true)}
-            onTouchEnd={() => {
               isPausedRef.current = false;
               startAutoScroll();
             }}
@@ -163,7 +187,7 @@ export const CategoryScroll: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <div className="w-20 h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 rounded-full  overflow-hidden bg-foreground/5 mb-2">
+                <div className="w-20 h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 rounded-full overflow-hidden bg-foreground/5 mb-2">
                   {category.imageUrl ? (
                     <img
                       src={category.imageUrl}

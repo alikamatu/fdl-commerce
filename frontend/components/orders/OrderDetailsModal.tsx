@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Calendar, MapPin, Truck, Package, CheckCircle, MessageCircle } from "lucide-react";
 import { Order } from "@/types/order";
-import { getStatusIcon, getStatusColor, formatOrderDate, formatCurrency, canCancelOrder } from "@/utils/orderStatus";
+import { getStatusIcon, getStatusColor, formatOrderDate, formatCurrency, canCancelOrder, formatStatusDisplay } from "@/utils/orderStatus";
 
 interface OrderDetailsModalProps {
   order: Order;
@@ -89,7 +89,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                     <div className="flex items-center space-x-2">
                       <StatusIcon className="w-5 h-5" />
                       <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(order.status)}`}>
-                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                        {formatStatusDisplay(order.status)} {order.status === "available" ? "for Pickup" : ""}
                       </span>
                     </div>
                   </div>

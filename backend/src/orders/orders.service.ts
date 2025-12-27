@@ -677,7 +677,7 @@ async cancelOrder(id: string, userId?: string, isAdmin: boolean = false): Promis
     throw new NotFoundException('Order not found');
   }
 
-  if (!['pending', 'confirmed'].includes(order.status)) {
+  if (!['pending_payment', 'pending', 'confirmed'].includes(order.status)) {
     throw new BadRequestException(`Cannot cancel order with status: ${order.status}`);
   }
 
