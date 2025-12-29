@@ -6,8 +6,8 @@ import { ChevronLeft, ChevronRight, Image as ImageIcon } from "lucide-react";
 import { useCategories } from "@/hooks/useCategories";
 
 const MOBILE_BREAKPOINT = 768;
-const DESKTOP_SPEED = 0.4; // px/frame
-const MOBILE_SPEED = 0.25;
+const DESKTOP_SPEED = 0.8; // px/frame
+const MOBILE_SPEED = 0.8;
 
 export const CategoryScroll: React.FC = () => {
   const { categories, loading, error } = useCategories();

@@ -30,7 +30,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
     const adminWhatsAppNumber = process.env.NEXT_PUBLIC_ADMIN_WHATSAPP_NUMBER || '233547129636';
     const message = `Hello! I need follow-up on my order:\n\n` +
       `Order #: ${order.orderNumber}\n` +
-      `Status: ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}\n` +
+      `Status: ${formatStatusDisplay(order.status)}\n` +
       `Total: GH₵${(order.totalCents / 100).toFixed(2)}\n` +
       `Ordered: ${new Date(order.createdAt).toLocaleDateString()}\n` +
       `Delivery: ${order.shippingAddress.firstName} ${order.shippingAddress.lastName}, ${order.shippingAddress.city}\n\n` +

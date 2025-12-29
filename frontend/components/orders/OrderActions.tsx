@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Eye, X, Truck, MessageCircle } from "lucide-react";
 import { Order } from "@/types/order";
-import { canCancelOrder } from "@/utils/orderStatus";
+import { canCancelOrder, formatStatusDisplay } from "@/utils/orderStatus";
 
 interface OrderActionsProps {
   order: Order;
@@ -46,7 +46,7 @@ export const OrderActions: React.FC<OrderActionsProps> = ({
     
     const message = `Hello! I need follow-up on my order:\n\n` +
       `Order #: ${order.orderNumber}\n` +
-      `Status: ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}\n` +
+      `Status: ${formatStatusDisplay(order.status)}\n` +
       `Total: GH₵${(order.totalCents / 100).toFixed(2)}\n` +
       `Ordered: ${new Date(order.createdAt).toLocaleDateString()}\n\n` +
       `Delivery: ${order.shippingAddress.firstName} ${order.shippingAddress.lastName}, ${order.shippingAddress.city}\n\n` +
@@ -56,7 +56,7 @@ export const OrderActions: React.FC<OrderActionsProps> = ({
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${adminWhatsAppNumber}?text=${encodedMessage}`;
     
-    window.open(whatsappUrl, '_blank');
+    window.open(whatsappUrl);
   };
 
   return (
