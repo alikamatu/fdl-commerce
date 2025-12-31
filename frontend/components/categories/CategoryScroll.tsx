@@ -6,107 +6,53 @@ import { ChevronLeft, ChevronRight, Image as ImageIcon } from "lucide-react";
 import { useCategories } from "@/hooks/useCategories";
 
 const MOBILE_BREAKPOINT = 768;
-const DESKTOP_SPEED = 0.8; // px/frame
-const MOBILE_SPEED = 0.8;
-const SCROLL_PAUSE_DURATION = 0; // 3 seconds before resuming
 
 export const CategoryScroll: React.FC = () => {
   const { categories, loading, error } = useCategories();
 
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const rafRef = useRef<number | null>(null);
-  const scrollEndTimer = useRef<NodeJS.Timeout | null>(null);
-  const lastUserInteractionRef = useRef<number>(0);
-
-  const isPausedRef = useRef(false);
+  const [isAutoScrolling, setIsAutoScrolling] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const scrollResumeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const items = [...categories, ...categories, ...categories];
 
-  const handleInfiniteBounds = useCallback(() => {
-    const el = containerRef.current;
-    if (!el) return;
 
-    const setWidth = el.scrollWidth / 3;
+  const pauseAutoScroll = useCallback(() => {
+    setIsAutoScrolling(false);
 
-    if (el.scrollLeft < setWidth * 0.5) {
-      el.scrollLeft += setWidth;
-    } else if (el.scrollLeft > setWidth * 1.5) {
-      el.scrollLeft -= setWidth;
+    if (scrollResumeTimerRef.current) {
+      clearTimeout(scrollResumeTimerRef.current);
     }
+
+    // Resume after 2 seconds of inactivity
+    scrollResumeTimerRef.current = setTimeout(() => {
+      setIsAutoScrolling(true);
+    }, 200);
   }, []);
-
-  /* ---------------- Auto Scroll ------------------ */
-
-  const startAutoScroll = useCallback(() => {
-    if (rafRef.current) return;
-
-    const speed = isMobile ? MOBILE_SPEED : DESKTOP_SPEED;
-
-    const step = () => {
-      const el = containerRef.current;
-      if (!el) {
-        rafRef.current = null;
-        return;
-      }
-
-      // Check if pause duration has expired
-      const timeSinceLastInteraction = Date.now() - lastUserInteractionRef.current;
-      if (timeSinceLastInteraction < SCROLL_PAUSE_DURATION) {
-        rafRef.current = requestAnimationFrame(step);
-        return;
-      }
-
-      el.scrollLeft += speed;
-      handleInfiniteBounds();
-
-      rafRef.current = requestAnimationFrame(step);
-    };
-
-    rafRef.current = requestAnimationFrame(step);
-  }, [handleInfiniteBounds, isMobile]);
-
-  const stopAutoScroll = useCallback(() => {
-    if (rafRef.current) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    }
-  }, []);
-
-  /* ------------- User Interaction ---------------- */
 
   const handleUserScroll = useCallback(() => {
-    lastUserInteractionRef.current = Date.now();
-    
-    if (scrollEndTimer.current) {
-      clearTimeout(scrollEndTimer.current);
-    }
-
-    // Timer ensures we wait for momentum to settle before resuming
-    scrollEndTimer.current = setTimeout(() => {
-      startAutoScroll();
-    }, SCROLL_PAUSE_DURATION);
-  }, [startAutoScroll]);
+    pauseAutoScroll();
+  }, [pauseAutoScroll]);
 
   const manualScroll = (dir: "left" | "right") => {
     const el = containerRef.current;
     if (!el) return;
 
-    stopAutoScroll();
-    lastUserInteractionRef.current = Date.now();
+    pauseAutoScroll();
 
     el.scrollBy({
       left: dir === "left" ? -el.clientWidth * 0.6 : el.clientWidth * 0.6,
       behavior: "smooth",
     });
 
+    // Resume after animation completes
     setTimeout(() => {
-      lastUserInteractionRef.current = Date.now();
-      startAutoScroll();
-    }, 400);
+      setIsAutoScrolling(true);
+    }, 600);
   };
 
-  /* ----------------- Effects --------------------- */
+  /* --------------- Effects --------------- */
 
   useEffect(() => {
     const detectMobile = () =>
@@ -121,30 +67,48 @@ export const CategoryScroll: React.FC = () => {
     const el = containerRef.current;
     if (!el || categories.length === 0) return;
 
-    // Start from middle set
+    // Initialize scroll position to middle set
     const setWidth = el.scrollWidth / 3;
     el.scrollLeft = setWidth;
 
-    // Add small delay to ensure DOM is ready
-    const timer = setTimeout(() => {
-      lastUserInteractionRef.current = Date.now();
-      startAutoScroll();
-    }, 100);
+    setIsAutoScrolling(true);
 
     return () => {
-      clearTimeout(timer);
-      stopAutoScroll();
+      if (scrollResumeTimerRef.current) {
+        clearTimeout(scrollResumeTimerRef.current);
+      }
     };
-  }, [categories.length, startAutoScroll, stopAutoScroll]);
+  }, [categories.length]);
 
-  /* ----------------- Guards ---------------------- */
+  /* --------------- CSS Animation --------------- */
+
+  const animationDuration = isMobile ? 20 : 25; // seconds for full scroll
+
+  const scrollAnimation = `
+    @keyframes autoScroll {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(calc(-100% / 3));
+      }
+    }
+
+    .auto-scroll-active {
+      animation: autoScroll ${animationDuration}s linear infinite;
+    }
+  `;
+
+  /* --------------- Guards --------------- */
 
   if (loading || error || categories.length === 0) return null;
 
-  /* ------------------ JSX ------------------------ */
+  /* --------------- JSX --------------- */
 
   return (
     <section className="py-10 bg-background w-full">
+      <style>{scrollAnimation}</style>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -161,7 +125,7 @@ export const CategoryScroll: React.FC = () => {
           </p>
         </motion.div>
 
-        <div className="relative">
+        <div className="relative overflow-hidden">
           {!isMobile && (
             <button
               onClick={() => manualScroll("left")}
@@ -181,61 +145,54 @@ export const CategoryScroll: React.FC = () => {
           )}
 
           <div
-            ref={containerRef}
-            className="flex gap-4 md:gap-6 overflow-x-scroll scrollbar-hide py-4"
-            style={{
-              WebkitOverflowScrolling: "touch",
-              touchAction: "pan-x",
-            }}
-            onScroll={handleUserScroll}
-            onMouseEnter={() => {
-              stopAutoScroll();
-            }}
-            onMouseLeave={() => {
-              lastUserInteractionRef.current = Date.now();
-              startAutoScroll();
-            }}
+            className="relative"
+            onMouseEnter={() => setIsAutoScrolling(false)}
+            onMouseLeave={() => setIsAutoScrolling(true)}
           >
-            {items.map((category, index) => (
-              <motion.a
-                key={`${category._id}-${index}`}
-                href={`/products?category=${category._id}`}
-                className="flex-shrink-0 w-24 md:w-32 lg:w-40 flex flex-col items-center"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <div className="w-20 h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 rounded-full overflow-hidden bg-foreground/5 mb-2">
-                  {category.imageUrl ? (
-                    <img
-                      src={category.imageUrl}
-                      alt={category.name}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <ImageIcon className="text-foreground/30" />
-                    </div>
-                  )}
-                </div>
+            <div
+              ref={containerRef}
+              className={`flex gap-4 md:gap-6 py-4 ${
+                isAutoScrolling ? "auto-scroll-active" : ""
+              }`}
+              style={{
+                WebkitOverflowScrolling: "touch",
+                width: "100%",
+              }}
+              onScroll={handleUserScroll}
+              onTouchStart={() => pauseAutoScroll()}
+            >
+              {items.map((category, index) => (
+                <motion.a
+                  key={`${category._id}-${index}`}
+                  href={`/products?category=${category._id}`}
+                  className="flex-shrink-0 w-24 md:w-32 lg:w-40 flex flex-col items-center"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <div className="w-20 h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 rounded-full overflow-hidden bg-foreground/5 mb-2">
+                    {category.imageUrl ? (
+                      <img
+                        src={category.imageUrl}
+                        alt={category.name}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <ImageIcon className="text-foreground/30" />
+                      </div>
+                    )}
+                  </div>
 
-                <span className="text-xs md:text-sm text-center text-foreground/80">
-                  {category.name}
-                </span>
-              </motion.a>
-            ))}
+                  <span className="text-xs md:text-sm text-center text-foreground/80">
+                    {category.name}
+                  </span>
+                </motion.a>
+              ))}
+            </div>
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        .scrollbar-hide {
-          scrollbar-width: none;
-        }
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
     </section>
   );
 };
