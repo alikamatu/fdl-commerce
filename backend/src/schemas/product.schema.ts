@@ -71,7 +71,7 @@ reviewCount: number;
 
   // New fields for deals and discounts
   @Prop({ default: null })
-  originalPriceCents: number;
+  originalPriceCents?: number;
 
   @Prop({ default: 0 })
   discountPercent: number;
@@ -80,7 +80,7 @@ reviewCount: number;
   isDeal: boolean;
 
   @Prop({ default: null })
-  dealExpiresAt: Date;
+  dealExpiresAt?: Date;
 
   @Prop({ 
     default: 0,

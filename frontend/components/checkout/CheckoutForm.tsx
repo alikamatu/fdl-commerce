@@ -14,7 +14,7 @@ interface CheckoutFormProps {
   onOrderComplete: (orderData: any) => void;
 }
 
-type PaymentMethod = 'paystack' | 'cash_on_delivery' | 'cash_on_pickup';
+type PaymentMethod = 'paystack' | 'cash_or_momo' | 'cash_or_momo';
 
 declare global {
   interface Window {
@@ -47,7 +47,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   const [paystackLoaded, setPaystackLoaded] = useState(false);
   const [error, setError] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
-    deliveryMethod === 'delivery' ? 'cash_on_delivery' : 'cash_on_pickup'
+    deliveryMethod === 'delivery' ? 'cash_or_momo' : 'cash_or_momo'
   );
 
   const [formData, setFormData] = useState({
@@ -538,7 +538,7 @@ const initializePaystackPayment = (order: any) => {
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                   onClick={() => setPaymentMethod(
-                    deliveryMethod === 'delivery' ? 'cash_on_delivery' : 'cash_on_pickup'
+                    deliveryMethod === 'delivery' ? 'cash_or_momo' : 'cash_or_momo'
                   )}
                   whileHover={{ scale: 1.02 }}
                 >

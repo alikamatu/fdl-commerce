@@ -357,6 +357,7 @@ export default function ProductEditPage() {
     } : {
       originalPriceCents: null,
       discountPercent: 0,
+      isDeal: data.isDeal,
       dealExpiresAt: null,
     }),
   };
@@ -696,7 +697,7 @@ export default function ProductEditPage() {
           </motion.div>
 
           {/* Deal & Discount */}
-          {/* <motion.div
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -798,7 +799,7 @@ export default function ProductEditPage() {
                 </motion.div>
               )}
             </div>
-          </motion.div> */}
+          </motion.div>
 
           {/* Images */}
           <motion.div

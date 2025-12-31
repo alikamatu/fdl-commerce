@@ -16,8 +16,8 @@ interface RecommendedProductsProps {
 }
 
 export const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
-  title = "Game Consoles & Controllers",
-  category = "game-consoles-controllers", // You'll need to update this with your actual laptop category ID
+  title = "Phones",
+  category = "phones", // You'll need to update this with your actual laptop category ID
   limit = 10,
   showViewAll = true,
 }) => {
@@ -98,7 +98,7 @@ export const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
                 {title}
               </h2>
               <p className="text-foreground/60 text-sm">
-                Curated selection of latest top-performing game consoles and controllers
+                Curated selection of latest top-performing mobile phones
               </p>
             </div>
           </div>
@@ -108,7 +108,7 @@ export const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
               href={`/products?category=${category}`}
               className="hidden sm:flex items-center gap-2 px-4 py-2 border border-foreground/20 rounded-lg font-medium hover:bg-foreground/5 transition-colors"
             >
-              View All Game Consoles & Controllers
+              View All Phones
               <ArrowRight size={16} />
             </a>
           )}
@@ -196,7 +196,7 @@ export const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
               href={`/products?category=${category}`}
               className="inline-flex items-center gap-2 px-6 py-3 border border-foreground/20 rounded-lg font-medium hover:bg-foreground/5 transition-colors"
             >
-              View All Game Consoles & Controllers
+              View All Game Phones
               <ArrowRight size={16} />
             </a>
           </div>

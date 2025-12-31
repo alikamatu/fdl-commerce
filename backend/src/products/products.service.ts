@@ -22,7 +22,6 @@ export class ProductsService {
       throw new ConflictException('Product with this SKU already exists');
     }
 
-    // Verify category exists
     const category = await this.categoryModel.findById(createProductDto.categoryId);
     if (!category) {
       throw new NotFoundException('Category not found');
@@ -32,165 +31,224 @@ export class ProductsService {
     return createdProduct.save();
   }
 
-  async findAll({
-    page = 1,
-    limit = 10,
-    category,
-    search,
-    brand,
-    minPrice,
-    maxPrice,
-    inStock,
-    isDeal,
-    sortBy = 'newest' // Add sortBy parameter with default
-  }: {
-    page?: number;
-    limit?: number;
-    category?: string;
-    search?: string;
-    brand?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    inStock?: boolean;
-    isDeal?: boolean;
-    sortBy?: string; // Add this
-  } = {}) {
-    const query: any = { isActive: true };
-
-      query.$or = [
-    { isDeal: false },
-    { 
+  // In products.service.ts, add this method:
+async updateExpiredDeals(): Promise<void> {
+  const currentDate = new Date();
+  
+  await this.productModel.updateMany(
+    {
       isDeal: true,
-      dealExpiresAt: { $gt: new Date() }
+      dealExpiresAt: { $lte: currentDate }
     },
-    { 
-      isDeal: true,
-      dealExpiresAt: null
-    },
-    { 
-      isDeal: true,
-      dealExpiresAt: { $exists: false }
+    {
+      $set: {
+        isDeal: false,
+        originalPriceCents: undefined,
+        discountPercent: 0,
+        dealExpiresAt: undefined
+      }
     }
-  ];
+  );
+}
 
-    if (category) {
-      // Try both ObjectId and string comparison
-      query.$or = [
-        { categoryId: category },
-        { categoryId: new Types.ObjectId(category) }
-      ];
-    }
+async findAll({
+  page = 1,
+  limit = 10,
+  category,
+  search,
+  brand,
+  minPrice,
+  maxPrice,
+  inStock,
+  isDeal,
+  sortBy = 'newest'
+}: {
+  page?: number;
+  limit?: number;
+  category?: string;
+  search?: string;
+  brand?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  inStock?: boolean;
+  isDeal?: boolean;
+  sortBy?: string;
+} = {}) {
+  // Start with base query
+  const query: any = { isActive: true };
 
-    if (search) {
-      query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-        { brand: { $regex: search, $options: 'i' } },
-      ];
-    }
+  if (category) {
+    // Try both ObjectId and string comparison
+    query.$or = [
+      { categoryId: category },
+      { categoryId: new Types.ObjectId(category) }
+    ];
+  }
 
-    if (minPrice !== undefined) {
-      query.priceCents = { ...query.priceCents, $gte: minPrice };
-    }
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: 'i' } },
+      { description: { $regex: search, $options: 'i' } },
+      { brand: { $regex: search, $options: 'i' } },
+    ];
+  }
 
-    if (maxPrice !== undefined) {
-      query.priceCents = { ...query.priceCents, $lte: maxPrice };
-    }
+  if (minPrice !== undefined) {
+    query.priceCents = { ...query.priceCents, $gte: minPrice };
+  }
 
-    if (inStock !== undefined) {
-      query.stock = inStock ? { $gt: 0 } : { $lte: 0 };
-    }
+  if (maxPrice !== undefined) {
+    query.priceCents = { ...query.priceCents, $lte: maxPrice };
+  }
 
-    if (brand) {
-      query.brand = { $regex: brand, $options: 'i' };
-    }
+  if (inStock !== undefined) {
+    query.stock = inStock ? { $gt: 0 } : { $lte: 0 };
+  }
 
-    // Add isDeal filter - only show products that are marked as deals AND haven't expired
-    if (isDeal !== undefined && isDeal) {
+  if (brand) {
+    query.brand = { $regex: brand, $options: 'i' };
+  }
+
+  // IMPORTANT FIX: Handle deal filtering correctly
+  if (isDeal !== undefined) {
+    if (isDeal) {
+      // When specifically looking for deals, only show ACTIVE deals
       query.isDeal = true;
-      query.dealExpiresAt = { $gt: new Date() }; // Only active deals
+      query.$or = [
+        { dealExpiresAt: { $gt: new Date() } },
+        { dealExpiresAt: null },
+        { dealExpiresAt: { $exists: false } }
+      ];
+    } else {
+      // When NOT looking for deals, show non-deals AND expired deals
+      query.$or = [
+        { isDeal: false },
+        { 
+          isDeal: true,
+          dealExpiresAt: { $lt: new Date() }
+        }
+      ];
     }
-
-    const skip = (page - 1) * limit;
-
-    // Determine sort order based on sortBy parameter
-    let sortOption: any = { createdAt: -1 }; // Default: newest first
-
-    switch (sortBy) {
-      case 'price-low':
-        sortOption = { priceCents: 1 }; // Price: Low to High
-        break;
-      case 'price-high':
-        sortOption = { priceCents: -1 }; // Price: High to Low
-        break;
-      case 'name':
-        sortOption = { title: 1 }; // Name: A to Z
-        break;
-      case 'stock':
-        sortOption = { stock: -1 }; // In Stock First (highest stock first)
-        break;
-      case 'discount':
-        sortOption = { discountPercent: -1, createdAt: -1 }; // Best Discount
-        break;
-      case 'rating':
-        sortOption = { averageRating: -1, createdAt: -1 }; // Highest Rated
-        break;
-      case 'newest':
-      default:
-        sortOption = { createdAt: -1 }; // Newest First
-        break;
-    }
-
-    console.log('Query:', JSON.stringify(query)); // Debug log
-    console.log('Skip:', skip, 'Limit:', limit); // Debug log
-    console.log('Sort:', sortOption); // Debug log
-
-    const [products, total] = await Promise.all([
-      this.productModel
-        .find(query)
-        .populate('categoryId', 'name slug imageUrl')
-        .sort(sortOption) // Apply dynamic sorting
-        .skip(skip)
-        .limit(limit)
-        .exec(),
-      this.productModel.countDocuments(query),
-    ]);
-
-    console.log('Found products:', products.length); // Debug log
-
-    return {
-      products,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit),
-    };
+  } else {
+    // By default (isDeal not specified), show all products including expired deals as normal products
+    // No special filtering needed - the application logic will handle expired deals
   }
 
-  async findOne(id: string): Promise<Product> {
-    const product = await this.productModel
-      .findById(id)
-      .populate('categoryId', 'name slug')
-      .exec();
+  const skip = (page - 1) * limit;
 
-    if (!product) {
-      throw new NotFoundException('Product not found');
-    }
+  // ... rest of your sort logic remains the same
+  let sortOption: any = { createdAt: -1 };
 
-    return product;
+  switch (sortBy) {
+    case 'price-low':
+      sortOption = { priceCents: 1 };
+      break;
+    case 'price-high':
+      sortOption = { priceCents: -1 };
+      break;
+    case 'name':
+      sortOption = { title: 1 };
+      break;
+    case 'stock':
+      sortOption = { stock: -1 };
+      break;
+    case 'discount':
+      sortOption = { discountPercent: -1, createdAt: -1 };
+      break;
+    case 'rating':
+      sortOption = { averageRating: -1, createdAt: -1 };
+      break;
+    case 'newest':
+    default:
+      sortOption = { createdAt: -1 };
+      break;
   }
 
-  async findBySku(sku: string): Promise<Product> {
-    const product = await this.productModel
-      .findOne({ sku })
-      .populate('categoryId', 'name slug')
-      .exec();
+  const [products, total] = await Promise.all([
+    this.productModel
+      .find(query)
+      .populate('categoryId', 'name slug imageUrl')
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limit)
+      .exec(),
+    this.productModel.countDocuments(query),
+  ]);
 
-    if (!product) {
-      throw new NotFoundException('Product not found');
+  // Post-processing: Automatically convert expired deals to normal products
+  const currentDate = new Date();
+  const processedProducts = products.map(product => {
+    const productObj = product.toObject();
+    
+    // If deal has expired, convert it to a normal product
+    if (productObj.isDeal && productObj.dealExpiresAt && 
+        productObj.dealExpiresAt <= currentDate) {
+      productObj.isDeal = false;
+      productObj.originalPriceCents = undefined;
+      productObj.discountPercent = 0;
+      productObj.dealExpiresAt = undefined;
     }
+    
+    return productObj;
+  });
 
-    return product;
+  return {
+    products: processedProducts,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
+}
+
+async findOne(id: string): Promise<any> {
+  const product = await this.productModel
+    .findById(id)
+    .populate('categoryId', 'name slug')
+    .exec();
+
+  if (!product) {
+    throw new NotFoundException('Product not found');
   }
+
+  // Convert expired deal to normal product
+  const productObj = product.toObject();
+  const currentDate = new Date();
+  
+  if (productObj.isDeal && productObj.dealExpiresAt && 
+      productObj.dealExpiresAt <= currentDate) {
+    productObj.isDeal = false;
+    productObj.originalPriceCents = undefined;
+    productObj.discountPercent = 0;
+    productObj.dealExpiresAt = undefined;
+  }
+
+  return productObj;
+}
+
+async findBySku(sku: string): Promise<any> {
+  const product = await this.productModel
+    .findOne({ sku })
+    .populate('categoryId', 'name slug')
+    .exec();
+
+  if (!product) {
+    throw new NotFoundException('Product not found');
+  }
+
+  // Convert expired deal to normal product
+  const productObj = product.toObject();
+  const currentDate = new Date();
+  
+  if (productObj.isDeal && productObj.dealExpiresAt && 
+      productObj.dealExpiresAt <= currentDate) {
+    productObj.isDeal = false;
+    productObj.originalPriceCents = undefined;
+    productObj.discountPercent = 0;
+    productObj.dealExpiresAt = undefined;
+  }
+
+  return productObj;
+}
 
   async update(id: string, updateProductDto: UpdateProductDto): Promise<Product> {
     if (updateProductDto.sku) {

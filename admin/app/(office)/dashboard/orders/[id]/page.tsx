@@ -954,6 +954,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
         onChange={(e) => setSelectedPaymentMethod(e.target.value)}
         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black focus:border-black transition-all duration-200 bg-white appearance-none cursor-pointer"
       >
+        <option value="cash_or_momo">N/A</option>
         <option value="mobile_money">Mobile Money (MoMo)</option>
         <option value="cash">Cash</option>
         <option value="bank_transfer">Bank Transfer</option>

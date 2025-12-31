@@ -8,6 +8,7 @@ import { useCategories } from "@/hooks/useCategories";
 const MOBILE_BREAKPOINT = 768;
 const DESKTOP_SPEED = 0.8; // px/frame
 const MOBILE_SPEED = 0.8;
+const SCROLL_PAUSE_DURATION = 0; // 3 seconds before resuming
 
 export const CategoryScroll: React.FC = () => {
   const { categories, loading, error } = useCategories();
@@ -15,14 +16,12 @@ export const CategoryScroll: React.FC = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const scrollEndTimer = useRef<NodeJS.Timeout | null>(null);
+  const lastUserInteractionRef = useRef<number>(0);
 
   const isPausedRef = useRef(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Repeat categories for seamless infinite scroll
   const items = [...categories, ...categories, ...categories];
-
-  /* -------------------- Utils -------------------- */
 
   const handleInfiniteBounds = useCallback(() => {
     const el = containerRef.current;
@@ -46,8 +45,15 @@ export const CategoryScroll: React.FC = () => {
 
     const step = () => {
       const el = containerRef.current;
-      if (!el || isPausedRef.current) {
+      if (!el) {
         rafRef.current = null;
+        return;
+      }
+
+      // Check if pause duration has expired
+      const timeSinceLastInteraction = Date.now() - lastUserInteractionRef.current;
+      if (timeSinceLastInteraction < SCROLL_PAUSE_DURATION) {
+        rafRef.current = requestAnimationFrame(step);
         return;
       }
 
@@ -69,33 +75,35 @@ export const CategoryScroll: React.FC = () => {
 
   /* ------------- User Interaction ---------------- */
 
-  const handleUserScroll = () => {
-    isPausedRef.current = true;
-    stopAutoScroll();
-
+  const handleUserScroll = useCallback(() => {
+    lastUserInteractionRef.current = Date.now();
+    
     if (scrollEndTimer.current) {
       clearTimeout(scrollEndTimer.current);
     }
 
-    // Restart only after momentum stops (mobile-safe)
+    // Timer ensures we wait for momentum to settle before resuming
     scrollEndTimer.current = setTimeout(() => {
-      isPausedRef.current = false;
       startAutoScroll();
-    }, 120);
-  };
+    }, SCROLL_PAUSE_DURATION);
+  }, [startAutoScroll]);
 
   const manualScroll = (dir: "left" | "right") => {
     const el = containerRef.current;
     if (!el) return;
 
     stopAutoScroll();
+    lastUserInteractionRef.current = Date.now();
 
     el.scrollBy({
       left: dir === "left" ? -el.clientWidth * 0.6 : el.clientWidth * 0.6,
       behavior: "smooth",
     });
 
-    setTimeout(startAutoScroll, 400);
+    setTimeout(() => {
+      lastUserInteractionRef.current = Date.now();
+      startAutoScroll();
+    }, 400);
   };
 
   /* ----------------- Effects --------------------- */
@@ -117,9 +125,16 @@ export const CategoryScroll: React.FC = () => {
     const setWidth = el.scrollWidth / 3;
     el.scrollLeft = setWidth;
 
-    startAutoScroll();
+    // Add small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      lastUserInteractionRef.current = Date.now();
+      startAutoScroll();
+    }, 100);
 
-    return () => stopAutoScroll();
+    return () => {
+      clearTimeout(timer);
+      stopAutoScroll();
+    };
   }, [categories.length, startAutoScroll, stopAutoScroll]);
 
   /* ----------------- Guards ---------------------- */
@@ -173,9 +188,11 @@ export const CategoryScroll: React.FC = () => {
               touchAction: "pan-x",
             }}
             onScroll={handleUserScroll}
-            onMouseEnter={() => (isPausedRef.current = true)}
+            onMouseEnter={() => {
+              stopAutoScroll();
+            }}
             onMouseLeave={() => {
-              isPausedRef.current = false;
+              lastUserInteractionRef.current = Date.now();
               startAutoScroll();
             }}
           >

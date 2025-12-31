@@ -870,7 +870,7 @@ export class EmailService {
                           </td>
                           <td width="50%" style="padding: 5px 0 5px 10px;">
                             <strong style="color: #555;">Payment Method:</strong><br>
-                            <span style="color: #333;">${order.deliveryMethod === 'delivery' ? 'Cash' : 'Cash/Momo'}</span>
+                            <span style="color: #333;">${order.deliveryMethod === 'delivery' || order.deliveryMethod === 'pickup' ? 'N/A' : 'Paystack'}</span>
                           </td>
                         </tr>
                         <tr>

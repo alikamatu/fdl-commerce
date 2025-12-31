@@ -18,11 +18,12 @@ export interface HeroSlide {
 const defaultSlides: HeroSlide[] = [
   {
     id: '1',
-    image: '/images/253832.jpg',
+    image: '/images/12421.svg',
     title: 'Cash on Delivery / Pickup @ UPSA Campus',
     description: 'Free Delivery',
     ctaText: 'Shop Now',
     ctaLink: '/products',
+    textColor: 'black',
   },
   {
     id: '2',
@@ -31,6 +32,7 @@ const defaultSlides: HeroSlide[] = [
     description: 'Discover the latest additions to our curated collection',
     ctaText: 'Explore New',
     ctaLink: '/products?sort=newest',
+    textColor: 'white',
   },
   {
     id: '3',
@@ -39,6 +41,7 @@ const defaultSlides: HeroSlide[] = [
     description: 'Save big on premium items with exclusive discounts',
     ctaText: 'View Deals',
     ctaLink: '/products?discount=true',
+    textColor: 'black',
   },
   {
     id: '4',
@@ -46,7 +49,8 @@ const defaultSlides: HeroSlide[] = [
     title: 'Premium Quality Guranteed',
     description: 'Shop with confidence with our authenticity promise',
     ctaText: 'Learn More',
-    ctaLink: '/faqs'
+    ctaLink: '/faqs',
+    textColor: 'white',
   },
 ];
 
@@ -113,7 +117,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
                       initial={{ opacity: 0, y: 30 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.7, delay: 0.2 }}
-                      className="max-w-2xl text-white"
+                      className={`max-w-2xl ${slides[currentSlide].textColor === 'white' ? 'text-white' : 'text-black'}`}
                     >
                       <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light mb-3 md:mb-4 leading-tight">
                         {slides[currentSlide].title}
