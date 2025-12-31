@@ -18,6 +18,16 @@ export class EmailService {
     this.logger.log('✅ Resend email service initialized');
   }
 
+    private formatOrderStatus(status: string): string {
+    if (!status) return 'Unknown Status';
+    
+    // Replace underscores with spaces and capitalize each word
+    return status
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  }
+
   // Keep existing verification, password reset, and welcome emails as they are
   async sendVerificationEmail(email: string, token: string, displayName: string) {
     const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
@@ -746,13 +756,14 @@ export class EmailService {
   private generateAdminOrderText(order: any): string {
     const items = order.items || [];
     const shippingAddress = order.shippingAddress || {};
+    const formattedStatus = this.formatOrderStatus(order.status);
 
     let text = `NEW ORDER RECEIVED!\n\n`;
     text += `Order Details:\n`;
     text += `${'-'.repeat(60)}\n`;
     text += `Order Number: ${order.orderNumber}\n`;
     text += `Order Date: ${new Date().toLocaleDateString()}\n`;
-    text += `Status: ${order.status}\n\n`;
+    text += `Status: ${formattedStatus}\n\n`;
     
     text += `CUSTOMER INFORMATION:\n`;
     text += `Name: ${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}\n`;
@@ -791,6 +802,7 @@ export class EmailService {
   private generateAdminOrderHTML(order: any): string {
     const items = order.items || [];
     const shippingAddress = order.shippingAddress || {};
+    const formattedStatus = this.formatOrderStatus(order.status);
 
     return `
       <!DOCTYPE html>
@@ -849,7 +861,7 @@ export class EmailService {
                           </td>
                           <td width="50%" style="padding: 5px 0 5px 10px; vertical-align: top;">
                             <strong style="color: #555;">Status:</strong><br>
-                            <span style="background-color: #ffc107; color: #000; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">${order.status}</span>
+                            <span style="background-color: #ffc107; color: #000; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">${formattedStatus}</span>
                           </td>
                         </tr>
                       </table>

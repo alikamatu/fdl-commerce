@@ -335,32 +335,32 @@ export default function ProductEditPage() {
     try {
       const imageUrls = await uploadAllImages();
 
-      const productData = {
-        sku: data.sku,
-        title: data.title,
-        description: data.description,
-        priceCents: Math.round(parseFloat(data.price) * 100),
-        currency: data.currency,
-        categoryId: data.categoryId,
-        brand: data.brand,
-        stock: parseInt(data.stock),
-        images: imageUrls.map((url, index) => ({
-          url,
-          alt: data.title,
-          position: index,
-        })),
-        specifications: specifications.filter(spec => spec.key && spec.value),
-       ...(data.isDeal ? {
-      originalPriceCents: data.originalPrice ? Math.round(parseFloat(data.originalPrice) * 100) : undefined,
-      discountPercent: data.discountPercent ? parseFloat(data.discountPercent) : undefined,
-      dealExpiresAt: data.dealExpiresAt ? new Date(data.dealExpiresAt) : undefined,
-    } : {
-      originalPriceCents: null,
-      discountPercent: 0,
-      isDeal: data.isDeal,
-      dealExpiresAt: null,
-    }),
-  };
+const productData = {
+  sku: data.sku,
+  title: data.title,
+  description: data.description,
+  priceCents: Math.round(parseFloat(data.price) * 100),
+  currency: data.currency,
+  categoryId: data.categoryId,
+  brand: data.brand,
+  stock: parseInt(data.stock),
+  images: imageUrls.map((url, index) => ({
+    url,
+    alt: data.title,
+    position: index,
+  })),
+  specifications: specifications.filter(spec => spec.key && spec.value),
+  isDeal: data.isDeal, // Always include isDeal field
+  originalPriceCents: data.isDeal && data.originalPrice
+    ? Math.round(parseFloat(data.originalPrice) * 100)
+    : undefined,
+  discountPercent: data.isDeal && data.discountPercent
+    ? parseInt(data.discountPercent)
+    : undefined,
+  dealExpiresAt: data.isDeal && data.dealExpiresAt
+    ? new Date(data.dealExpiresAt).toISOString()
+    : undefined,
+};
 
       const token = getAuthToken();
 

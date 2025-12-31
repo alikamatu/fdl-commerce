@@ -196,7 +196,7 @@ export const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
               href={`/products?category=${category}`}
               className="inline-flex items-center gap-2 px-6 py-3 border border-foreground/20 rounded-lg font-medium hover:bg-foreground/5 transition-colors"
             >
-              View All Game Phones
+              View All Phones
               <ArrowRight size={16} />
             </a>
           </div>
