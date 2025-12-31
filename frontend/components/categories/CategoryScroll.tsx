@@ -17,6 +17,7 @@ export const CategoryScroll: React.FC = () => {
 
   const items = [...categories, ...categories, ...categories];
 
+  /* ------------- User Interaction Handlers --------- */
 
   const pauseAutoScroll = useCallback(() => {
     setIsAutoScrolling(false);
@@ -25,10 +26,10 @@ export const CategoryScroll: React.FC = () => {
       clearTimeout(scrollResumeTimerRef.current);
     }
 
-    // Resume after 2 seconds of inactivity
+    // Resume after 3 seconds of inactivity
     scrollResumeTimerRef.current = setTimeout(() => {
       setIsAutoScrolling(true);
-    }, 200);
+    }, 3000);
   }, []);
 
   const handleUserScroll = useCallback(() => {
@@ -97,6 +98,10 @@ export const CategoryScroll: React.FC = () => {
     .auto-scroll-active {
       animation: autoScroll ${animationDuration}s linear infinite;
     }
+
+    .auto-scroll-paused {
+      animation-play-state: paused;
+    }
   `;
 
   /* --------------- Guards --------------- */
@@ -152,7 +157,7 @@ export const CategoryScroll: React.FC = () => {
             <div
               ref={containerRef}
               className={`flex gap-4 md:gap-6 py-4 ${
-                isAutoScrolling ? "auto-scroll-active" : ""
+                isAutoScrolling ? "auto-scroll-active" : "auto-scroll-paused"
               }`}
               style={{
                 WebkitOverflowScrolling: "touch",
