@@ -503,30 +503,30 @@ const initializePaystackPayment = (order: any) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Paystack Payment */}
                 <motion.div
-                  className={`p-6 border-2 rounded-xl cursor-pointer transition-all ${
-                    paymentMethod === 'paystack' 
-                      ? 'border-black bg-black/5' 
-                      : 'border-gray-200 hover:border-gray-300'
+                  className={`p-6 border-2 rounded-xl cursor-not-allowed transition-all opacity-50 ${
+                  paymentMethod === 'paystack' 
+                    ? 'border-black bg-black/5' 
+                    : 'border-gray-200 hover:border-gray-300'
                   }`}
-                  onClick={() => setPaymentMethod('paystack')}
-                  whileHover={{ scale: 1.02 }}
+                  onClick={() => {}}
+                  whileHover={{ scale: 1 }}
                 >
                   <div className="flex items-center gap-4 mb-4">
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                      paymentMethod === 'paystack' ? 'border-black' : 'border-gray-300'
-                    }`}>
-                      {paymentMethod === 'paystack' && (
-                        <div className="w-3 h-3 bg-black rounded-full" />
-                      )}
-                    </div>
-                    <Smartphone size={24} />
-                    <div>
-                      <h4 className="font-semibold">Pay with Paystack</h4>
-                      <p className="text-sm text-gray-600">Card, Mobile Money, Bank</p>
-                    </div>
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                    paymentMethod === 'paystack' ? 'border-black' : 'border-gray-300'
+                  }`}>
+                    {paymentMethod === 'paystack' && (
+                    <div className="w-3 h-3 bg-black rounded-full" />
+                    )}
+                  </div>
+                  <Smartphone size={24} />
+                  <div>
+                    <h4 className="font-semibold">Pay with Paystack</h4>
+                    <p className="text-sm text-gray-600">Card, Mobile Money, Bank</p>
+                  </div>
                   </div>
                   <p className="text-sm text-gray-700 ml-10">
-                    Secure online payment - instant confirmation
+                  Secure online payment - instant confirmation
                   </p>
                 </motion.div>
 
@@ -624,7 +624,7 @@ const initializePaystackPayment = (order: any) => {
                     <span>GH₵ {(subtotalCents / 100).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between mb-2">
-                    <span>Shipping</span>
+                    <span>{deliveryMethod === 'delivery' ? 'Delivery Fee' : 'Pickup Fee'}</span>
                     <span className="text-green-600">FREE</span>
                   </div>
                   <div className="flex justify-between text-lg font-bold pt-4 border-t">

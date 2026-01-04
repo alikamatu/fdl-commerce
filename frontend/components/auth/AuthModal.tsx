@@ -553,13 +553,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {currentView === 'register' && (
           <div>
-            Already have an account?{' '}
+            Already have an account?{' '} 
             <button
               type="button"
               onClick={() => switchView('login')}
               className="text-blue-700 hover:underline font-medium"
             >
-              Continue
+              Sign in
             </button>
           </div>
         )}
