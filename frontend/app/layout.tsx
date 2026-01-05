@@ -8,6 +8,8 @@ import { WishlistProvider } from "@/context/WishlistContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { Footer } from "@/components/home/Footer";
 import Script from "next/script";
+import GoogleTagManager from "@/components/analytics/GoogleTagManager";
+import GoogleTagManagerNoScript from "@/components/analytics/GoogleTagManagerNoScript";
 
 const fontPoppins = Poppins({
   variable: "--font-poppins",
@@ -99,6 +101,8 @@ export default function RootLayout({
       <body
         className={`${fontPoppins.variable} ${fontMont.variable} ${fontLato.variable} antialiased transition-colors duration-500`}
       >
+        <GoogleTagManager />
+        <GoogleTagManagerNoScript />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
           <CartProvider>
