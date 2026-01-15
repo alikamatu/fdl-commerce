@@ -16,7 +16,7 @@ export default function Home() {
       
       <FeaturesSection />
 
-      <Suspense fallback={<div className="py-12 text-center">Loading products...</div>}>
+      <Suspense fallback={<div className="py-12 text-center px-4">Loading products...</div>}>
         <Products />
       </Suspense>
 

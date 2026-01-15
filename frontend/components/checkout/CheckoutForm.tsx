@@ -503,13 +503,13 @@ const initializePaystackPayment = (order: any) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Paystack Payment */}
                 <motion.div
-                  className={`p-6 border-2 rounded-xl cursor-not-allowed transition-all opacity-50 ${
+                  className={`p-6 border-2 rounded-xl cursor-pointer transition-all ${
                   paymentMethod === 'paystack' 
                     ? 'border-black bg-black/5' 
                     : 'border-gray-200 hover:border-gray-300'
                   }`}
-                  onClick={() => {}}
-                  whileHover={{ scale: 1 }}
+                  onClick={() => setPaymentMethod('paystack')}
+                  whileHover={{ scale: 1.02 }}
                 >
                   <div className="flex items-center gap-4 mb-4">
                   <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
