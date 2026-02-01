@@ -48,7 +48,7 @@ interface Order {
   email: string;
   userId?: string;
   items: OrderItem[];
-  shippingAddress: ShippingAddress;
+  shippingAddress?: ShippingAddress;
   subtotalCents: number;
   shippingCents: number;
   taxCents: number;
@@ -173,8 +173,9 @@ const fetchOrders = async () => {
   };
 }
 
-const formatPaymentMethod = (method: string) => {
-  switch (method.toLowerCase()) {
+const formatPaymentMethod = (method?: string) => {
+  const m = (method || '').toLowerCase();
+  switch (m) {
     case 'mobile_money':
       return 'Mobile Money (MoMo)';
     case 'cash':
@@ -186,7 +187,7 @@ const formatPaymentMethod = (method: string) => {
     case 'cash_or_momo':
       return 'N/A';
     default:
-      return method.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      return (method || '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   }
 };
 
@@ -217,11 +218,13 @@ export default function AdminOrdersPage() {
 
     // Filter by search term
     if (searchTerm) {
-      filtered = filtered.filter(order =>
-        order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.shippingAddress.fullName.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(order => {
+        const orderNumber = String(order.orderNumber || '').toLowerCase();
+        const email = String(order.email || '').toLowerCase();
+        const fullName = String(order.shippingAddress?.fullName || '').toLowerCase();
+        return orderNumber.includes(term) || email.includes(term) || fullName.includes(term);
+      });
     }
 
     // Filter by status
@@ -359,14 +362,14 @@ export default function AdminOrdersPage() {
       const exportData = filteredOrders.map(order => ({
         'Order Number': order.orderNumber,
         'Customer Email': order.email,
-        'Customer Name': order.shippingAddress.fullName,
+        'Customer Name': order.shippingAddress?.fullName || order.email || '',
         'Total Amount': formatPrice(order.totalCents),
         Status: order.status,
         'Order Date': formatDate(order.createdAt),
         'Payment Status': order.paymentCompleted ? 'Completed' : 'Pending',
         'Items Count': order.items.length,
-        'Shipping City': order.shippingAddress.city,
-        'Shipping Country': order.shippingAddress.country
+        'Shipping City': order.shippingAddress?.city || '',
+        'Shipping Country': order.shippingAddress?.country || ''
       }));
 
       const headers = Object.keys(exportData[0] || {});
@@ -556,7 +559,7 @@ export default function AdminOrdersPage() {
                 <option value="all">All Time</option>
                 <option value="today">Today</option>
                 <option value="week">Last 7 Days</option>
-                <option value="monlg">Last 30 Days</option>
+                <option value="month">Last 30 Days</option>
               </select>
             </div>
 
@@ -615,12 +618,12 @@ export default function AdminOrdersPage() {
                       <div>
                         <div className="flex items-center gap-2 mb-1">
                           <User className="w-4 h-4 text-gray-400" />
-                          <p className="font-medium text-gray-900">{order.shippingAddress.fullName}</p>
+                          <p className="font-medium text-gray-900">{order.shippingAddress?.fullName || order.email || '—'}</p>
                         </div>
                         <p className="text-sm text-gray-600 mb-1">{order.email}</p>
                         <div className="flex items-center gap-1 text-sm text-gray-500">
                           <MapPin className="w-3 h-3" />
-                          <span>{order.shippingAddress.city}</span>
+                          <span>{order.shippingAddress?.city || '—'}</span>
                         </div>
                       </div>
                     </td>

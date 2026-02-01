@@ -4,15 +4,10 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Search, 
-  Filter, 
   Star, 
-  Eye, 
-  Edit2, 
   Trash2, 
   RefreshCw,
   AlertTriangle,
-  CheckCircle2,
-  XCircle,
   MessageSquare,
   User,
   Package,
@@ -307,7 +302,7 @@ export default function AdminReviewsDashboardPage() {
                 <img
                   src={review.product.images[0].url}
                   alt={review.product.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
               ) : (
                 <Package className="w-6 h-6 text-gray-400 m-auto mt-2" />
@@ -453,7 +448,7 @@ export default function AdminReviewsDashboardPage() {
                         key={index}
                         src={image}
                         alt={`Review image ${index + 1}`}
-                        className="w-20 h-20 rounded-lg object-cover border border-gray-200"
+                        className="w-20 h-20 rounded-lg object-contain border border-gray-200"
                       />
                     ))}
                   </div>
