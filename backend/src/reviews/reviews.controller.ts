@@ -124,8 +124,8 @@ async findAllForAdmin(
   }
 
   const result = await this.reviewsService.findAllForAdmin({
-    page,
-    limit,
+    page: page ? Number(page) : 1,
+    limit: limit ? Number(limit) : 10,
     rating,
     isActive,
     isVerified,

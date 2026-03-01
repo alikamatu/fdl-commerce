@@ -76,7 +76,7 @@ export default function AdminReviewsDashboardPage() {
   });
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 10,
+    limit: 20,
     total: 0,
     pages: 0
   });
@@ -619,8 +619,8 @@ export default function AdminReviewsDashboardPage() {
             {/* Pagination */}
             <div className="flex items-center gap-2">
               <button
-                onClick={() => fetchReviews(pagination.page - 1)}
-                disabled={pagination.page === 1}
+                onClick={() => fetchReviews(Number(pagination.page) - 1)}
+                disabled={Number(pagination.page) === 1}
                 className="px-3 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
               >
                 Previous
@@ -629,8 +629,8 @@ export default function AdminReviewsDashboardPage() {
                 Page {pagination.page} of {pagination.pages}
               </span>
               <button
-                onClick={() => fetchReviews(pagination.page + 1)}
-                disabled={pagination.page === pagination.pages}
+                onClick={() => fetchReviews(Number(pagination.page) + 1)}
+                disabled={Number(pagination.page) === Number(pagination.pages)}
                 className="px-3 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
               >
                 Next

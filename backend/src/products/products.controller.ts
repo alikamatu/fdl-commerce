@@ -226,7 +226,7 @@ export class ProductsController {
   @ApiOperation({ summary: 'Get low stock products' })
   async getLowStock(@Query('threshold') threshold: string) {
     const products = await this.productsService.getLowStock(
-      threshold ? parseInt(threshold) : 10,
+      threshold ? parseInt(threshold) : 5,
     );
     return {
       success: true,

@@ -73,7 +73,7 @@ export default function AdminHome() {
       
       // Fetch recent products (using your products endpoint)
       const productsResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/products?limit=5&sort=-createdAt`, 
+        `${process.env.NEXT_PUBLIC_API_URL}/api/products?limit=15&sort=-createdAt`, 
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -88,7 +88,7 @@ export default function AdminHome() {
 
       // Fetch low stock alerts
       const alertsResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/products/low-stock?threshold=10`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/products/low-stock?threshold=5`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
