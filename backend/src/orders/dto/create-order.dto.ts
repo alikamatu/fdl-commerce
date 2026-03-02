@@ -1,4 +1,15 @@
-import { IsArray, IsEmail, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, ValidateNested, IsEnum, IsIn } from 'class-validator';
+import {
+  IsArray,
+  IsEmail,
+  IsNotEmpty,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  ValidateNested,
+  IsEnum,
+  IsIn,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class OrderItemDto {
@@ -90,7 +101,17 @@ export class CreateOrderDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsIn(['cash', 'bank_transfer', 'mobile_money', 'cash_or_momo', 'paystack', 'cash_on_delivery', 'cash_on_pickup', 'bank_card', 'na'])
+  @IsIn([
+    'cash',
+    'bank_transfer',
+    'mobile_money',
+    'cash_or_momo',
+    'paystack',
+    'cash_on_delivery',
+    'cash_on_pickup',
+    'bank_card',
+    'na',
+  ])
   paymentMethod: string;
 
   @IsNumber()

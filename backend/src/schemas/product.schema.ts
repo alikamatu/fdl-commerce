@@ -26,7 +26,8 @@ export class ProductSpecification {
   value: string;
 }
 
-export const ProductSpecificationSchema = SchemaFactory.createForClass(ProductSpecification);
+export const ProductSpecificationSchema =
+  SchemaFactory.createForClass(ProductSpecification);
 
 @Schema({ timestamps: true })
 export class Product {
@@ -42,11 +43,11 @@ export class Product {
   @Prop({ required: true })
   priceCents: number;
 
-@Prop({ default: 0 })
-averageRating: number;
+  @Prop({ default: 0 })
+  averageRating: number;
 
-@Prop({ default: 0 })
-reviewCount: number;
+  @Prop({ default: 0 })
+  reviewCount: number;
 
   @Prop({ required: true, default: 'USD' })
   currency: string;
@@ -82,14 +83,14 @@ reviewCount: number;
   @Prop({ default: null })
   dealExpiresAt?: Date;
 
-  @Prop({ 
+  @Prop({
     default: 0,
     validate: {
-      validator: function(v: number) {
+      validator: function (v: number) {
         return v >= 0;
       },
-      message: 'soldCount cannot be negative'
-    }
+      message: 'soldCount cannot be negative',
+    },
   })
   soldCount: number;
 }

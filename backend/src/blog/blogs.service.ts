@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Blog, BlogDocument } from '../schemas/blog.schema';
@@ -7,9 +11,7 @@ import { UpdateBlogDto } from './dto/update-blog.dto';
 
 @Injectable()
 export class BlogsService {
-  constructor(
-    @InjectModel(Blog.name) private blogModel: Model<BlogDocument>,
-  ) {}
+  constructor(@InjectModel(Blog.name) private blogModel: Model<BlogDocument>) {}
 
   async create(createBlogDto: CreateBlogDto, authorId: string): Promise<Blog> {
     // Generate slug from title
@@ -183,13 +185,13 @@ export class BlogsService {
 
   async getCategories(): Promise<string[]> {
     const blogs = await this.blogModel.find().select('categories');
-    const allCategories = blogs.flatMap(blog => blog.categories);
+    const allCategories = blogs.flatMap((blog) => blog.categories);
     return [...new Set(allCategories)];
   }
 
   async getTags(): Promise<string[]> {
     const blogs = await this.blogModel.find().select('tags');
-    const allTags = blogs.flatMap(blog => blog.tags);
+    const allTags = blogs.flatMap((blog) => blog.tags);
     return [...new Set(allTags)];
   }
 }

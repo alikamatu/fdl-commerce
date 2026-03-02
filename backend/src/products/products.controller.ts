@@ -85,7 +85,7 @@ export class ProductsController {
 
     return {
       success: true,
-      data: result.products, 
+      data: result.products,
       pagination: {
         total: result.total,
         page: result.page,
@@ -96,11 +96,11 @@ export class ProductsController {
 
   @Get('products/deals')
   @ApiOperation({ summary: 'Get deal products' })
-  @ApiResponse({ status: 200, description: 'Deal products retrieved successfully' })
-  async findDeals(
-    @Query('page') page: string,
-    @Query('limit') limit: string,
-  ) {
+  @ApiResponse({
+    status: 200,
+    description: 'Deal products retrieved successfully',
+  })
+  async findDeals(@Query('page') page: string, @Query('limit') limit: string) {
     const result = await this.productsService.findDealProducts({
       page: page ? parseInt(page) : 1,
       limit: limit ? parseInt(limit) : 10,
@@ -175,10 +175,13 @@ export class ProductsController {
       message: 'Product deleted successfully',
     };
   }
-  
+
   @Get('products/search/suggestions')
   @ApiOperation({ summary: 'Get search suggestions' })
-  @ApiResponse({ status: 200, description: 'Search suggestions retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Search suggestions retrieved successfully',
+  })
   async getSearchSuggestions(
     @Query('q') query: string,
     @Query('limit') limit: string,
@@ -208,8 +211,9 @@ export class ProductsController {
           new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), // 5MB
           new FileTypeValidator({ fileType: /(jpg|jpeg|png|webp)$/ }),
         ],
-      })
-    ) file: Express.Multer.File,
+      }),
+    )
+    file: Express.Multer.File,
   ) {
     const result = await this.fileUploadService.uploadImage(file);
     return {

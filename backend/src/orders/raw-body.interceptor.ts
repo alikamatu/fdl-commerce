@@ -10,11 +10,11 @@ import { Observable } from 'rxjs';
 export class RawBodyInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
-    
+
     if (request.body && typeof request.body === 'object') {
       request.rawBody = JSON.stringify(request.body);
     }
-    
+
     return next.handle();
   }
 }

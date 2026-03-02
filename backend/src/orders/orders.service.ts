@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Order, OrderDocument } from '../schemas/order.schema';
@@ -47,10 +52,16 @@ export class OrdersService implements OnModuleInit {
 
   async verifyPaystackPayment(reference: string): Promise<any> {
     try {
-      const verificationResult = await this.paystackService.verifyTransaction(reference);
-      
-      if (!verificationResult.status || verificationResult.data.status !== 'success') {
-        throw new BadRequestException('Payment verification failed or payment not successful');
+      const verificationResult =
+        await this.paystackService.verifyTransaction(reference);
+
+      if (
+        !verificationResult.status ||
+        verificationResult.data.status !== 'success'
+      ) {
+        throw new BadRequestException(
+          'Payment verification failed or payment not successful',
+        );
       }
 
       return {
@@ -71,11 +82,11 @@ export class OrdersService implements OnModuleInit {
   }
   async findAll(userId?: string, includeAll: boolean = false) {
     let query = {};
-    
+
     if (!includeAll && userId) {
       query = { userId: new Types.ObjectId(userId) };
     }
-    
+
     const orders = await this.orderModel
       .find(query)
       .sort({ createdAt: -1 })
@@ -84,14 +95,14 @@ export class OrdersService implements OnModuleInit {
     return orders;
   }
 
-    async initializePaystackPayment(
+  async initializePaystackPayment(
     orderId: string,
     email: string,
     amountCents: number,
-    metadata?: any
+    metadata?: any,
   ): Promise<{ authorizationUrl: string; reference: string }> {
     const order = await this.orderModel.findById(orderId);
-    
+
     if (!order) {
       throw new NotFoundException('Order not found');
     }
@@ -101,10 +112,13 @@ export class OrdersService implements OnModuleInit {
     }
 
     const reference = this.paystackService.generateReference();
-    
+
     // Convert amount to smallest unit (pesewas for GHS)
-    const amountInPesewas = this.paystackService.convertToSmallestUnit(amountCents / 100, 'GHS');
-    
+    const amountInPesewas = this.paystackService.convertToSmallestUnit(
+      amountCents / 100,
+      'GHS',
+    );
+
     const transaction: PaystackTransaction = {
       reference,
       amount: amountInPesewas,
@@ -118,8 +132,9 @@ export class OrdersService implements OnModuleInit {
       },
     };
 
-    const response = await this.paystackService.initializeTransaction(transaction);
-    
+    const response =
+      await this.paystackService.initializeTransaction(transaction);
+
     // Update order with payment reference
     order.paymentId = reference;
     await order.save();
@@ -131,19 +146,23 @@ export class OrdersService implements OnModuleInit {
   }
 
   // New method to find orders by userId OR email (includes legacy guest orders)
-  async findAllByUserOrEmail(userId: string, email: string, includeAll: boolean = false) {
+  async findAllByUserOrEmail(
+    userId: string,
+    email: string,
+    includeAll: boolean = false,
+  ) {
     let query = {};
-    
+
     if (!includeAll) {
       // Find orders where userId matches OR email matches (for guest orders)
       query = {
         $or: [
           { userId: new Types.ObjectId(userId) },
-          { email: email, userId: { $exists: false } } // Guest orders with same email
-        ]
+          { email: email, userId: { $exists: false } }, // Guest orders with same email
+        ],
       };
     }
-    
+
     const orders = await this.orderModel
       .find(query)
       .sort({ createdAt: -1 })
@@ -154,17 +173,20 @@ export class OrdersService implements OnModuleInit {
 
     return orders;
   }
-  
 
   async confirmPayment(
     orderId: string,
     paymentReference: string,
     paystackReference: string,
-    userId?: string
+    userId?: string,
   ): Promise<Order> {
-    const verificationResult = await this.verifyPaystackPayment(paymentReference);
+    const verificationResult =
+      await this.verifyPaystackPayment(paymentReference);
 
-    if (verificationResult.status !== true || verificationResult.data.status !== 'success') {
+    if (
+      verificationResult.status !== true ||
+      verificationResult.data.status !== 'success'
+    ) {
       throw new BadRequestException('Payment verification failed');
     }
 
@@ -191,17 +213,21 @@ export class OrdersService implements OnModuleInit {
     return order.save();
   }
 
-  async sendShippingNotification(id: string): Promise<{ success: boolean; message: string }> {
+  async sendShippingNotification(
+    id: string,
+  ): Promise<{ success: boolean; message: string }> {
     try {
       const order = await this.orderModel.findById(id);
-      
+
       if (!order) {
         throw new NotFoundException('Order not found');
       }
 
       // Check for both 'delivering' and 'available' statuses
       if (!['delivering', 'available'].includes(order.status)) {
-        throw new BadRequestException(`Order status must be 'delivering' or 'available'. Current status: ${order.status}`);
+        throw new BadRequestException(
+          `Order status must be 'delivering' or 'available'. Current status: ${order.status}`,
+        );
       }
 
       // Create fullName from firstName and lastName
@@ -228,13 +254,13 @@ export class OrdersService implements OnModuleInit {
           deliveryMethod: order.deliveryMethod,
           shippingAddress: order.shippingAddress,
           email: order.email,
-          emailType: emailType  // Pass the email type
-        }
+          emailType: emailType, // Pass the email type
+        },
       );
 
       return {
         success: true,
-        message: 'Shipping notification sent successfully'
+        message: 'Shipping notification sent successfully',
       };
     } catch (error) {
       console.error('Error sending shipping notification:', error);
@@ -242,10 +268,12 @@ export class OrdersService implements OnModuleInit {
     }
   }
 
-  async sendPickupNotification(id: string): Promise<{ success: boolean; message: string }> {
+  async sendPickupNotification(
+    id: string,
+  ): Promise<{ success: boolean; message: string }> {
     try {
       const order = await this.orderModel.findById(id);
-      
+
       if (!order) {
         throw new NotFoundException('Order not found');
       }
@@ -273,13 +301,13 @@ export class OrdersService implements OnModuleInit {
           shippingAddress: order.shippingAddress,
           email: order.email,
           pickupLocation: order.shippingAddress.pickupLocation,
-          emailType: 'available'  // Specify this is for pickup/available
-        }
+          emailType: 'available', // Specify this is for pickup/available
+        },
       );
 
       return {
         success: true,
-        message: 'Pickup notification sent successfully'
+        message: 'Pickup notification sent successfully',
       };
     } catch (error) {
       console.error('Error sending pickup notification:', error);
@@ -287,10 +315,12 @@ export class OrdersService implements OnModuleInit {
     }
   }
 
-  async sendDeliveredNotification(id: string): Promise<{ success: boolean; message: string }> {
+  async sendDeliveredNotification(
+    id: string,
+  ): Promise<{ success: boolean; message: string }> {
     try {
       const order = await this.orderModel.findById(id);
-      
+
       if (!order) {
         throw new NotFoundException('Order not found');
       }
@@ -316,13 +346,13 @@ export class OrdersService implements OnModuleInit {
           paymentMethod: order.paymentMethod,
           deliveryMethod: order.deliveryMethod,
           shippingAddress: order.shippingAddress,
-          email: order.email
-        }
+          email: order.email,
+        },
       );
 
       return {
         success: true,
-        message: 'Delivered notification sent successfully'
+        message: 'Delivered notification sent successfully',
       };
     } catch (error) {
       console.error('Error sending delivered notification:', error);
@@ -330,228 +360,260 @@ export class OrdersService implements OnModuleInit {
     }
   }
 
- async create(createOrderDto: CreateOrderDto, userId: string): Promise<Order> {
-  if (!userId) {
-    throw new BadRequestException('User authentication required to place order');
-  }
+  async create(createOrderDto: CreateOrderDto, userId: string): Promise<Order> {
+    console.log('=== Order Creation Start ===');
+    console.log('userId:', userId);
+    console.log('Payment Method:', createOrderDto.paymentMethod);
 
-  const session = await this.orderModel.db.startSession();
-  session.startTransaction();
-
-  let savedOrder: Order | null = null;
-
-  try {
-    // 1️⃣ Generate a unique sequential order number using an atomic counter.
-    //    If the counter ever falls behind the highest existing order, we
-    //    bump it in a loop until we find an unused value.  This also guards
-    //    against any manual inserts or resets of the counter collection.
-    let orderNumber: string;
-    while (true) {
-      const counter = await this.counterModel.findOneAndUpdate(
-        { key: 'orderNumber' },
-        { $inc: { seq: 1 } },
-        {
-          new: true,
-          upsert: true,
-          session,
-        },
+    if (!userId) {
+      throw new BadRequestException(
+        'User authentication required to place order',
       );
-      const seq = counter.seq;
-      orderNumber = `ORD-${seq.toString().padStart(6, '0')}`;
-
-      // make sure no order already exists with this number (handles
-      // potential out‑of‑sync situations)
-      const exists = await this.orderModel
-        .findOne({ orderNumber })
-        .session(session);
-      if (!exists) break;
-      // otherwise loop and increment again
     }
 
-    // 2️⃣ Validate stock & update products
-    for (const item of createOrderDto.items) {
-      const product = await this.productModel.findById(item.productId).session(session);
+    const session = await this.orderModel.db.startSession();
+    try {
+      session.startTransaction();
+    } catch (sessionError) {
+      console.error(
+        'Failed to start transaction. This might be because the database is not a replica set:',
+        sessionError.message,
+      );
+      // Fallback or rethrow with clearer message
+      throw new BadRequestException(
+        'Database transaction failure. Please contact support.',
+      );
+    }
 
-      if (!product) {
-        throw new NotFoundException(`Product ${item.title} not found`);
+    let savedOrder: Order | null = null;
+
+    try {
+      console.log('Generating order number...');
+      // 1️⃣ Generate a unique sequential order number using an atomic counter.
+      let orderNumber: string;
+      while (true) {
+        const counter = await this.counterModel.findOneAndUpdate(
+          { key: 'orderNumber' },
+          { $inc: { seq: 1 } },
+          {
+            new: true,
+            upsert: true,
+            session,
+          },
+        );
+        const seq = counter.seq;
+        orderNumber = `ORD-${seq.toString().padStart(6, '0')}`;
+
+        const exists = await this.orderModel
+          .findOne({ orderNumber })
+          .session(session);
+        if (!exists) break;
+      }
+      console.log('Order number generated:', orderNumber);
+
+      // 2️⃣ Validate stock & update products
+      console.log('Validating stock for items:', createOrderDto.items.length);
+      for (const item of createOrderDto.items) {
+        const product = await this.productModel
+          .findById(item.productId)
+          .session(session);
+
+        if (!product) {
+          throw new NotFoundException(`Product ${item.title} not found`);
+        }
+
+        if (product.stock < item.quantity) {
+          throw new BadRequestException(
+            `Insufficient stock for ${item.title}. Available: ${product.stock}`,
+          );
+        }
+
+        product.stock -= item.quantity;
+        product.soldCount += item.quantity;
+        await product.save({ session });
       }
 
-      if (product.stock < item.quantity) {
-        throw new BadRequestException(
-          `Insufficient stock for ${item.title}. Available: ${product.stock}`,
+      // 3️⃣ Determine initial payment + order status
+      let status: string;
+      let paymentCompleted = false;
+
+      switch (createOrderDto.paymentMethod) {
+        case 'paystack':
+          status = 'pending_payment';
+          paymentCompleted = false;
+          break;
+
+        case 'cash_on_delivery':
+        case 'cash_on_pickup':
+          status = 'confirmed';
+          paymentCompleted = false;
+          break;
+
+        default:
+          status = 'confirmed';
+          paymentCompleted = false;
+          break;
+      }
+
+      // 4️⃣ Create order
+      console.log('Saving order document...');
+      const order = new this.orderModel({
+        orderNumber,
+        userId: userId, // Mongoose handles string to ObjectId conversion if schema is correct
+        email: createOrderDto.email,
+        items: createOrderDto.items,
+        shippingAddress: createOrderDto.shippingAddress,
+        deliveryMethod: createOrderDto.deliveryMethod || 'delivery',
+        subtotalCents: createOrderDto.subtotalCents,
+        shippingCents: createOrderDto.shippingCents,
+        taxCents: createOrderDto.taxCents || 0,
+        totalCents: createOrderDto.totalCents,
+        paymentMethod: createOrderDto.paymentMethod,
+        paymentCompleted,
+        status,
+      });
+
+      await order.save({ session });
+
+      // 5️⃣ Commit transaction
+      console.log('Committing transaction...');
+      await session.commitTransaction();
+      session.endSession();
+      console.log('Transaction committed successfully.');
+
+      // 6️⃣ Reload saved order (clean instance)
+      savedOrder = await this.orderModel.findById(order._id);
+
+      if (!savedOrder) {
+        throw new NotFoundException('Order not found after creation');
+      }
+
+      console.log('Order created successfully:', savedOrder.orderNumber);
+
+      // 7️⃣ Send order confirmation email (ALL orders)
+      try {
+        const fullName = `${savedOrder.shippingAddress.firstName} ${savedOrder.shippingAddress.lastName}`;
+
+        await this.emailService.sendOrderConfirmationEmail(
+          savedOrder.email,
+          fullName,
+          savedOrder.orderNumber,
+          {
+            items: savedOrder.items,
+            subtotalCents: savedOrder.subtotalCents,
+            shippingCents: savedOrder.shippingCents,
+            taxCents: savedOrder.taxCents,
+            totalCents: savedOrder.totalCents,
+            paymentMethod: savedOrder.paymentMethod,
+            deliveryMethod: savedOrder.deliveryMethod,
+            shippingAddress: savedOrder.shippingAddress,
+            paymentStatus: savedOrder.paymentCompleted ? 'paid' : 'pending',
+          },
+        );
+      } catch (emailError) {
+        console.error(
+          'Failed to send order confirmation email:',
+          emailError.message,
         );
       }
 
-      product.stock -= item.quantity;
-      product.soldCount += item.quantity;
-      await product.save({ session });
-    }
-
-    // 3️⃣ Determine initial payment + order status
-    let status: string;
-    let paymentCompleted = false;
-
-    switch (createOrderDto.paymentMethod) {
-      case 'paystack':
-        status = 'pending_payment';
-        paymentCompleted = false;
-        break;
-
-      case 'cash_on_delivery':
-      case 'cash_on_pickup':
-        status = 'confirmed';
-        paymentCompleted = false;
-        break;
-
-      default:
-        status = 'confirmed';
-        paymentCompleted = false;
-        break;
-    }
-
-    // 4️⃣ Create order
-    const order = new this.orderModel({
-      orderNumber,
-      userId: new Types.ObjectId(userId),
-      email: createOrderDto.email,
-      items: createOrderDto.items,
-      shippingAddress: createOrderDto.shippingAddress,
-      deliveryMethod: createOrderDto.deliveryMethod || 'delivery',
-      subtotalCents: createOrderDto.subtotalCents,
-      shippingCents: createOrderDto.shippingCents,
-      taxCents: createOrderDto.taxCents || 0,
-      totalCents: createOrderDto.totalCents,
-      paymentMethod: createOrderDto.paymentMethod,
-      paymentCompleted,
-      status,
-    });
-
-    await order.save({ session });
-
-    // 5️⃣ Commit transaction
-    await session.commitTransaction();
-    session.endSession();
-
-    // 6️⃣ Reload saved order (clean instance)
-    savedOrder = await this.orderModel.findById(order._id);
-
-    if (!savedOrder) {
-      throw new NotFoundException('Order not found after creation');
-    }
-
-    console.log('Order created successfully:', savedOrder.orderNumber);
-
-    // 7️⃣ Send order confirmation email (ALL orders)
-    try {
-      const fullName = `${savedOrder.shippingAddress.firstName} ${savedOrder.shippingAddress.lastName}`;
-
-      await this.emailService.sendOrderConfirmationEmail(
-        savedOrder.email,
-        fullName,
-        savedOrder.orderNumber,
-        {
-          items: savedOrder.items,
-          subtotalCents: savedOrder.subtotalCents,
-          shippingCents: savedOrder.shippingCents,
-          taxCents: savedOrder.taxCents,
-          totalCents: savedOrder.totalCents,
-          paymentMethod: savedOrder.paymentMethod,
-          deliveryMethod: savedOrder.deliveryMethod,
-          shippingAddress: savedOrder.shippingAddress,
-          paymentStatus: savedOrder.paymentCompleted ? 'paid' : 'pending',
-        },
-      );
-    } catch (emailError) {
-      console.error(
-        'Failed to send order confirmation email:',
-        emailError.message,
-      );
-      // ❗ Never fail order creation because of email
-    }
-
-    // 8️⃣ Send new order notification to admin
-    try {
-      const adminEmail = process.env.ADMIN_EMAIL;
-      if (adminEmail) {
-        await this.emailService.sendNewOrderNotificationToAdmin(savedOrder, adminEmail);
-      } else {
-        console.warn('ADMIN_EMAIL not set, skipping admin notification');
+      // 8️⃣ Send new order notification to admin
+      try {
+        const adminEmail = process.env.ADMIN_EMAIL;
+        if (adminEmail) {
+          await this.emailService.sendNewOrderNotificationToAdmin(
+            savedOrder,
+            adminEmail,
+          );
+        } else {
+          console.warn('ADMIN_EMAIL not set, skipping admin notification');
+        }
+      } catch (emailError) {
+        console.error(
+          'Failed to send admin notification email:',
+          emailError.message,
+        );
       }
-    } catch (emailError) {
-      console.error(
-        'Failed to send admin notification email:',
-        emailError.message,
-      );
-      // ❗ Never fail order creation because of email
+
+      return savedOrder;
+    } catch (error) {
+      console.error('Error in order creation process:', error);
+      if (session.inTransaction()) {
+        await session.abortTransaction();
+      }
+      session.endSession();
+      throw error;
     }
-
-    return savedOrder;
-  } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-    throw error;
   }
-}
-
 
   async completePaystackPayment(
-  reference: string,
-  userId?: string,
-  isAdmin: boolean = false
-): Promise<Order> {
-  try {
-    // Verify payment with Paystack
-    const verificationResult = await this.paystackService.verifyTransaction(reference);
+    reference: string,
+    userId?: string,
+    isAdmin: boolean = false,
+  ): Promise<Order> {
+    try {
+      // Verify payment with Paystack
+      const verificationResult =
+        await this.paystackService.verifyTransaction(reference);
 
-    if (!verificationResult.status || verificationResult.data.status !== 'success') {
-      throw new BadRequestException('Payment verification failed or payment not successful');
+      if (
+        !verificationResult.status ||
+        verificationResult.data.status !== 'success'
+      ) {
+        throw new BadRequestException(
+          'Payment verification failed or payment not successful',
+        );
+      }
+
+      // Extract orderId from metadata
+      const orderId = verificationResult.data.metadata?.orderId;
+
+      if (!orderId) {
+        throw new BadRequestException('Order ID not found in payment metadata');
+      }
+
+      // Find order by ID (not by paymentId reference)
+      const query: any = { _id: orderId };
+      if (!isAdmin && userId) {
+        query.userId = new Types.ObjectId(userId);
+      }
+
+      const order = await this.orderModel.findOne(query);
+
+      if (!order) {
+        throw new NotFoundException('Order not found');
+      }
+
+      // Verify amount matches (Paystack returns amount in pesewas)
+      const expectedAmount = Math.round(order.totalCents); // Already in pesewas
+      const paidAmount = verificationResult.data.amount;
+
+      if (Math.abs(paidAmount - expectedAmount) > 1) {
+        // Allow 1 pesewa difference for rounding
+        console.error('Amount mismatch:', {
+          expected: expectedAmount,
+          paid: paidAmount,
+        });
+        throw new BadRequestException('Payment amount mismatch');
+      }
+
+      // Update order
+      order.paymentCompleted = true;
+      order.status = 'confirmed';
+      order.paymentId = reference;
+
+      const updatedOrder = await order.save();
+
+      return updatedOrder;
+    } catch (error) {
+      console.error('Paystack payment completion error:', error);
+      throw error;
     }
-
-    // Extract orderId from metadata
-    const orderId = verificationResult.data.metadata?.orderId;
-    
-    if (!orderId) {
-      throw new BadRequestException('Order ID not found in payment metadata');
-    }
-
-    // Find order by ID (not by paymentId reference)
-    const query: any = { _id: orderId };
-    if (!isAdmin && userId) {
-      query.userId = new Types.ObjectId(userId);
-    }
-
-    const order = await this.orderModel.findOne(query);
-
-    if (!order) {
-      throw new NotFoundException('Order not found');
-    }
-
-    // Verify amount matches (Paystack returns amount in pesewas)
-    const expectedAmount = Math.round(order.totalCents); // Already in pesewas
-    const paidAmount = verificationResult.data.amount;
-
-    if (Math.abs(paidAmount - expectedAmount) > 1) { // Allow 1 pesewa difference for rounding
-      console.error('Amount mismatch:', { expected: expectedAmount, paid: paidAmount });
-      throw new BadRequestException('Payment amount mismatch');
-    }
-
-    // Update order
-    order.paymentCompleted = true;
-    order.status = 'confirmed';
-    order.paymentId = reference;
-
-    const updatedOrder = await order.save();
-
-    return updatedOrder;
-  } catch (error) {
-    console.error('Paystack payment completion error:', error);
-    throw error;
   }
-}
 
   async findOne(id: string, userId?: string, isAdmin: boolean = false) {
     const query: any = { _id: id };
-    
+
     if (!isAdmin && userId) {
       query.userId = new Types.ObjectId(userId);
     }
@@ -567,7 +629,7 @@ export class OrdersService implements OnModuleInit {
 
   async findById(id: string, userId?: string, isAdmin: boolean = false) {
     const query: any = { _id: id };
-    
+
     if (!isAdmin && userId) {
       query.userId = new Types.ObjectId(userId);
     }
@@ -581,7 +643,11 @@ export class OrdersService implements OnModuleInit {
     return order;
   }
 
-  async findByOrderNumber(orderNumber: string, userId?: string, isAdmin: boolean = false) {
+  async findByOrderNumber(
+    orderNumber: string,
+    userId?: string,
+    isAdmin: boolean = false,
+  ) {
     const query: any = { orderNumber };
     if (!isAdmin && userId) {
       query.userId = new Types.ObjectId(userId);
@@ -601,96 +667,112 @@ export class OrdersService implements OnModuleInit {
       {
         $match: {
           paymentCompleted: true,
-          createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
-        }
+          createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+        },
       },
       {
         $group: {
           _id: null,
           totalOrders: { $sum: 1 },
           totalRevenue: { $sum: '$totalCents' },
-          averageOrderValue: { $avg: '$totalCents' }
-        }
-      }
+          averageOrderValue: { $avg: '$totalCents' },
+        },
+      },
     ]);
 
-    return stats[0] || { totalOrders: 0, totalRevenue: 0, averageOrderValue: 0 };
+    return (
+      stats[0] || { totalOrders: 0, totalRevenue: 0, averageOrderValue: 0 }
+    );
   }
 
- async updateStatus(id: string, status: string): Promise<Order> {
-  const order = await this.orderModel.findById(id);
+  async updateStatus(id: string, status: string): Promise<Order> {
+    const order = await this.orderModel.findById(id);
 
-  if (!order) {
-    throw new NotFoundException('Order not found');
-  }
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
 
-  // Validate status
-  const validStatuses = ['pending_payment', 'pending', 'confirmed', 'processing', 'delivering', 'available', 'delivered', 'cancelled'];
-  if (!validStatuses.includes(status)) {
-    throw new BadRequestException(`Invalid status: ${status}`);
-  }
+    // Validate status
+    const validStatuses = [
+      'pending_payment',
+      'pending',
+      'confirmed',
+      'processing',
+      'delivering',
+      'available',
+      'delivered',
+      'cancelled',
+    ];
+    if (!validStatuses.includes(status)) {
+      throw new BadRequestException(`Invalid status: ${status}`);
+    }
 
-  console.log(`Updating order ${id} from ${order.status} to ${status}`);
+    console.log(`Updating order ${id} from ${order.status} to ${status}`);
 
-  // Handle cancellation - restore stock and decrease soldCount
-  if (status === 'cancelled' && order.status !== 'cancelled') {
-    console.log('Order is being cancelled, restoring product stock and soldCount...');
-    
-    for (const item of order.items) {
-      const product = await this.productModel.findById(item.productId);
-      if (product) {
-        console.log(`Updating product ${product.title}: stock +${item.quantity}, soldCount -${item.quantity}`);
-        
-        // Use atomic update to ensure consistency
-        await this.productModel.findByIdAndUpdate(
-          item.productId,
-          {
-            $inc: { 
+    // Handle cancellation - restore stock and decrease soldCount
+    if (status === 'cancelled' && order.status !== 'cancelled') {
+      console.log(
+        'Order is being cancelled, restoring product stock and soldCount...',
+      );
+
+      for (const item of order.items) {
+        const product = await this.productModel.findById(item.productId);
+        if (product) {
+          console.log(
+            `Updating product ${product.title}: stock +${item.quantity}, soldCount -${item.quantity}`,
+          );
+
+          // Use atomic update to ensure consistency
+          await this.productModel.findByIdAndUpdate(item.productId, {
+            $inc: {
               stock: item.quantity,
-              soldCount: -item.quantity
-            }
-          }
-        );
+              soldCount: -item.quantity,
+            },
+          });
+        }
       }
     }
-  }
 
-  // Handle status change from cancelled to another status (un-cancellation)
-  if (order.status === 'cancelled' && status !== 'cancelled') {
-    console.log('Order is being un-cancelled, updating product stock and soldCount...');
-    
-    for (const item of order.items) {
-      const product = await this.productModel.findById(item.productId);
-      if (product) {
-        console.log(`Updating product ${product.title}: stock -${item.quantity}, soldCount +${item.quantity}`);
-        
-        await this.productModel.findByIdAndUpdate(
-          item.productId,
-          {
-            $inc: { 
+    // Handle status change from cancelled to another status (un-cancellation)
+    if (order.status === 'cancelled' && status !== 'cancelled') {
+      console.log(
+        'Order is being un-cancelled, updating product stock and soldCount...',
+      );
+
+      for (const item of order.items) {
+        const product = await this.productModel.findById(item.productId);
+        if (product) {
+          console.log(
+            `Updating product ${product.title}: stock -${item.quantity}, soldCount +${item.quantity}`,
+          );
+
+          await this.productModel.findByIdAndUpdate(item.productId, {
+            $inc: {
               stock: -item.quantity,
-              soldCount: item.quantity
-            }
-          }
-        );
+              soldCount: item.quantity,
+            },
+          });
+        }
       }
     }
+
+    order.status = status;
+
+    // Update timestamps based on status changes
+    if (
+      status === 'delivering' ||
+      (status === 'available' && !order.shippedAt)
+    ) {
+      order.shippedAt = new Date();
+    } else if (status === 'delivered' && !order.deliveredAt) {
+      order.deliveredAt = new Date();
+    }
+
+    const updatedOrder = await order.save();
+    console.log('Order updated successfully:', updatedOrder._id);
+
+    return updatedOrder;
   }
-
-  order.status = status;
-
-  // Update timestamps based on status changes
-  if (status === 'delivering' || (status === 'available' && !order.shippedAt)) {
-    order.shippedAt = new Date();
-  } else if (status === 'delivered' && !order.deliveredAt) {
-    order.deliveredAt = new Date();
-  }
-
-  const updatedOrder = await order.save();
-  console.log('Order updated successfully:', updatedOrder._id);
-  
-  return updatedOrder;
-}
 
   async updatePaymentMethod(id: string, paymentMethod: string): Promise<Order> {
     const order = await this.orderModel.findById(id);
@@ -700,52 +782,66 @@ export class OrdersService implements OnModuleInit {
     }
 
     // Validate payment method
-    const validPaymentMethods = ['cash', 'bank_transfer', 'mobile_money', 'cash_or_momo', 'paystack', 'cash_on_delivery', 'cash_on_pickup', 'bank_card'];
+    const validPaymentMethods = [
+      'cash',
+      'bank_transfer',
+      'mobile_money',
+      'cash_or_momo',
+      'paystack',
+      'cash_on_delivery',
+      'cash_on_pickup',
+      'bank_card',
+    ];
     if (!validPaymentMethods.includes(paymentMethod)) {
       throw new BadRequestException(`Invalid payment method: ${paymentMethod}`);
     }
 
-    console.log(`Updating order ${id} payment method from ${order.paymentMethod} to ${paymentMethod}`);
+    console.log(
+      `Updating order ${id} payment method from ${order.paymentMethod} to ${paymentMethod}`,
+    );
 
     order.paymentMethod = paymentMethod;
 
     const updatedOrder = await order.save();
     console.log('Order payment method updated successfully:', updatedOrder._id);
-    
+
     return updatedOrder;
   }
 
-async cancelOrder(id: string, userId?: string, isAdmin: boolean = false): Promise<Order> {
-  const query: any = { _id: id };
-  
-  if (!isAdmin && userId) {
-    query.userId = new Types.ObjectId(userId);
-  }
+  async cancelOrder(
+    id: string,
+    userId?: string,
+    isAdmin: boolean = false,
+  ): Promise<Order> {
+    const query: any = { _id: id };
 
-  const order = await this.orderModel.findOne(query);
+    if (!isAdmin && userId) {
+      query.userId = new Types.ObjectId(userId);
+    }
 
-  if (!order) {
-    throw new NotFoundException('Order not found');
-  }
+    const order = await this.orderModel.findOne(query);
 
-  if (!['pending_payment', 'pending', 'confirmed'].includes(order.status)) {
-    throw new BadRequestException(`Cannot cancel order with status: ${order.status}`);
-  }
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
 
-  // Use atomic updates for products
-  for (const item of order.items) {
-    await this.productModel.findByIdAndUpdate(
-      item.productId,
-      {
-        $inc: { 
+    if (!['pending_payment', 'pending', 'confirmed'].includes(order.status)) {
+      throw new BadRequestException(
+        `Cannot cancel order with status: ${order.status}`,
+      );
+    }
+
+    // Use atomic updates for products
+    for (const item of order.items) {
+      await this.productModel.findByIdAndUpdate(item.productId, {
+        $inc: {
           stock: item.quantity,
-          soldCount: -item.quantity
-        }
-      }
-    );
-  }
+          soldCount: -item.quantity,
+        },
+      });
+    }
 
-  order.status = 'cancelled';
-  return order.save();
-}
+    order.status = 'cancelled';
+    return order.save();
+  }
 }

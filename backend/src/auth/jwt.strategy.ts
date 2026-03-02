@@ -7,9 +7,7 @@ import { User, UserDocument } from '../schemas/user.schema';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
-  ) {
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -18,24 +16,26 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-  console.log('=== JWT Validation Start ===');
-  console.log('Payload:', payload);
-  console.log('Looking for userId:', payload.userId);
-  
-  const user = await this.userModel.findById(payload.userId).select('-passwordHash');
-  
-  console.log('User found:', !!user);
-  if (user) {
-    console.log('User email:', user.email);
-    console.log('User active:', user.isActive);
+    console.log('=== JWT Validation Start ===');
+    console.log('Payload:', payload);
+    console.log('Looking for userId:', payload.userId);
+
+    const user = await this.userModel
+      .findById(payload.userId)
+      .select('-passwordHash');
+
+    console.log('User found:', !!user);
+    if (user) {
+      console.log('User email:', user.email);
+      console.log('User active:', user.isActive);
+    }
+
+    if (!user || !user.isActive) {
+      console.log('❌ JWT Validation FAILED - User not found or inactive');
+      throw new UnauthorizedException('User not found or inactive');
+    }
+
+    console.log('✅ JWT Validation SUCCESS');
+    return user;
   }
-  
-  if (!user || !user.isActive) {
-    console.log('❌ JWT Validation FAILED - User not found or inactive');
-    throw new UnauthorizedException('User not found or inactive');
-  }
-  
-  console.log('✅ JWT Validation SUCCESS');
-  return user;
-}
 }

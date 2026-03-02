@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Category, CategoryDocument } from '../schemas/category.schema';
@@ -11,17 +15,22 @@ export class CategoriesService {
     private fileUploadService: FileUploadService,
   ) {}
 
-  async create(name: string, slug: string, imageUrl?: string, imagePublicId?: string): Promise<Category> {
+  async create(
+    name: string,
+    slug: string,
+    imageUrl?: string,
+    imagePublicId?: string,
+  ): Promise<Category> {
     const existingCategory = await this.categoryModel.findOne({ slug });
     if (existingCategory) {
       throw new ConflictException('Category with this slug already exists');
     }
 
-    const category = new this.categoryModel({ 
-      name, 
-      slug, 
-      imageUrl, 
-      imagePublicId 
+    const category = new this.categoryModel({
+      name,
+      slug,
+      imageUrl,
+      imagePublicId,
     });
     return category.save();
   }
@@ -47,11 +56,11 @@ export class CategoriesService {
   }
 
   async update(
-    id: string, 
-    name: string, 
-    slug: string, 
-    imageUrl?: string, 
-    imagePublicId?: string
+    id: string,
+    name: string,
+    slug: string,
+    imageUrl?: string,
+    imagePublicId?: string,
   ): Promise<Category> {
     const existingCategory = await this.categoryModel.findOne({
       slug,
@@ -94,7 +103,7 @@ export class CategoriesService {
 
   async remove(id: string): Promise<void> {
     const category = await this.categoryModel.findById(id);
-    
+
     if (!category) {
       throw new NotFoundException('Category not found');
     }

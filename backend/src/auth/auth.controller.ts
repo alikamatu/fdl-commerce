@@ -1,4 +1,14 @@
-import { Controller, Post, Body, UseGuards, Get, Request, Patch, Req, Res } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Get,
+  Request,
+  Patch,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -9,7 +19,7 @@ import { AuthGuard } from '@nestjs/passport';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-    @Get('google')
+  @Get('google')
   async googleAuth() {
     // This route redirects to Google OAuth
   }
@@ -19,7 +29,7 @@ export class AuthController {
   async googleAuthRedirect(@Req() req, @Res() res) {
     // Get the token from the validated user
     const { token } = req.user;
-    
+
     // Redirect to frontend with token
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     res.redirect(`${frontendUrl}/auth/callback?token=${token}`);
@@ -36,10 +46,13 @@ export class AuthController {
   @Post('google/link')
   async linkGoogleAccount(@Request() req, @Body() body: { token: string }) {
     const result = await this.authService.googleLogin(body.token);
-    
+
     // Link Google ID to current user
-    await this.authService.linkGoogleAccount(req.user._id, result.user.googleId);
-    
+    await this.authService.linkGoogleAccount(
+      req.user._id,
+      result.user.googleId,
+    );
+
     return { message: 'Google account linked successfully' };
   }
 
@@ -83,8 +96,15 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('change-password')
-  async changePassword(@Request() req, @Body() body: { currentPassword: string; newPassword: string }) {
-    return this.authService.changePassword(req.user._id, body.currentPassword, body.newPassword);
+  async changePassword(
+    @Request() req,
+    @Body() body: { currentPassword: string; newPassword: string },
+  ) {
+    return this.authService.changePassword(
+      req.user._id,
+      body.currentPassword,
+      body.newPassword,
+    );
   }
 
   @UseGuards(JwtAuthGuard)

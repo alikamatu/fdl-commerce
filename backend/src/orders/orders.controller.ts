@@ -1,16 +1,16 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
+import {
+  Controller,
+  Get,
+  Post,
   Patch,
-  Body, 
-  Param, 
-  UseGuards, 
+  Body,
+  Param,
+  UseGuards,
   Request,
   UseInterceptors,
   Req,
   BadRequestException,
-  Headers
+  Headers,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { OrdersService } from './orders.service';
@@ -36,11 +36,11 @@ export class OrdersController {
     if (req.user.role !== 'admin') {
       return { success: false, message: 'Access denied. Admin role required.' };
     }
-    
+
     const orders = await this.ordersService.findAll(undefined, true);
     return {
       success: true,
-      data: orders
+      data: orders,
     };
   }
 
@@ -50,17 +50,21 @@ export class OrdersController {
     const isAdmin = req.user.role === 'admin';
     const userId = req.user._id;
     const email = req.user.email;
-    
+
     console.log('Fetching orders for userId:', userId, 'email:', email);
-    
+
     // Fetch orders by userId AND email to include guest orders
-    const orders = await this.ordersService.findAllByUserOrEmail(userId, email, isAdmin);
-    
+    const orders = await this.ordersService.findAllByUserOrEmail(
+      userId,
+      email,
+      isAdmin,
+    );
+
     console.log('Found orders:', orders.length);
-    
+
     return {
       success: true,
-      data: orders
+      data: orders,
     };
   }
 
@@ -69,12 +73,12 @@ export class OrdersController {
   async updateOrderStatus(
     @Param('id') id: string,
     @Body() body: { status: string },
-    @Request() req
+    @Request() req,
   ) {
     if (req.user.role !== 'admin') {
       return { success: false, message: 'Access denied. Admin role required.' };
     }
-    
+
     return this.ordersService.updateStatus(id, body.status);
   }
 
@@ -84,10 +88,10 @@ export class OrdersController {
     if (req.user.role !== 'admin') {
       return { success: false, message: 'Access denied. Admin role required.' };
     }
-    
+
     return this.ordersService.getOrderStats();
   }
-  
+
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findOne(@Param('id') id: string, @Request() req) {
@@ -97,44 +101,41 @@ export class OrdersController {
 
   @UseGuards(JwtAuthGuard)
   @Get('number/:orderNumber')
-  async findByOrderNumber(@Param('orderNumber') orderNumber: string, @Request() req) {
+  async findByOrderNumber(
+    @Param('orderNumber') orderNumber: string,
+    @Request() req,
+  ) {
     const isAdmin = req.user?.role === 'admin';
     const userId = req.user?._id;
     return this.ordersService.findByOrderNumber(orderNumber, userId, isAdmin);
   }
 
   @UseGuards(JwtAuthGuard)
-@Post(':id/notify-delivering')
-async sendShippingNotification(
-  @Param('id') id: string,
-  @Request() req
-) {
-  if (req.user.role !== 'admin') {
-    return { success: false, message: 'Access denied. Admin role required.' };
+  @Post(':id/notify-delivering')
+  async sendShippingNotification(@Param('id') id: string, @Request() req) {
+    if (req.user.role !== 'admin') {
+      return { success: false, message: 'Access denied. Admin role required.' };
+    }
+
+    return this.ordersService.sendShippingNotification(id);
   }
-  
-  return this.ordersService.sendShippingNotification(id);
-}
 
   @UseGuards(JwtAuthGuard)
   @Post(':id/initialize-paystack')
-  async initializePaystackPayment(
-    @Param('id') id: string,
-    @Request() req
-  ) {
+  async initializePaystackPayment(@Param('id') id: string, @Request() req) {
     const order = await this.ordersService.findOne(id, req.user._id, false);
-    
+
     if (order.paymentMethod !== 'paystack') {
-      return { 
-        success: false, 
-        message: 'Order payment method is not Paystack' 
+      return {
+        success: false,
+        message: 'Order payment method is not Paystack',
       };
     }
 
     if (order.paymentCompleted) {
-      return { 
-        success: false, 
-        message: 'Payment already completed for this order' 
+      return {
+        success: false,
+        message: 'Payment already completed for this order',
       };
     }
 
@@ -146,7 +147,7 @@ async sendShippingNotification(
         userId: req.user._id,
         userName: req.user.name,
         deliveryMethod: order.deliveryMethod,
-      }
+      },
     );
 
     return {
@@ -162,7 +163,7 @@ async sendShippingNotification(
   async handlePaystackWebhook(
     @Body() body: any,
     @Headers('x-paystack-signature') signature: string,
-    @Req() request: any
+    @Req() request: any,
   ) {
     // Verify the webhook signature
     const crypto = require('crypto');
@@ -176,13 +177,17 @@ async sendShippingNotification(
     }
 
     const event = body.event;
-    
+
     if (event === 'charge.success') {
       const reference = body.data.reference;
-      
+
       // Complete the payment
-      await this.ordersService.completePaystackPayment(reference, undefined, true);
-      
+      await this.ordersService.completePaystackPayment(
+        reference,
+        undefined,
+        true,
+      );
+
       return { success: true, message: 'Payment completed successfully' };
     }
 
@@ -193,13 +198,13 @@ async sendShippingNotification(
   @Post('paystack/verify')
   async verifyPaystackPayment(
     @Body() body: { reference: string },
-    @Request() req
+    @Request() req,
   ) {
     try {
       const order = await this.ordersService.completePaystackPayment(
         body.reference,
         req.user._id,
-        req.user.role === 'admin'
+        req.user.role === 'admin',
       );
 
       return {
@@ -215,52 +220,46 @@ async sendShippingNotification(
     }
   }
 
-@UseGuards(JwtAuthGuard)
-@Patch(':id/payment-method')
-async updatePaymentMethod(
-  @Param('id') id: string,
-  @Body() body: { paymentMethod: string },
-  @Request() req
-) {
-  if (req.user.role !== 'admin') {
-    return { success: false, message: 'Access denied. Admin role required.' };
-  }
-  
-  return this.ordersService.updatePaymentMethod(id, body.paymentMethod);
-}
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id/payment-method')
+  async updatePaymentMethod(
+    @Param('id') id: string,
+    @Body() body: { paymentMethod: string },
+    @Request() req,
+  ) {
+    if (req.user.role !== 'admin') {
+      return { success: false, message: 'Access denied. Admin role required.' };
+    }
 
-@UseGuards(JwtAuthGuard)
-@Post(':id/notify-pickup')
-async sendPickupNotification(
-  @Param('id') id: string,
-  @Request() req
-) {
-  if (req.user.role !== 'admin') {
-    return { success: false, message: 'Access denied. Admin role required.' };
+    return this.ordersService.updatePaymentMethod(id, body.paymentMethod);
   }
-  
-  return this.ordersService.sendPickupNotification(id);
-}
 
-@UseGuards(JwtAuthGuard)
-@Post(':id/notify-delivered')
-async sendDeliveredNotification(
-  @Param('id') id: string,
-  @Request() req
-) {
-  if (req.user.role !== 'admin') {
-    return { success: false, message: 'Access denied. Admin role required.' };
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/notify-pickup')
+  async sendPickupNotification(@Param('id') id: string, @Request() req) {
+    if (req.user.role !== 'admin') {
+      return { success: false, message: 'Access denied. Admin role required.' };
+    }
+
+    return this.ordersService.sendPickupNotification(id);
   }
-  
-  return this.ordersService.sendDeliveredNotification(id);
-}
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/notify-delivered')
+  async sendDeliveredNotification(@Param('id') id: string, @Request() req) {
+    if (req.user.role !== 'admin') {
+      return { success: false, message: 'Access denied. Admin role required.' };
+    }
+
+    return this.ordersService.sendDeliveredNotification(id);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Post(':id/cancel')
   async cancelOrder(@Param('id') id: string, @Request() req) {
     const isAdmin = req.user.role === 'admin';
     const userId = req.user._id;
-    
+
     return this.ordersService.cancelOrder(id, userId, isAdmin);
   }
 }

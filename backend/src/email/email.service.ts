@@ -8,7 +8,7 @@ export class EmailService {
 
   constructor() {
     const apiKey = process.env.RESEND_API_KEY;
-    
+
     if (!apiKey) {
       this.logger.error('❌ RESEND_API_KEY is not set');
       throw new Error('RESEND_API_KEY is required');
@@ -18,25 +18,29 @@ export class EmailService {
     this.logger.log('✅ Resend email service initialized');
   }
 
-    private formatOrderStatus(status: string): string {
+  private formatOrderStatus(status: string): string {
     if (!status) return 'Unknown Status';
-    
+
     // Replace underscores with spaces and capitalize each word
     return status
       .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
   }
 
   // Keep existing verification, password reset, and welcome emails as they are
-  async sendVerificationEmail(email: string, token: string, displayName: string) {
+  async sendVerificationEmail(
+    email: string,
+    token: string,
+    displayName: string,
+  ) {
     const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
-    
+
     try {
       const { data, error } = await this.resend.emails.send({
         from: `Forbes Digital Lifeline <${process.env.EMAIL_FROM || 'onboarding@resend.dev'}>`,
         to: email,
-        subject: "Verify Your Email Address - Forbes Digital Lifeline",
+        subject: 'Verify Your Email Address - Forbes Digital Lifeline',
         text: `Hello ${displayName},\n\nPlease verify your email address by visiting: ${verificationUrl}\n\nThis link will expire in 24 hours.\n\nBest regards,\nForbes Digital Lifeline Team`,
         html: `
           <!DOCTYPE html>
@@ -87,11 +91,16 @@ export class EmailService {
       });
 
       if (error) {
-        this.logger.error(`❌ Failed to send verification email to ${email}:`, error);
+        this.logger.error(
+          `❌ Failed to send verification email to ${email}:`,
+          error,
+        );
         throw new Error(error.message);
       }
 
-      this.logger.log(`✅ Verification email sent to ${email} (ID: ${data?.id})`);
+      this.logger.log(
+        `✅ Verification email sent to ${email} (ID: ${data?.id})`,
+      );
       return data;
     } catch (error) {
       this.logger.error(`❌ Error sending verification email:`, error.message);
@@ -99,9 +108,13 @@ export class EmailService {
     }
   }
 
-  async sendPasswordResetEmail(email: string, token: string, displayName: string) {
+  async sendPasswordResetEmail(
+    email: string,
+    token: string,
+    displayName: string,
+  ) {
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
-    
+
     try {
       const { data, error } = await this.resend.emails.send({
         from: `Forbes Digital Lifeline <${process.env.EMAIL_FROM || 'onboarding@resend.dev'}>`,
@@ -160,14 +173,22 @@ export class EmailService {
       });
 
       if (error) {
-        this.logger.error(`❌ Failed to send password reset email to ${email}:`, error);
+        this.logger.error(
+          `❌ Failed to send password reset email to ${email}:`,
+          error,
+        );
         throw new Error(error.message);
       }
 
-      this.logger.log(`✅ Password reset email sent to ${email} (ID: ${data?.id})`);
+      this.logger.log(
+        `✅ Password reset email sent to ${email} (ID: ${data?.id})`,
+      );
       return data;
     } catch (error) {
-      this.logger.error(`❌ Error sending password reset email:`, error.message);
+      this.logger.error(
+        `❌ Error sending password reset email:`,
+        error.message,
+      );
       throw error;
     }
   }
@@ -177,7 +198,7 @@ export class EmailService {
       const { data, error } = await this.resend.emails.send({
         from: `Forbes Digital Lifeline <${process.env.EMAIL_FROM || 'onboarding@resend.dev'}>`,
         to: email,
-        subject: "Welcome to Forbes Digital Lifeline",
+        subject: 'Welcome to Forbes Digital Lifeline',
         text: `Welcome! ${displayName}\n\nYour account has been successfully created and verified.\n\nWe're excited to have you with us\n\nBest regards,\nForbes Digital Lifeline Team`,
         html: `
           <!DOCTYPE html>
@@ -227,7 +248,10 @@ export class EmailService {
       });
 
       if (error) {
-        this.logger.error(`❌ Failed to send welcome email to ${email}:`, error);
+        this.logger.error(
+          `❌ Failed to send welcome email to ${email}:`,
+          error,
+        );
         throw new Error(error.message);
       }
 
@@ -239,81 +263,156 @@ export class EmailService {
     }
   }
 
-  async sendOrderConfirmationEmail(email: string, displayName: string, orderNumber: string, orderDetails: any) {
+  async sendOrderConfirmationEmail(
+    email: string,
+    displayName: string,
+    orderNumber: string,
+    orderDetails: any,
+  ) {
     try {
       const { data, error } = await this.resend.emails.send({
         from: `Forbes Digital Lifeline <${process.env.EMAIL_FROM || 'onboarding@resend.dev'}>`,
         to: email,
         subject: `Order Confirmed - ${orderNumber} - Forbes Digital Lifeline`,
-        text: this.generateOrderText(displayName, orderNumber, orderDetails, 'confirmed'),
-        html: this.generateOrderHTML(displayName, orderNumber, orderDetails, 'confirmed'),
+        text: this.generateOrderText(
+          displayName,
+          orderNumber,
+          orderDetails,
+          'confirmed',
+        ),
+        html: this.generateOrderHTML(
+          displayName,
+          orderNumber,
+          orderDetails,
+          'confirmed',
+        ),
       });
 
       if (error) {
-        this.logger.error(`❌ Failed to send order confirmation email to ${email}:`, error);
+        this.logger.error(
+          `❌ Failed to send order confirmation email to ${email}:`,
+          error,
+        );
         throw new Error(error.message);
       }
 
-      this.logger.log(`✅ Order confirmation email sent to ${email} (ID: ${data?.id})`);
+      this.logger.log(
+        `✅ Order confirmation email sent to ${email} (ID: ${data?.id})`,
+      );
       return data;
     } catch (error) {
-      this.logger.error(`❌ Error sending order confirmation email:`, error.message);
+      this.logger.error(
+        `❌ Error sending order confirmation email:`,
+        error.message,
+      );
       throw error;
     }
   }
 
-  async sendShippingNotificationEmail(email: string, displayName: string, orderNumber: string, orderDetails: any) {
+  async sendShippingNotificationEmail(
+    email: string,
+    displayName: string,
+    orderNumber: string,
+    orderDetails: any,
+  ) {
     const deliveryMethod = orderDetails.deliveryMethod || 'delivery';
-    const subject = deliveryMethod === 'delivery' 
-      ? `Your Order ${orderNumber} is Out for Delivery - Forbes Digital Lifeline`
-      : `Your Order ${orderNumber} is Ready for Pickup - Forbes Digital Lifeline`;
+    const subject =
+      deliveryMethod === 'delivery'
+        ? `Your Order ${orderNumber} is Out for Delivery - Forbes Digital Lifeline`
+        : `Your Order ${orderNumber} is Ready for Pickup - Forbes Digital Lifeline`;
 
     try {
       const { data, error } = await this.resend.emails.send({
         from: `Forbes Digital Lifeline <${process.env.EMAIL_FROM || 'onboarding@resend.dev'}>`,
         to: email,
         subject: subject,
-        text: this.generateOrderText(displayName, orderNumber, orderDetails, 'shipping'),
-        html: this.generateOrderHTML(displayName, orderNumber, orderDetails, 'shipping'),
+        text: this.generateOrderText(
+          displayName,
+          orderNumber,
+          orderDetails,
+          'shipping',
+        ),
+        html: this.generateOrderHTML(
+          displayName,
+          orderNumber,
+          orderDetails,
+          'shipping',
+        ),
       });
 
       if (error) {
-        this.logger.error(`❌ Failed to send shipping notification email to ${email}:`, error);
+        this.logger.error(
+          `❌ Failed to send shipping notification email to ${email}:`,
+          error,
+        );
         throw new Error(error.message);
       }
 
-      this.logger.log(`✅ Shipping notification email sent to ${email} (ID: ${data?.id})`);
+      this.logger.log(
+        `✅ Shipping notification email sent to ${email} (ID: ${data?.id})`,
+      );
       return data;
     } catch (error) {
-      this.logger.error(`❌ Error sending shipping notification email:`, error.message);
+      this.logger.error(
+        `❌ Error sending shipping notification email:`,
+        error.message,
+      );
       throw error;
     }
   }
 
-  async sendPickupNotificationEmail(email: string, displayName: string, orderNumber: string, orderDetails: any) {
+  async sendPickupNotificationEmail(
+    email: string,
+    displayName: string,
+    orderNumber: string,
+    orderDetails: any,
+  ) {
     try {
       const { data, error } = await this.resend.emails.send({
         from: `Forbes Digital Lifeline <${process.env.EMAIL_FROM || 'onboarding@resend.dev'}>`,
         to: email,
         subject: `Your Order ${orderNumber} is Ready for Pickup - Forbes Digital Lifeline`,
-        text: this.generateOrderText(displayName, orderNumber, orderDetails, 'pickup'),
-        html: this.generateOrderHTML(displayName, orderNumber, orderDetails, 'pickup'),
+        text: this.generateOrderText(
+          displayName,
+          orderNumber,
+          orderDetails,
+          'pickup',
+        ),
+        html: this.generateOrderHTML(
+          displayName,
+          orderNumber,
+          orderDetails,
+          'pickup',
+        ),
       });
 
       if (error) {
-        this.logger.error(`❌ Failed to send pickup notification email to ${email}:`, error);
+        this.logger.error(
+          `❌ Failed to send pickup notification email to ${email}:`,
+          error,
+        );
         throw new Error(error.message);
       }
 
-      this.logger.log(`✅ Pickup notification email sent to ${email} (ID: ${data?.id})`);
+      this.logger.log(
+        `✅ Pickup notification email sent to ${email} (ID: ${data?.id})`,
+      );
       return data;
     } catch (error) {
-      this.logger.error(`❌ Error sending pickup notification email:`, error.message);
+      this.logger.error(
+        `❌ Error sending pickup notification email:`,
+        error.message,
+      );
       throw error;
     }
   }
 
-  async sendDeliveredNotificationEmail(email: string, displayName: string, orderNumber: string, orderDetails: any) {
+  async sendDeliveredNotificationEmail(
+    email: string,
+    displayName: string,
+    orderNumber: string,
+    orderDetails: any,
+  ) {
     const deliveryMethod = orderDetails.deliveryMethod || 'delivery';
     const subject = `Order ${orderNumber} ${deliveryMethod === 'delivery' ? 'Delivered' : 'Picked Up'} - Forbes Digital Lifeline`;
 
@@ -322,19 +421,37 @@ export class EmailService {
         from: `Forbes Digital Lifeline <${process.env.EMAIL_FROM || 'onboarding@resend.dev'}>`,
         to: email,
         subject: subject,
-        text: this.generateOrderText(displayName, orderNumber, orderDetails, 'delivered'),
-        html: this.generateOrderHTML(displayName, orderNumber, orderDetails, 'delivered'),
+        text: this.generateOrderText(
+          displayName,
+          orderNumber,
+          orderDetails,
+          'delivered',
+        ),
+        html: this.generateOrderHTML(
+          displayName,
+          orderNumber,
+          orderDetails,
+          'delivered',
+        ),
       });
 
       if (error) {
-        this.logger.error(`❌ Failed to send delivered notification email to ${email}:`, error);
+        this.logger.error(
+          `❌ Failed to send delivered notification email to ${email}:`,
+          error,
+        );
         throw new Error(error.message);
       }
 
-      this.logger.log(`✅ Delivered notification email sent to ${email} (ID: ${data?.id})`);
+      this.logger.log(
+        `✅ Delivered notification email sent to ${email} (ID: ${data?.id})`,
+      );
       return data;
     } catch (error) {
-      this.logger.error(`❌ Error sending delivered notification email:`, error.message);
+      this.logger.error(
+        `❌ Error sending delivered notification email:`,
+        error.message,
+      );
       throw error;
     }
   }
@@ -350,20 +467,33 @@ export class EmailService {
       });
 
       if (error) {
-        this.logger.error(`❌ Failed to send new order notification to admin:`, error);
+        this.logger.error(
+          `❌ Failed to send new order notification to admin:`,
+          error,
+        );
         throw new Error(error.message);
       }
 
-      this.logger.log(`✅ New order notification sent to admin (ID: ${data?.id})`);
+      this.logger.log(
+        `✅ New order notification sent to admin (ID: ${data?.id})`,
+      );
       return data;
     } catch (error) {
-      this.logger.error(`❌ Error sending new order notification to admin:`, error.message);
+      this.logger.error(
+        `❌ Error sending new order notification to admin:`,
+        error.message,
+      );
       throw error;
     }
   }
 
   // Helper method to generate text version of order emails
-  private generateOrderText(displayName: string, orderNumber: string, orderDetails: any, emailType: string): string {
+  private generateOrderText(
+    displayName: string,
+    orderNumber: string,
+    orderDetails: any,
+    emailType: string,
+  ): string {
     const items = orderDetails.items || [];
     const subtotalCents = orderDetails.subtotalCents || 0;
     const shippingCents = orderDetails.shippingCents || 0;
@@ -377,23 +507,31 @@ export class EmailService {
     switch (emailType) {
       case 'confirmed':
         headerText = 'Order Confirmation';
-        statusText = 'Thank you for your purchase! Your order has been confirmed and is now being processed.';
+        statusText =
+          'Thank you for your purchase! Your order has been confirmed and is now being processed.';
         break;
       case 'shipping':
-        headerText = deliveryMethod === 'delivery' ? 'Out for Delivery' : 'Ready for Pickup';
-        statusText = deliveryMethod === 'delivery' 
-          ? 'Great news! Your order is out for delivery and will arrive soon.'
-          : 'Great news! Your order is ready for pickup at our location.';
+        headerText =
+          deliveryMethod === 'delivery'
+            ? 'Out for Delivery'
+            : 'Ready for Pickup';
+        statusText =
+          deliveryMethod === 'delivery'
+            ? 'Great news! Your order is out for delivery and will arrive soon.'
+            : 'Great news! Your order is ready for pickup at our location.';
         break;
       case 'pickup':
         headerText = 'Ready for Pickup';
-        statusText = 'Your order is now ready for pickup! Please bring your order confirmation and valid ID.';
+        statusText =
+          'Your order is now ready for pickup! Please bring your order confirmation and valid ID.';
         break;
       case 'delivered':
-        headerText = deliveryMethod === 'delivery' ? 'Order Delivered' : 'Order Picked Up';
-        statusText = deliveryMethod === 'delivery'
-          ? 'Your order has been successfully delivered! Thank you for shopping with us.'
-          : 'Your order has been picked up! Thank you for shopping with us.';
+        headerText =
+          deliveryMethod === 'delivery' ? 'Order Delivered' : 'Order Picked Up';
+        statusText =
+          deliveryMethod === 'delivery'
+            ? 'Your order has been successfully delivered! Thank you for shopping with us.'
+            : 'Your order has been picked up! Thank you for shopping with us.';
         break;
     }
 
@@ -402,10 +540,10 @@ export class EmailService {
     text += `${headerText.toUpperCase()}\n`;
     text += `Order Number: ${orderNumber}\n`;
     text += `Order Date: ${new Date().toLocaleDateString()}\n\n`;
-    
+
     text += `ITEMS:\n`;
     text += `${'-'.repeat(60)}\n`;
-    
+
     if (items.length > 0) {
       items.forEach((item: any) => {
         text += `${item.title || 'Unknown Item'}\n`;
@@ -415,16 +553,16 @@ export class EmailService {
     } else {
       text += `No items details available\n\n`;
     }
-    
+
     text += `${'-'.repeat(60)}\n`;
     text += `Subtotal: GH₵${(subtotalCents / 100).toFixed(2)}\n`;
     text += `${deliveryMethod} Fee: GH₵${(shippingCents / 100).toFixed(2)}\n`;
     text += `TOTAL: GH₵${(totalCents / 100).toFixed(2)}\n\n`;
-    
+
     text += `${deliveryMethod.toUpperCase()} INFORMATION:\n`;
     text += `Method: ${deliveryMethod}\n`;
-    text += `Payment: ${deliveryMethod === "delivery" ? "Cash on Delivery" : "Cash/Momo"}\n`;
-    
+    text += `Payment: ${deliveryMethod === 'delivery' ? 'Cash on Delivery' : 'Cash/Momo'}\n`;
+
     if (emailType === 'delivered') {
       text += `Status: Completed\n\n`;
     } else if (emailType === 'shipping' || emailType === 'pickup') {
@@ -432,7 +570,7 @@ export class EmailService {
     } else {
       text += `Status: Confirmed\n\n`;
     }
-    
+
     text += `${deliveryMethod.toUpperCase()} ADDRESS:\n`;
     if (shippingAddress.firstName) {
       text += `${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}\n`;
@@ -443,15 +581,15 @@ export class EmailService {
     } else {
       text += `Address not available\n\n`;
     }
-    
+
     text += `Track your order: ${process.env.FRONTEND_URL}\n\n`;
-    
+
     text += `CONTACT INFORMATION:\n`;
     text += `Forbes Digital Lifeline\n`;
     text += `Website: https://forbesdigitals.com\n`;
     text += `Email: info@forbesdigitals.com\n`;
     text += `Phone: +233 54 712 9636\n\n`;
-    
+
     text += `Thank you for choosing Forbes Digital Lifeline!\n\n`;
     text += `Best regards,\n`;
     text += `The Forbes Digital Lifeline Team\n\n`;
@@ -459,17 +597,21 @@ export class EmailService {
 
     return text;
   }
-  
 
   // Helper method to generate HTML version of order emails
-  private generateOrderHTML(displayName: string, orderNumber: string, orderDetails: any, emailType: string): string {
+  private generateOrderHTML(
+    displayName: string,
+    orderNumber: string,
+    orderDetails: any,
+    emailType: string,
+  ): string {
     const items = orderDetails.items || [];
     const subtotalCents = orderDetails.subtotalCents || 0;
     const shippingCents = orderDetails.shippingCents || 0;
     const totalCents = orderDetails.totalCents || 0;
     const deliveryMethod = orderDetails.deliveryMethod || 'delivery';
     const shippingAddress = orderDetails.shippingAddress || {};
-    const paymentMethod = orderDetails.paymentMethod || 'cash'
+    const paymentMethod = orderDetails.paymentMethod || 'cash';
 
     let headerTitle = '';
     let headerEmoji = '';
@@ -480,42 +622,54 @@ export class EmailService {
     let buttonText = 'Track Your Order';
     let additionalInfo = '';
 
-      const formatPaymentMethod = (method: string) => {
-  switch (method.toLowerCase()) {
-    case 'mobile_money':
-      return 'Mobile Money (MoMo)';
-    case 'cash':
-      return 'Cash';
-    case 'bank_transfer':
-      return 'Bank Transfer';
-    case 'cash_or_momo':
-      return 'N/A';
-    default:
-      return method.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-  }
-};
-
+    const formatPaymentMethod = (method: string) => {
+      switch (method.toLowerCase()) {
+        case 'mobile_money':
+          return 'Mobile Money (MoMo)';
+        case 'cash':
+          return 'Cash';
+        case 'bank_transfer':
+          return 'Bank Transfer';
+        case 'cash_or_momo':
+          return 'N/A';
+        default:
+          return method
+            .replace(/_/g, ' ')
+            .replace(/\b\w/g, (l) => l.toUpperCase());
+      }
+    };
 
     switch (emailType) {
       case 'confirmed':
         headerTitle = 'Order Confirmation';
         headerEmoji = '✅';
-        statusMessage = 'Thank you for your purchase! Your order has been confirmed and is now being processed.';
+        statusMessage =
+          'Thank you for your purchase! Your order has been confirmed and is now being processed.';
         statusColor = '#28a745';
         statusBadge = 'Confirmed';
         buttonColor = '#000000';
         buttonText = 'Track Your Order';
         break;
       case 'shipping':
-        headerTitle = deliveryMethod === 'delivery' ? 'Out for Delivery' : 'Ready for Pickup';
+        headerTitle =
+          deliveryMethod === 'delivery'
+            ? 'Out for Delivery'
+            : 'Ready for Pickup';
         headerEmoji = deliveryMethod === 'delivery' ? '🚚' : '📦';
-        statusMessage = deliveryMethod === 'delivery' 
-          ? 'Great news! Your order is out for delivery and will arrive soon.'
-          : 'Great news! Your order is ready for pickup at our location.';
+        statusMessage =
+          deliveryMethod === 'delivery'
+            ? 'Great news! Your order is out for delivery and will arrive soon.'
+            : 'Great news! Your order is ready for pickup at our location.';
         statusColor = '#007bff';
-        statusBadge = deliveryMethod === 'delivery' ? 'Out for Delivery' : 'Ready for Pickup';
+        statusBadge =
+          deliveryMethod === 'delivery'
+            ? 'Out for Delivery'
+            : 'Ready for Pickup';
         buttonColor = '#007bff';
-        buttonText = deliveryMethod === 'delivery' ? 'Track Delivery' : 'View Pickup Details';
+        buttonText =
+          deliveryMethod === 'delivery'
+            ? 'Track Delivery'
+            : 'View Pickup Details';
         if (deliveryMethod !== 'delivery') {
           additionalInfo = `
             <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin: 20px 0;">
@@ -543,11 +697,13 @@ export class EmailService {
         `;
         break;
       case 'delivered':
-        headerTitle = deliveryMethod === 'delivery' ? 'Order Delivered' : 'Order Picked Up';
+        headerTitle =
+          deliveryMethod === 'delivery' ? 'Order Delivered' : 'Order Picked Up';
         headerEmoji = '🎉';
-        statusMessage = deliveryMethod === 'delivery'
-          ? 'Your order has been successfully delivered! We hope you enjoy your purchase.'
-          : 'Your order has been picked up! We hope you enjoy your purchase.';
+        statusMessage =
+          deliveryMethod === 'delivery'
+            ? 'Your order has been successfully delivered! We hope you enjoy your purchase.'
+            : 'Your order has been picked up! We hope you enjoy your purchase.';
         statusColor = '#28a745';
         statusBadge = 'Completed';
         buttonColor = '#6c757d';
@@ -607,21 +763,29 @@ export class EmailService {
                         </tr>
                       </thead>
                       <tbody>
-                        ${items.map((item: any) => `
+                        ${items
+                          .map(
+                            (item: any) => `
                         <tr>
                           <td style="padding: 12px 15px; border: 1px solid #dee2e6;">${item.title || 'Unknown Item'}</td>
                           <td style="text-align: center; padding: 12px 15px; border: 1px solid #dee2e6;">${item.quantity || 0}</td>
                           <td style="text-align: right; padding: 12px 15px; border: 1px solid #dee2e6;">GH₵${((item.priceCents || 0) / 100).toFixed(2)}</td>
                           <td style="text-align: right; padding: 12px 15px; border: 1px solid #dee2e6;">GH₵${(((item.priceCents || 0) * (item.quantity || 0)) / 100).toFixed(2)}</td>
                         </tr>
-                        `).join('')}
-                        ${items.length === 0 ? `
+                        `,
+                          )
+                          .join('')}
+                        ${
+                          items.length === 0
+                            ? `
                         <tr>
                           <td colspan="4" style="padding: 12px 15px; border: 1px solid #dee2e6; text-align: center; color: #666;">
                             No items details available
                           </td>
                         </tr>
-                        ` : ''}
+                        `
+                            : ''
+                        }
                       </tbody>
                       <tfoot style="background-color: #f8f9fa; font-weight: 600;">
                         <tr>
@@ -641,13 +805,17 @@ export class EmailService {
                   </td>
                 </tr>
 
-                ${additionalInfo ? `
+                ${
+                  additionalInfo
+                    ? `
                 <tr>
                   <td style="padding: 0 30px 20px 30px;">
                     ${additionalInfo}
                   </td>
                 </tr>
-                ` : ''}
+                `
+                    : ''
+                }
 
                 <!-- Order Details -->
                 <tr>
@@ -764,34 +932,34 @@ export class EmailService {
     text += `Order Number: ${order.orderNumber}\n`;
     text += `Order Date: ${new Date().toLocaleDateString()}\n`;
     text += `Status: ${formattedStatus}\n\n`;
-    
+
     text += `CUSTOMER INFORMATION:\n`;
     text += `Name: ${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}\n`;
     text += `Email: ${order.email}\n`;
     text += `Phone: ${shippingAddress.phone || 'Not provided'}\n\n`;
-    
+
     text += `ORDER DETAILS:\n`;
     text += `Total Amount: GH₵${(order.totalCents / 100).toFixed(2)}\n`;
     text += `Delivery Method: ${order.deliveryMethod}\n`;
     text += `Payment Method: ${order.paymentMethod}\n\n`;
-    
+
     text += `ITEMS:\n`;
     text += `${'-'.repeat(60)}\n`;
     items.forEach((item: any) => {
       text += `${item.title}\n`;
       text += `Qty: ${item.quantity} × GH₵${(item.priceCents / 100).toFixed(2)} = GH₵${((item.priceCents * item.quantity) / 100).toFixed(2)}\n\n`;
     });
-    
+
     text += `${'-'.repeat(60)}\n`;
     text += `Subtotal: GH₵${(order.subtotalCents / 100).toFixed(2)}\n`;
     text += `Delivery: GH₵${(order.shippingCents / 100).toFixed(2)}\n`;
     text += `TOTAL: GH₵${(order.totalCents / 100).toFixed(2)}\n\n`;
-    
+
     text += `DELIVERY ADDRESS:\n`;
     text += `${shippingAddress.address || ''}\n`;
     text += `${shippingAddress.city || ''}, ${shippingAddress.state || ''} ${shippingAddress.zipCode || ''}\n`;
     text += `${shippingAddress.country || ''}\n\n`;
-    
+
     text += `Please process this order in the admin dashboard: ${process.env.ADMIN_URL || process.env.FRONTEND_URL}\n\n`;
     text += `© ${new Date().getFullYear()} Forbes Digital Lifeline. All rights reserved.`;
 
@@ -914,14 +1082,18 @@ export class EmailService {
                         </tr>
                       </thead>
                       <tbody>
-                        ${items.map((item: any) => `
+                        ${items
+                          .map(
+                            (item: any) => `
                         <tr>
                           <td style="padding: 12px 15px; border: 1px solid #dee2e6;">${item.title || 'Unknown Item'}</td>
                           <td style="text-align: center; padding: 12px 15px; border: 1px solid #dee2e6;">${item.quantity || 0}</td>
                           <td style="text-align: right; padding: 12px 15px; border: 1px solid #dee2e6;">GH₵${((item.priceCents || 0) / 100).toFixed(2)}</td>
                           <td style="text-align: right; padding: 12px 15px; border: 1px solid #dee2e6;">GH₵${(((item.priceCents || 0) * (item.quantity || 0)) / 100).toFixed(2)}</td>
                         </tr>
-                        `).join('')}
+                        `,
+                          )
+                          .join('')}
                       </tbody>
                       <tfoot style="background-color: #f8f9fa; font-weight: 600;">
                         <tr>

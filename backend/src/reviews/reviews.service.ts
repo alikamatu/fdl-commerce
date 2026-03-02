@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Review, ReviewDocument } from '../schemas/review.schema';
@@ -17,7 +22,10 @@ export class ReviewsService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
 
-  async create(createReviewDto: CreateReviewDto, userId: string): Promise<Review> {
+  async create(
+    createReviewDto: CreateReviewDto,
+    userId: string,
+  ): Promise<Review> {
     try {
       const order = await this.orderModel.findOne({
         _id: new Types.ObjectId(createReviewDto.orderId),
@@ -29,11 +37,13 @@ export class ReviewsService {
       }
 
       if (order.status !== 'delivered') {
-        throw new BadRequestException('You can only review products from delivered orders');
+        throw new BadRequestException(
+          'You can only review products from delivered orders',
+        );
       }
 
       const productInOrder = order.items.find(
-        item => item.productId === createReviewDto.productId
+        (item) => item.productId === createReviewDto.productId,
       );
 
       if (!productInOrder) {
@@ -47,10 +57,14 @@ export class ReviewsService {
       });
 
       if (existingReview) {
-        throw new BadRequestException('You have already reviewed this product from this order');
+        throw new BadRequestException(
+          'You have already reviewed this product from this order',
+        );
       }
 
-      const product = await this.productModel.findById(createReviewDto.productId);
+      const product = await this.productModel.findById(
+        createReviewDto.productId,
+      );
       if (!product) {
         throw new NotFoundException('Product not found');
       }
@@ -67,7 +81,10 @@ export class ReviewsService {
 
       // Update product rating stats immediately
       await this.updateProductRatingStats(createReviewDto.productId);
-      console.log('✓ Product rating stats updated for:', createReviewDto.productId);
+      console.log(
+        '✓ Product rating stats updated for:',
+        createReviewDto.productId,
+      );
 
       return review;
     } catch (error) {
@@ -76,14 +93,18 @@ export class ReviewsService {
     }
   }
 
-  async findAllForProduct(productId: string, page: number = 1, limit: number = 10) {
+  async findAllForProduct(
+    productId: string,
+    page: number = 1,
+    limit: number = 10,
+  ) {
     const skip = (page - 1) * limit;
 
     const [reviews, total] = await Promise.all([
       this.reviewModel
-        .find({ 
+        .find({
           productId: productId,
-          isActive: true 
+          isActive: true,
         })
         .populate('userId', 'displayName email')
         .sort({ createdAt: -1, helpfulVotes: -1 })
@@ -91,20 +112,25 @@ export class ReviewsService {
         .limit(limit)
         .lean()
         .exec(),
-      this.reviewModel.countDocuments({ 
+      this.reviewModel.countDocuments({
         productId: productId,
-        isActive: true 
+        isActive: true,
       }),
     ]);
 
     // Transform to ensure user field exists
-    const transformedReviews = reviews.map(review => ({
+    const transformedReviews = reviews.map((review) => ({
       ...review,
-      user: review.userId ? {
-        displayName: (review.userId as any).displayName || (review.userId as any).email?.split('@')[0] || 'Anonymous User'
-      } : {
-        displayName: 'Anonymous User'
-      }
+      user: review.userId
+        ? {
+            displayName:
+              (review.userId as any).displayName ||
+              (review.userId as any).email?.split('@')[0] ||
+              'Anonymous User',
+          }
+        : {
+            displayName: 'Anonymous User',
+          },
     }));
 
     return {
@@ -155,7 +181,11 @@ export class ReviewsService {
     return review;
   }
 
-  async update(id: string, updateReviewDto: UpdateReviewDto, userId: string): Promise<Review> {
+  async update(
+    id: string,
+    updateReviewDto: UpdateReviewDto,
+    userId: string,
+  ): Promise<Review> {
     try {
       const review = await this.reviewModel.findById(id);
 
@@ -169,7 +199,9 @@ export class ReviewsService {
 
       const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
       if (review.createdAt < twentyFourHoursAgo) {
-        throw new BadRequestException('You can only edit reviews within 24 hours of posting');
+        throw new BadRequestException(
+          'You can only edit reviews within 24 hours of posting',
+        );
       }
 
       Object.assign(review, updateReviewDto);
@@ -185,7 +217,11 @@ export class ReviewsService {
     }
   }
 
-  async remove(id: string, userId: string, isAdmin: boolean = false): Promise<void> {
+  async remove(
+    id: string,
+    userId: string,
+    isAdmin: boolean = false,
+  ): Promise<void> {
     try {
       const review = await this.reviewModel.findById(id);
 
@@ -198,7 +234,7 @@ export class ReviewsService {
       }
 
       const productId = review.productId;
-      
+
       review.isActive = false;
       await review.save();
 
@@ -223,111 +259,115 @@ export class ReviewsService {
 
     review.helpfulVotes += 1;
     review.votedBy.push(userIdObj);
-    
+
     return review.save();
   }
 
   // Add to reviews.service.ts
 
-async findAllForAdmin(filters: {
-  page: number;
-  limit: number;
-  rating?: string;
-  isActive?: string;
-  isVerified?: string;
-  search?: string;
-}) {
-  const { page, limit, rating, isActive, isVerified, search } = filters;
-  const skip = (page - 1) * limit;
+  async findAllForAdmin(filters: {
+    page: number;
+    limit: number;
+    rating?: string;
+    isActive?: string;
+    isVerified?: string;
+    search?: string;
+  }) {
+    const { page, limit, rating, isActive, isVerified, search } = filters;
+    const skip = (page - 1) * limit;
 
-  const query: any = {};
+    const query: any = {};
 
-  if (rating) {
-    query.rating = parseInt(rating);
+    if (rating) {
+      query.rating = parseInt(rating);
+    }
+
+    if (isActive !== undefined) {
+      query.isActive = isActive === 'true';
+    }
+
+    if (isVerified !== undefined) {
+      query.isVerified = isVerified === 'true';
+    }
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { comment: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    const [reviews, total] = await Promise.all([
+      this.reviewModel
+        .find(query)
+        .populate('userId', 'displayName email')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean()
+        .exec(),
+      this.reviewModel.countDocuments(query),
+    ]);
+
+    // Get product details for each review
+    const reviewsWithProducts = await Promise.all(
+      reviews.map(async (review: any) => {
+        try {
+          const product = await this.productModel
+            .findById(review.productId)
+            .lean();
+          return {
+            ...review,
+            product: product
+              ? {
+                  title: product.title,
+                  images: product.images || [],
+                }
+              : null,
+          };
+        } catch (error) {
+          return {
+            ...review,
+            product: null,
+          };
+        }
+      }),
+    );
+
+    return {
+      reviews: reviewsWithProducts,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
+    };
   }
 
-  if (isActive !== undefined) {
-    query.isActive = isActive === 'true';
+  async adminToggleActive(id: string, isActive?: boolean): Promise<Review> {
+    const review = await this.reviewModel.findById(id);
+
+    if (!review) {
+      throw new NotFoundException('Review not found');
+    }
+
+    review.isActive = isActive !== undefined ? isActive : !review.isActive;
+    await review.save();
+
+    return review;
   }
 
-  if (isVerified !== undefined) {
-    query.isVerified = isVerified === 'true';
+  async adminRemove(id: string): Promise<void> {
+    const result = await this.reviewModel.findByIdAndDelete(id);
+
+    if (!result) {
+      throw new NotFoundException('Review not found');
+    }
+
+    // Update product rating stats after deletion
+    await this.updateProductRatingStats(result.productId);
   }
-
-  if (search) {
-    query.$or = [
-      { title: { $regex: search, $options: 'i' } },
-      { comment: { $regex: search, $options: 'i' } },
-    ];
-  }
-
-  const [reviews, total] = await Promise.all([
-    this.reviewModel
-      .find(query)
-      .populate('userId', 'displayName email')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean()
-      .exec(),
-    this.reviewModel.countDocuments(query),
-  ]);
-
-  // Get product details for each review
-  const reviewsWithProducts = await Promise.all(
-    reviews.map(async (review: any) => {
-      try {
-        const product = await this.productModel.findById(review.productId).lean();
-        return {
-          ...review,
-          product: product ? {
-            title: product.title,
-            images: product.images || []
-          } : null
-        };
-      } catch (error) {
-        return {
-          ...review,
-          product: null
-        };
-      }
-    })
-  );
-
-  return {
-    reviews: reviewsWithProducts,
-    pagination: {
-      page,
-      limit,
-      total,
-      pages: Math.ceil(total / limit),
-    },
-  };
-}
-
-async adminToggleActive(id: string, isActive?: boolean): Promise<Review> {
-  const review = await this.reviewModel.findById(id);
-  
-  if (!review) {
-    throw new NotFoundException('Review not found');
-  }
-
-  review.isActive = isActive !== undefined ? isActive : !review.isActive;
-  await review.save();
-
-  return review;
-}
-
-async adminRemove(id: string): Promise<void> {
-  const result = await this.reviewModel.findByIdAndDelete(id);
-  
-  if (!result) {
-    throw new NotFoundException('Review not found');
-  }
-
-  // Update product rating stats after deletion
-  await this.updateProductRatingStats(result.productId);
-}
 
   async voteUnhelpful(id: string, userId: string): Promise<Review> {
     const review = await this.reviewModel.findById(id);
@@ -344,13 +384,13 @@ async adminRemove(id: string): Promise<void> {
 
     review.unhelpfulVotes += 1;
     review.votedBy.push(userIdObj);
-    
+
     return review.save();
   }
 
   async getProductReviewStats(productId: string) {
     console.log('Getting stats for product:', productId);
-    
+
     const stats = await this.reviewModel.aggregate([
       {
         $match: {
@@ -439,7 +479,7 @@ async adminRemove(id: string): Promise<void> {
   private async updateProductRatingStats(productId: string) {
     try {
       console.log(`Updating rating stats for product: ${productId}`);
-      
+
       // Use string matching for productId
       const stats = await this.reviewModel.aggregate([
         {
@@ -462,9 +502,11 @@ async adminRemove(id: string): Promise<void> {
       if (stats.length > 0) {
         const avgRating = Math.round(stats[0].averageRating * 10) / 10;
         const count = stats[0].reviewCount;
-        
-        console.log(`Setting averageRating: ${avgRating}, reviewCount: ${count}`);
-        
+
+        console.log(
+          `Setting averageRating: ${avgRating}, reviewCount: ${count}`,
+        );
+
         const updateResult = await this.productModel.updateOne(
           { _id: productId },
           {
@@ -472,15 +514,17 @@ async adminRemove(id: string): Promise<void> {
               averageRating: avgRating,
               reviewCount: count,
             },
-          }
+          },
         );
-        
+
         console.log('Update result:', updateResult);
-        
+
         if (updateResult.matchedCount === 0) {
           console.error(`Product ${productId} not found!`);
         } else if (updateResult.modifiedCount === 0) {
-          console.warn(`Product ${productId} found but not modified (values may be the same)`);
+          console.warn(
+            `Product ${productId} found but not modified (values may be the same)`,
+          );
         } else {
           console.log(`✓ Successfully updated product ${productId}`);
         }
@@ -493,7 +537,7 @@ async adminRemove(id: string): Promise<void> {
               averageRating: 0,
               reviewCount: 0,
             },
-          }
+          },
         );
       }
     } catch (error) {
@@ -506,7 +550,7 @@ async adminRemove(id: string): Promise<void> {
   async syncAllProductRatings() {
     const productIds = await this.reviewModel.distinct('productId');
     console.log(`Syncing ratings for ${productIds.length} products...`);
-    
+
     for (const productId of productIds) {
       try {
         await this.updateProductRatingStats(productId);
@@ -514,7 +558,7 @@ async adminRemove(id: string): Promise<void> {
         console.error(`Failed to update product ${productId}:`, error.message);
       }
     }
-    
+
     console.log('Rating sync complete!');
   }
 }

@@ -70,7 +70,10 @@ export class CategoriesController {
 
   @Get('categories')
   @ApiOperation({ summary: 'Get all categories' })
-  @ApiResponse({ status: 200, description: 'Categories retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Categories retrieved successfully',
+  })
   async findAll() {
     const categories = await this.categoriesService.findAll();
     return {

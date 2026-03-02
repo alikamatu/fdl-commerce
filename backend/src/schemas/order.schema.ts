@@ -62,7 +62,8 @@ export class ShippingAddress {
   pickupLocation?: string; // For pickup orders
 }
 
-export const ShippingAddressSchema = SchemaFactory.createForClass(ShippingAddress);
+export const ShippingAddressSchema =
+  SchemaFactory.createForClass(ShippingAddress);
 
 @Schema({ timestamps: true })
 export class Order {
@@ -93,27 +94,44 @@ export class Order {
   @Prop({ required: true })
   totalCents: number;
 
-    @Prop({ 
-    type: String, 
-    enum: ['delivery', 'pickup'], 
-    default: 'delivery' 
+  @Prop({
+    type: String,
+    enum: ['delivery', 'pickup'],
+    default: 'delivery',
   })
   deliveryMethod: string;
 
-@Prop({ 
-  required: true, 
-  enum: ['pending_payment', 'pending', 'confirmed', 'processing', 'delivering', 'available', 'delivered', 'cancelled'],
-  default: 'confirmed'
-})
-status: string;
+  @Prop({
+    required: true,
+    enum: [
+      'pending_payment',
+      'pending',
+      'confirmed',
+      'processing',
+      'delivering',
+      'available',
+      'delivered',
+      'cancelled',
+    ],
+    default: 'confirmed',
+  })
+  status: string;
 
-  @Prop({ 
-  required: true,
-  enum: ['cash', 'bank_transfer', 'mobile_money', 'cash_or_momo', 'paystack', 'cash_on_delivery', 'cash_on_pickup', 'bank_card'],
-  default: 'mobile_money'
-})
-paymentMethod: string;
-
+  @Prop({
+    required: true,
+    enum: [
+      'cash',
+      'bank_transfer',
+      'mobile_money',
+      'cash_or_momo',
+      'paystack',
+      'cash_on_delivery',
+      'cash_on_pickup',
+      'bank_card',
+    ],
+    default: 'mobile_money',
+  })
+  paymentMethod: string;
 
   @Prop({ default: false })
   paymentCompleted: boolean;

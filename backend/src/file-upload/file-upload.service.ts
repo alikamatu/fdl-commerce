@@ -11,13 +11,17 @@ export class FileUploadService {
     });
   }
 
-  async uploadImage(file: Express.Multer.File): Promise<{ url: string; publicId: string }> {
+  async uploadImage(
+    file: Express.Multer.File,
+  ): Promise<{ url: string; publicId: string }> {
     if (!file.mimetype.startsWith('image/')) {
       throw new BadRequestException('Only image files are allowed');
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      throw new BadRequestException('File size too large. Maximum 5MB allowed.');
+      throw new BadRequestException(
+        'File size too large. Maximum 5MB allowed.',
+      );
     }
 
     return new Promise((resolve, reject) => {

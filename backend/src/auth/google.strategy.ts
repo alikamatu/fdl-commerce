@@ -6,12 +6,12 @@ import { AuthService } from './auth.service';
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(private authService: AuthService) {
-super({
-  clientID: process.env.GOOGLE_CLIENT_ID!,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-  callbackURL: process.env.GOOGLE_CALLBACK_URL!,
-  scope: ['email', 'profile'],
-});
+    super({
+      clientID: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      callbackURL: process.env.GOOGLE_CALLBACK_URL!,
+      scope: ['email', 'profile'],
+    });
   }
 
   async validate(
@@ -21,9 +21,9 @@ super({
     done: VerifyCallback,
   ): Promise<any> {
     console.log('Google profile:', profile);
-    
+
     const { id, name, emails, photos } = profile;
-    
+
     const user = {
       googleId: id,
       email: emails[0].value,
@@ -35,7 +35,7 @@ super({
 
     // Find or create user in your database
     const existingUser = await this.authService.validateGoogleUser(user);
-    
+
     done(null, existingUser);
   }
 }

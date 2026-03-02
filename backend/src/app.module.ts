@@ -19,7 +19,9 @@ import { GoogleStrategy } from './auth/google.strategy';
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGODB_URI') || 'mongodb://localhost:27017/techstore',
+        uri:
+          configService.get<string>('MONGODB_URI') ||
+          'mongodb://localhost:27017/techstore',
       }),
       inject: [ConfigService],
     }),
@@ -38,8 +40,7 @@ import { GoogleStrategy } from './auth/google.strategy';
     FileUploadModule,
     OrdersModule,
     BlogsModule,
-    ReviewsModule
+    ReviewsModule,
   ],
 })
-
 export class AppModule {}

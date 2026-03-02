@@ -24,7 +24,10 @@ export class ReviewsController {
   @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() createReviewDto: CreateReviewDto, @Request() req) {
-    const review = await this.reviewsService.create(createReviewDto, req.user._id);
+    const review = await this.reviewsService.create(
+      createReviewDto,
+      req.user._id,
+    );
     return {
       success: true,
       data: review,
@@ -38,7 +41,11 @@ export class ReviewsController {
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
   ) {
-    const result = await this.reviewsService.findAllForProduct(productId, page, limit);
+    const result = await this.reviewsService.findAllForProduct(
+      productId,
+      page,
+      limit,
+    );
     return {
       success: true,
       data: result.reviews,
@@ -53,7 +60,11 @@ export class ReviewsController {
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
   ) {
-    const result = await this.reviewsService.findAllByUser(req.user._id, page, limit);
+    const result = await this.reviewsService.findAllByUser(
+      req.user._id,
+      page,
+      limit,
+    );
     return {
       success: true,
       data: result.reviews,
@@ -77,7 +88,11 @@ export class ReviewsController {
     @Body() updateReviewDto: UpdateReviewDto,
     @Request() req,
   ) {
-    const review = await this.reviewsService.update(id, updateReviewDto, req.user._id);
+    const review = await this.reviewsService.update(
+      id,
+      updateReviewDto,
+      req.user._id,
+    );
     return {
       success: true,
       data: review,
@@ -86,13 +101,13 @@ export class ReviewsController {
   }
 
   @Get('sync-all-ratings')
-async syncAllProductRatings() {
-  await this.reviewsService.syncAllProductRatings();
-  return {
-    success: true,
-    message: 'All product ratings have been synced',
-  };
-}
+  async syncAllProductRatings() {
+    await this.reviewsService.syncAllProductRatings();
+    return {
+      success: true,
+      message: 'All product ratings have been synced',
+    };
+  }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
@@ -107,78 +122,81 @@ async syncAllProductRatings() {
 
   // Add to reviews.controller.ts
 
-@UseGuards(JwtAuthGuard)
-@Get('admin/all')
-async findAllForAdmin(
-  @Request() req?: any,
-  @Query('page') page: number = 1,
-  @Query('limit') limit: number = 10,
-  @Query('rating') rating?: string,
-  @Query('isActive') isActive?: string,
-  @Query('isVerified') isVerified?: string,
-  @Query('search') search?: string,
-) {
-  // Check admin permissions
-  if (req?.user?.role !== 'admin') {
-    throw new ForbiddenException('Admin access required');
+  @UseGuards(JwtAuthGuard)
+  @Get('admin/all')
+  async findAllForAdmin(
+    @Request() req?: any,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('rating') rating?: string,
+    @Query('isActive') isActive?: string,
+    @Query('isVerified') isVerified?: string,
+    @Query('search') search?: string,
+  ) {
+    // Check admin permissions
+    if (req?.user?.role !== 'admin') {
+      throw new ForbiddenException('Admin access required');
+    }
+
+    const result = await this.reviewsService.findAllForAdmin({
+      page: page ? Number(page) : 1,
+      limit: limit ? Number(limit) : 10,
+      rating,
+      isActive,
+      isVerified,
+      search,
+    });
+
+    return {
+      success: true,
+      data: result.reviews,
+      pagination: result.pagination,
+    };
   }
 
-  const result = await this.reviewsService.findAllForAdmin({
-    page: page ? Number(page) : 1,
-    limit: limit ? Number(limit) : 10,
-    rating,
-    isActive,
-    isVerified,
-    search
-  });
-  
-  return {
-    success: true,
-    data: result.reviews,
-    pagination: result.pagination,
-  };
-}
+  @UseGuards(JwtAuthGuard)
+  @Patch('admin/:id')
+  async adminUpdateReview(
+    @Param('id') id: string,
+    @Body() body: { action: 'toggle' | 'delete'; isActive?: boolean },
+    @Request() req,
+  ) {
+    if (req.user.role !== 'admin') {
+      throw new ForbiddenException('Admin access required');
+    }
 
-@UseGuards(JwtAuthGuard)
-@Patch('admin/:id')
-async adminUpdateReview(
-  @Param('id') id: string,
-  @Body() body: { action: 'toggle' | 'delete'; isActive?: boolean },
-  @Request() req
-) {
-  if (req.user.role !== 'admin') {
-    throw new ForbiddenException('Admin access required');
+    if (body.action === 'delete') {
+      await this.reviewsService.adminRemove(id);
+      return {
+        success: true,
+        message: 'Review deleted successfully',
+      };
+    } else {
+      const review = await this.reviewsService.adminToggleActive(
+        id,
+        body.isActive,
+      );
+      return {
+        success: true,
+        data: review,
+        message: `Review ${body.isActive ? 'activated' : 'deactivated'} successfully`,
+      };
+    }
   }
 
-  if (body.action === 'delete') {
+  @UseGuards(JwtAuthGuard)
+  @Delete('admin/:id')
+  async adminDeleteReview(@Param('id') id: string, @Request() req) {
+    if (req.user.role !== 'admin') {
+      throw new ForbiddenException('Admin access required');
+    }
+
     await this.reviewsService.adminRemove(id);
     return {
       success: true,
-      message: 'Review deleted successfully',
-    };
-  } else {
-    const review = await this.reviewsService.adminToggleActive(id, body.isActive);
-    return {
-      success: true,
-      data: review,
-      message: `Review ${body.isActive ? 'activated' : 'deactivated'} successfully`,
+      message: 'Review permanently deleted',
     };
   }
-}
-
-@UseGuards(JwtAuthGuard)
-@Delete('admin/:id')
-async adminDeleteReview(@Param('id') id: string, @Request() req) {
-  if (req.user.role !== 'admin') {
-    throw new ForbiddenException('Admin access required');
-  }
-
-  await this.reviewsService.adminRemove(id);
-  return {
-    success: true,
-    message: 'Review permanently deleted',
-  };
-}
 
   @UseGuards(JwtAuthGuard)
   @Post(':id/helpful')
@@ -214,7 +232,9 @@ async adminDeleteReview(@Param('id') id: string, @Request() req) {
   @UseGuards(JwtAuthGuard)
   @Get('user/reviewable-products')
   async getUserReviewableProducts(@Request() req) {
-    const products = await this.reviewsService.getUserReviewableProducts(req.user._id);
+    const products = await this.reviewsService.getUserReviewableProducts(
+      req.user._id,
+    );
     return {
       success: true,
       data: products,

@@ -17,7 +17,7 @@ import { PaystackService } from 'src/paystack/paystack.service';
       { name: Counter.name, schema: CounterSchema },
     ]),
     AuthModule,
-    EmailModule
+    EmailModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService, PaystackService],

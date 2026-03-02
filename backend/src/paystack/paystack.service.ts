@@ -50,10 +50,12 @@ export class PaystackService {
     this.secretKey = process.env.PAYSTACK_SECRET_KEY || '';
   }
 
-  async initializeTransaction(transaction: PaystackTransaction): Promise<PaystackResponse> {
+  async initializeTransaction(
+    transaction: PaystackTransaction,
+  ): Promise<PaystackResponse> {
     try {
       const amountInSmallestUnit = transaction.amount; // Already in kobo/pesewas
-      
+
       const response = await axios.post(
         `${this.baseUrl}/transaction/initialize`,
         {
@@ -69,17 +71,24 @@ export class PaystackService {
             Authorization: `Bearer ${this.secretKey}`,
             'Content-Type': 'application/json',
           },
-        }
+        },
       );
 
       return response.data;
     } catch (error) {
-      console.error('Paystack initialization error:', error.response?.data || error.message);
-      throw new Error(`Paystack initialization failed: ${error.response?.data?.message || error.message}`);
+      console.error(
+        'Paystack initialization error:',
+        error.response?.data || error.message,
+      );
+      throw new Error(
+        `Paystack initialization failed: ${error.response?.data?.message || error.message}`,
+      );
     }
   }
 
-  async verifyTransaction(reference: string): Promise<PaystackVerificationResponse> {
+  async verifyTransaction(
+    reference: string,
+  ): Promise<PaystackVerificationResponse> {
     try {
       const response = await axios.get(
         `${this.baseUrl}/transaction/verify/${reference}`,
@@ -87,13 +96,18 @@ export class PaystackService {
           headers: {
             Authorization: `Bearer ${this.secretKey}`,
           },
-        }
+        },
       );
 
       return response.data;
     } catch (error) {
-      console.error('Paystack verification error:', error.response?.data || error.message);
-      throw new Error(`Paystack verification failed: ${error.response?.data?.message || error.message}`);
+      console.error(
+        'Paystack verification error:',
+        error.response?.data || error.message,
+      );
+      throw new Error(
+        `Paystack verification failed: ${error.response?.data?.message || error.message}`,
+      );
     }
   }
 

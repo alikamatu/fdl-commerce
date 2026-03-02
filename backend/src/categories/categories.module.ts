@@ -9,9 +9,9 @@ import { FileUploadModule } from 'src/file-upload/file-upload.module';
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: Category.name, schema: CategorySchema }
+      { name: Category.name, schema: CategorySchema },
     ]),
-    AuthModule, 
+    AuthModule,
     FileUploadModule,
   ],
   controllers: [CategoriesController],

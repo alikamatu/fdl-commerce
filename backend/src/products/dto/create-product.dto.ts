@@ -1,20 +1,20 @@
-import { 
-  IsString, 
-  IsNumber, 
-  IsArray, 
-  IsNotEmpty, 
-  IsOptional, 
-  Min, 
-  IsBoolean, 
-  IsMongoId, 
-  Max, 
-  IsDate, 
+import {
+  IsString,
+  IsNumber,
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  Min,
+  IsBoolean,
+  IsMongoId,
+  Max,
+  IsDate,
   IsUrl,
   ArrayMaxSize,
   MaxLength,
   MinLength,
   ValidateNested,
-  IsPositive
+  IsPositive,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -41,7 +41,9 @@ export class ProductSpecificationDto {
 
   @IsString()
   @IsNotEmpty()
-  @MaxLength(500, { message: 'Specification value cannot exceed 500 characters' })
+  @MaxLength(500, {
+    message: 'Specification value cannot exceed 500 characters',
+  })
   value: string;
 }
 
