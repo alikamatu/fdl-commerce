@@ -1,21 +1,49 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Order, OrderDocument } from '../schemas/order.schema';
 import { Product, ProductDocument } from '../schemas/product.schema';
+import { Counter, CounterDocument } from '../schemas/counter.schema';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { EmailService } from '../email/email.service';
 import { PaystackService } from '../paystack/paystack.service';
 import { PaystackTransaction } from '../paystack/paystack.service';
 
 @Injectable()
-export class OrdersService {
+export class OrdersService implements OnModuleInit {
   constructor(
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
+    // counter model used for generating sequential identifiers
+    @InjectModel(Counter.name) private counterModel: Model<CounterDocument>,
     private readonly emailService: EmailService,
     private readonly paystackService: PaystackService,
   ) {}
+
+  async onModuleInit() {
+    // make sure our counter won't generate duplicates if the database
+    // already contains orders (especially useful after deployments or
+    // imports that bypassed the counter logic)
+    try {
+      const latest = await this.orderModel
+        .findOne()
+        .sort({ createdAt: -1 })
+        .select('orderNumber')
+        .exec();
+      if (latest?.orderNumber) {
+        const num = parseInt(latest.orderNumber.replace(/^ORD-0*/, ''), 10);
+        if (!isNaN(num)) {
+          await this.counterModel.updateOne(
+            { key: 'orderNumber' },
+            { $max: { seq: num } },
+            { upsert: true },
+          );
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to initialize order counter:', err.message || err);
+    }
+  }
 
   async verifyPaystackPayment(reference: string): Promise<any> {
     try {
@@ -313,9 +341,32 @@ export class OrdersService {
   let savedOrder: Order | null = null;
 
   try {
-    // 1️⃣ Generate order number
-    const orderCount = await this.orderModel.countDocuments().session(session);
-    const orderNumber = `ORD-${(orderCount + 1).toString().padStart(6, '0')}`;
+    // 1️⃣ Generate a unique sequential order number using an atomic counter.
+    //    If the counter ever falls behind the highest existing order, we
+    //    bump it in a loop until we find an unused value.  This also guards
+    //    against any manual inserts or resets of the counter collection.
+    let orderNumber: string;
+    while (true) {
+      const counter = await this.counterModel.findOneAndUpdate(
+        { key: 'orderNumber' },
+        { $inc: { seq: 1 } },
+        {
+          new: true,
+          upsert: true,
+          session,
+        },
+      );
+      const seq = counter.seq;
+      orderNumber = `ORD-${seq.toString().padStart(6, '0')}`;
+
+      // make sure no order already exists with this number (handles
+      // potential out‑of‑sync situations)
+      const exists = await this.orderModel
+        .findOne({ orderNumber })
+        .session(session);
+      if (!exists) break;
+      // otherwise loop and increment again
+    }
 
     // 2️⃣ Validate stock & update products
     for (const item of createOrderDto.items) {
