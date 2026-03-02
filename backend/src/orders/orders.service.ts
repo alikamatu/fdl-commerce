@@ -371,19 +371,27 @@ export class OrdersService implements OnModuleInit {
       );
     }
 
-    const session = await this.orderModel.db.startSession();
+    let session: any = null;
     let useTransaction = false;
+
     try {
-      session.startTransaction();
-      useTransaction = true;
-      console.log('✅ Transaction started successfully.');
+      session = await this.orderModel.db.startSession();
+      console.log('✅ MongoDB session started.');
+      try {
+        session.startTransaction();
+        useTransaction = true;
+        console.log('✅ Transaction started successfully.');
+      } catch (transactionError) {
+        console.warn(
+          '⚠️ Failed to start transaction. Falling back to non-transactional mode:',
+          transactionError.message,
+        );
+      }
     } catch (sessionError) {
       console.warn(
-        '⚠️ Failed to start transaction. Falling back to non-transactional mode:',
+        '⚠️ Failed to start session (Sessions might not be supported). Proceeding without session:',
         sessionError.message,
       );
-      // We don't throw here, we just proceed without transaction if the DB doesn't support it
-      // but we keep the session for consistency if possible, or just don't use it.
     }
 
     let savedOrder: Order | null = null;

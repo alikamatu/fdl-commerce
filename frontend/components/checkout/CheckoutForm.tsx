@@ -110,8 +110,8 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
         priceCents: item.priceCents,
         quantity: item.quantity,
         image: item.image,
-        sku: item.sku,
-        brand: item.brand,
+        sku: item.sku || 'N/A',
+        brand: item.brand || 'N/A',
       })),
       shippingAddress: deliveryMethod === 'delivery' ? {
         firstName: formData.firstName,
@@ -143,6 +143,8 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
     };
 
     const token = localStorage.getItem('token');
+    console.log('Sending order data to backend:', JSON.stringify(orderData, null, 2));
+
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders`, {
       method: 'POST',
       headers: {
@@ -299,7 +301,7 @@ const initializePaystackPayment = (order: any) => {
   ];
 
   return (
-    <>
+    <form onSubmit={(e) => { e.preventDefault(); handlePlaceOrder(); }}>
       <div className="max-w-4xl mx-auto">
         {/* Progress Steps */}
         <motion.div 
@@ -704,6 +706,6 @@ const initializePaystackPayment = (order: any) => {
           )}
         </AnimatePresence>
       </div>
-    </>
+    </form>
   );
 };
