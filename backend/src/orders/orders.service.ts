@@ -490,12 +490,14 @@ export class OrdersService implements OnModuleInit {
       console.log('✅ Order document saved.');
 
       // 5️⃣ Commit transaction
-      if (useTransaction) {
+      if (useTransaction && session) {
         console.log('--- Committing transaction ---');
         await session.commitTransaction();
         console.log('✅ Transaction committed successfully.');
       }
-      session.endSession();
+      if (session) {
+        session.endSession();
+      }
 
       // 6️⃣ Reload saved order (clean instance)
       savedOrder = await this.orderModel.findById(order._id);
@@ -560,11 +562,13 @@ export class OrdersService implements OnModuleInit {
       return savedOrder;
     } catch (error) {
       console.error('❌ Error in order creation process:', error);
-      if (useTransaction && session.inTransaction()) {
+      if (useTransaction && session && typeof session.inTransaction === 'function' && session.inTransaction()) {
         console.log('--- Aborting transaction ---');
         await session.abortTransaction();
       }
-      session.endSession();
+      if (session) {
+        session.endSession();
+      }
       throw error;
     }
   }
