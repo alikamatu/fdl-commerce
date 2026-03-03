@@ -23,11 +23,23 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
+    let message = (exception as any)?.message || 'Internal server error';
+
+    // Granular error extraction for ValidationPipe and other HttpExceptions
+    if (exception instanceof HttpException) {
+      const response = exception.getResponse() as any;
+      if (typeof response === 'object' && response.message) {
+        message = Array.isArray(response.message)
+          ? response.message.join(', ')
+          : response.message;
+      }
+    }
+
     const responseBody = {
       statusCode: httpStatus,
       timestamp: new Date().toISOString(),
       path: httpAdapter.getRequestUrl(ctx.getRequest()),
-      message: (exception as any)?.message || 'Internal server error',
+      message,
     };
 
     // LOG THE FULL STACK TRACE FOR 500 ERRORS

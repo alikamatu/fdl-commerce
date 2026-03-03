@@ -66,7 +66,7 @@ export class CreateProductDto {
 
   @IsNumber()
   @Min(1, { message: 'Price must be at least $0.01' })
-  @Max(1000000, { message: 'Price cannot exceed $10,000' })
+  @Max(10000000, { message: 'Price cannot exceed $100,000' })
   priceCents: number;
 
   @IsString()
