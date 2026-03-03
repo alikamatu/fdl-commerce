@@ -364,6 +364,7 @@ export class OrdersService implements OnModuleInit {
     console.log('=== Order Creation Start ===');
     console.log('userId:', userId);
     console.log('Payment Method:', createOrderDto.paymentMethod);
+    console.log('Items count:', createOrderDto.items?.length);
 
     if (!userId) {
       throw new BadRequestException(
@@ -371,108 +372,60 @@ export class OrdersService implements OnModuleInit {
       );
     }
 
-    let session: any = null;
-    let useTransaction = false;
-
     try {
-      session = await this.orderModel.db.startSession();
-      console.log('✅ MongoDB session started.');
-      try {
-        session.startTransaction();
-        useTransaction = true;
-        console.log('✅ Transaction started successfully.');
-      } catch (transactionError) {
-        console.warn(
-          '⚠️ Failed to start transaction. Falling back to non-transactional mode:',
-          transactionError.message,
-        );
-      }
-    } catch (sessionError) {
-      console.warn(
-        '⚠️ Failed to start session (Sessions might not be supported). Proceeding without session:',
-        sessionError.message,
-      );
-    }
-
-    let savedOrder: Order | null = null;
-
-    try {
-      console.log('--- Generating order number ---');
-      // 1️⃣ Generate a unique sequential order number using an atomic counter.
+      // 1️⃣ Generate a unique sequential order number
+      console.log('--- Step 1: Generating order number ---');
       let orderNumber: string;
-      while (true) {
-        const counter = await this.counterModel.findOneAndUpdate(
-          { key: 'orderNumber' },
-          { $inc: { seq: 1 } },
-          {
-            new: true,
-            upsert: true,
-            session: useTransaction ? session : undefined,
-          },
-        );
-        const seq = counter.seq;
-        orderNumber = `ORD-${seq.toString().padStart(6, '0')}`;
-
-        const exists = await this.orderModel
-          .findOne({ orderNumber })
-          .session(useTransaction ? session : null);
-        if (!exists) break;
-      }
-      console.log(`Order number generated: ${orderNumber}`);
+      const counter = await this.counterModel.findOneAndUpdate(
+        { key: 'orderNumber' },
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true },
+      );
+      const seq = counter.seq;
+      orderNumber = `ORD-${seq.toString().padStart(6, '0')}`;
+      console.log(`✅ Order number generated: ${orderNumber}`);
 
       // 2️⃣ Validate stock & update products
-      console.log(`--- Validating stock for ${createOrderDto.items.length} items ---`);
+      console.log('--- Step 2: Validating stock ---');
       for (const item of createOrderDto.items) {
-        const product = await this.productModel
-          .findById(item.productId)
-          .session(useTransaction ? session : null);
+        const product = await this.productModel.findById(item.productId);
 
         if (!product) {
-          console.error(`❌ Product not found: ${item.productId} (${item.title})`);
+          console.error(`❌ Product not found: ${item.productId}`);
           throw new NotFoundException(`Product ${item.title} not found`);
         }
 
-        console.log(`Checking stock for ${product.title}: available=${product.stock}, requested=${item.quantity}`);
+        console.log(`Stock check: ${product.title} - available=${product.stock}, requested=${item.quantity}`);
         if (product.stock < item.quantity) {
-          console.error(`❌ Insufficient stock for ${product.title}`);
           throw new BadRequestException(
             `Insufficient stock for ${item.title}. Available: ${product.stock}`,
           );
         }
 
         product.stock -= item.quantity;
-        product.soldCount += item.quantity;
-        await product.save({ session: useTransaction ? session : undefined });
+        product.soldCount = (product.soldCount || 0) + item.quantity;
+        await product.save();
       }
-      console.log('✅ Stock validation and updates completed.');
+      console.log('✅ Stock validated and updated.');
 
-      // 3️⃣ Determine initial payment + order status
+      // 3️⃣ Determine initial status
       let status: string;
       let paymentCompleted = false;
 
       switch (createOrderDto.paymentMethod) {
         case 'paystack':
           status = 'pending_payment';
-          paymentCompleted = false;
           break;
-
-        case 'cash_on_delivery':
-        case 'cash_on_pickup':
-          status = 'confirmed';
-          paymentCompleted = false;
-          break;
-
         default:
           status = 'confirmed';
-          paymentCompleted = false;
           break;
       }
 
-      // 4️⃣ Create order
-      console.log('--- Saving order document ---');
+      // 4️⃣ Create and save order
+      console.log('--- Step 4: Saving order ---');
       const order = new this.orderModel({
         orderNumber,
-        userId: userId,
+        userId,
         email: createOrderDto.email,
         items: createOrderDto.items,
         shippingAddress: createOrderDto.shippingAddress,
@@ -486,34 +439,12 @@ export class OrdersService implements OnModuleInit {
         status,
       });
 
-      await order.save({ session: useTransaction ? session : undefined });
-      console.log('✅ Order document saved.');
+      const savedOrder = await order.save();
+      console.log(`✅ Order saved: ${savedOrder.orderNumber} (ID: ${savedOrder._id})`);
 
-      // 5️⃣ Commit transaction
-      if (useTransaction && session) {
-        console.log('--- Committing transaction ---');
-        await session.commitTransaction();
-        console.log('✅ Transaction committed successfully.');
-      }
-      if (session) {
-        session.endSession();
-      }
-
-      // 6️⃣ Reload saved order (clean instance)
-      savedOrder = await this.orderModel.findById(order._id);
-
-      if (!savedOrder) {
-        console.error(`❌ Order not found after creation: ${order._id}`);
-        throw new NotFoundException('Order not found after creation');
-      }
-
-      console.log(`✅ Order created successfully: ${savedOrder.orderNumber}`);
-
-      // 7️⃣ Send order confirmation email (ALL orders)
+      // 5️⃣ Send confirmation email (non-blocking)
       try {
-        console.log('--- Sending confirmation email ---');
         const fullName = `${savedOrder.shippingAddress.firstName} ${savedOrder.shippingAddress.lastName}`;
-
         await this.emailService.sendOrderConfirmationEmail(
           savedOrder.email,
           fullName,
@@ -532,15 +463,11 @@ export class OrdersService implements OnModuleInit {
         );
         console.log('✅ Confirmation email sent.');
       } catch (emailError) {
-        console.error(
-          '⚠️ Failed to send order confirmation email:',
-          emailError.message,
-        );
+        console.error('⚠️ Email failed (non-blocking):', emailError.message);
       }
 
-      // 8️⃣ Send new order notification to admin
+      // 6️⃣ Send admin notification (non-blocking)
       try {
-        console.log('--- Sending admin notification ---');
         const adminEmail = process.env.ADMIN_EMAIL;
         if (adminEmail) {
           await this.emailService.sendNewOrderNotificationToAdmin(
@@ -548,27 +475,15 @@ export class OrdersService implements OnModuleInit {
             adminEmail,
           );
           console.log('✅ Admin notification sent.');
-        } else {
-          console.warn('⚠️ ADMIN_EMAIL not set, skipping admin notification');
         }
       } catch (emailError) {
-        console.error(
-          '⚠️ Failed to send admin notification email:',
-          emailError.message,
-        );
+        console.error('⚠️ Admin email failed (non-blocking):', emailError.message);
       }
 
       console.log('=== Order Creation Success ===');
       return savedOrder;
     } catch (error) {
-      console.error('❌ Error in order creation process:', error);
-      if (useTransaction && session && typeof session.inTransaction === 'function' && session.inTransaction()) {
-        console.log('--- Aborting transaction ---');
-        await session.abortTransaction();
-      }
-      if (session) {
-        session.endSession();
-      }
+      console.error('❌ Order creation failed:', error.message, error.stack);
       throw error;
     }
   }
