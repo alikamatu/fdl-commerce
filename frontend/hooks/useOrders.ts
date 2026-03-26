@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Order, OrdersResponse } from '@/types/order';
 import { useAuth } from '@/context/AuthContext';
+import { ApiHelper } from '@/lib/api-helper';
 
 export const useOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -20,19 +21,11 @@ export const useOrders = () => {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders`, {
+      const data: OrdersResponse = await ApiHelper.json('/orders', {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${user?.token}`,
-          'Content-Type': 'application/json',
-        },
+        requireAuth: true,
       });
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch orders: ${response.statusText}`);
-      }
-
-      const data: OrdersResponse = await response.json();
       console.log('Fetched orders:', data);
       
       if (data.success) {
@@ -42,7 +35,13 @@ export const useOrders = () => {
       }
     } catch (err) {
       console.error('Orders fetch error:', err);
-      setError(err instanceof Error ? err.message : 'An error occurred while fetching orders');
+      let errorMessage = err instanceof Error ? err.message : 'An error occurred while fetching orders';
+      
+      if (errorMessage === 'SESSION_EXPIRED') {
+        errorMessage = 'Your session expired. Please login again.';
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -50,12 +49,9 @@ export const useOrders = () => {
 
   const cancelOrder = async (orderId: string): Promise<boolean> => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/cancel`, {
+      const response = await ApiHelper.fetch(`/orders/${orderId}/cancel`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${user?.token}`,
-          'Content-Type': 'application/json',
-        },
+        requireAuth: true,
       });
 
       if (response.ok) {

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
+import { ApiHelper } from '@/lib/api-helper';
 
 interface CheckoutFormProps {
   deliveryMethod: 'delivery' | 'pickup';
@@ -142,24 +143,27 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
       totalCents,
     };
 
-    const token = localStorage.getItem('token');
     console.log('Sending order data to backend:', JSON.stringify(orderData, null, 2));
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` }),
-      },
-      body: JSON.stringify(orderData),
-    });
+    try {
+      const response = await ApiHelper.fetch('/orders', {
+        method: 'POST',
+        requireAuth: true,
+        body: JSON.stringify(orderData),
+      });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Order creation failed');
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Order creation failed');
+      }
+
+      return await response.json();
+    } catch (err) {
+      if (err instanceof Error && err.message === 'SESSION_EXPIRED') {
+        throw new Error('Your session expired. Please login again.');
+      }
+      throw err;
     }
-
-    return await response.json();
   };
 
 const initializePaystackPayment = (order: any) => {
@@ -193,18 +197,11 @@ const initializePaystackPayment = (order: any) => {
       const handlePaymentResponse = async () => {
         try {
           // Verify payment on backend
-          const token = localStorage.getItem('token');
-          const verifyResponse = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/orders/paystack/verify`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                ...(token && { 'Authorization': `Bearer ${token}` }),
-              },
-              body: JSON.stringify({ reference: response.reference }),
-            }
-          );
+          const verifyResponse = await ApiHelper.fetch('/orders/paystack/verify', {
+            method: 'POST',
+            requireAuth: true,
+            body: JSON.stringify({ reference: response.reference }),
+          });
 
           const verifyData = await verifyResponse.json();
           
@@ -216,9 +213,15 @@ const initializePaystackPayment = (order: any) => {
           }
         } catch (err) {
           console.error('Payment verification error:', err);
+          // Handle session expired
+          const errorMessage = err instanceof Error ? err.message : 'Payment verification failed';
+          const displayMessage = errorMessage === 'SESSION_EXPIRED' 
+            ? 'Your session expired. Please login again.' 
+            : errorMessage;
+          
           // Use setTimeout to avoid React state updates during render
           setTimeout(() => {
-            setError(err instanceof Error ? err.message : 'Payment verification failed');
+            setError(displayMessage);
           }, 0);
         } finally {
           setTimeout(() => {

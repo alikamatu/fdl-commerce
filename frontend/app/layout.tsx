@@ -7,6 +7,7 @@ import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { Footer } from "@/components/home/Footer";
+import { SessionExpiredNotification } from "@/components/SessionExpiredNotification";
 import Script from "next/script";
 import GoogleTagManager from "@/components/analytics/GoogleTagManager";
 import GoogleTagManagerNoScript from "@/components/analytics/GoogleTagManagerNoScript";
@@ -105,19 +106,20 @@ export default function RootLayout({
         <GoogleTagManagerNoScript />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
-          <CartProvider>
-            <WishlistProvider>
-              <div className="overflow-x-hidden">
-                <Navbar />
-                      <Script
-        src="https://js.paystack.co/v1/inline.js"
-        strategy="lazyOnload"
-      />
-                <main>{children}</main>
-                <Footer />
-              </div>
-            </WishlistProvider>
-          </CartProvider>
+            <CartProvider>
+              <WishlistProvider>
+                <SessionExpiredNotification />
+                <div className="overflow-x-hidden">
+                  <Navbar />
+                  <Script
+                    src="https://js.paystack.co/v1/inline.js"
+                    strategy="lazyOnload"
+                  />
+                  <main>{children}</main>
+                  <Footer />
+                </div>
+              </WishlistProvider>
+            </CartProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>
