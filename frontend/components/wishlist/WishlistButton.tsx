@@ -58,11 +58,10 @@ export const WishlistButton: React.FC<WishlistButtonProps> = ({
       onClick={handleWishlistToggle}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      className={`rounded-full transition-all duration-300 ${
-        isWishlisted
+      className={`rounded-full transition-all duration-300 flex items-center justify-center ${isWishlisted
           ? 'bg-red-500 text-white hover:bg-red-600'
           : 'bg-background/80 text-foreground/60 hover:text-foreground border border-foreground/20 hover:border-foreground/30 hover:bg-background'
-      } ${sizeClasses[size]} ${className}`}
+        } ${sizeClasses[size]} ${className}`}
     >
       <motion.div
         animate={{

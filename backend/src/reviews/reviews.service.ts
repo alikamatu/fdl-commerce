@@ -97,7 +97,7 @@ export class ReviewsService {
     productId: string,
     page: number = 1,
     limit: number = 10,
-  ) {
+  ): Promise<{ reviews: any[]; pagination: { page: number; limit: number; total: number; pages: number } }> {
     const skip = (page - 1) * limit;
 
     const [reviews, total] = await Promise.all([

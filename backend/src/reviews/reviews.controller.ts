@@ -40,7 +40,7 @@ export class ReviewsController {
     @Param('productId') productId: string,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
-  ) {
+  ): Promise<{ success: boolean; data: any[]; pagination: { page: number; limit: number; total: number; pages: number } }> {
     const result = await this.reviewsService.findAllForProduct(
       productId,
       page,

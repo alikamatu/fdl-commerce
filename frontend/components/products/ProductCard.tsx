@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { ShoppingCart, Eye, Star, Zap, Clock } from 'lucide-react';
+import { ShoppingCart, Eye, Clock } from 'lucide-react';
 import { Product } from '@/types/product';
 import { useCart } from '@/context/CartContext';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
@@ -22,30 +22,30 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const router = useRouter();
 
   const currentPrice = (product.priceCents / 100).toFixed(2);
-  const originalPrice = product.originalPriceCents 
+  const originalPrice = product.originalPriceCents
     ? (product.originalPriceCents / 100).toFixed(2)
     : null;
-  
-  const discountPercent = product.discountPercent || (originalPrice 
+
+  const discountPercent = product.discountPercent || (originalPrice
     ? Math.round(((parseFloat(originalPrice) - parseFloat(currentPrice)) / parseFloat(originalPrice)) * 100)
     : 0);
-  
+
   const mainImage = product.images[0]?.url || '/placeholder-product.jpg';
   const isOutOfStock = product.stock === 0;
 
   // Calculate time left for deal
   const getTimeLeft = () => {
     if (!product.dealExpiresAt) return null;
-    
+
     const now = new Date();
     const expiry = new Date(product.dealExpiresAt);
     const diff = expiry.getTime() - now.getTime();
-    
+
     if (diff <= 0) return 'Expired';
-    
+
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    
+
     if (hours > 0) {
       return `${hours}h ${minutes}m`;
     }
@@ -58,7 +58,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     if (isOutOfStock) return;
 
     setIsAddingToCart(true);
-    
+
     const cartItem = {
       productId: product._id,
       title: product.title,
@@ -71,7 +71,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     };
 
     addItem(cartItem);
-    
+
     setTimeout(() => {
       setIsAddingToCart(false);
     }, 500);
@@ -83,7 +83,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4 }}
       transition={{ duration: 0.3 }}
-      className="group relative"
+      className="group relative cursor-pointer"
+      onClick={() => router.push(`/products/${product._id}`)}
     >
       {/* Discount Badge */}
       {discountPercent > 0 && (
@@ -106,9 +107,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
       <div className="bg-background rounded-lg overflow-hidden transition-all duration-300 group-hover:shadow-lg group-hover:border-foreground/20 h-full flex flex-col">
         {/* Wishlist Button */}
-        <div className="absolute top-3 right-3 z-10">
-          <WishlistButton 
-            product={product} 
+        <div
+          className="absolute top-3 right-3 z-10"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <WishlistButton
+            product={product}
             size="sm"
           />
         </div>
@@ -123,9 +127,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         )}
 
         {/* Product Image */}
-        <div 
-          className="relative aspect-[4/3] overflow-hidden cursor-pointer bg-gray-50"
-          onClick={() => router.push(`/products/${product._id}`)}
+        <div
+          className="relative aspect-[4/3] overflow-hidden bg-gray-50"
         >
           <motion.img
             src={mainImage}
@@ -135,7 +138,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             transition={{ duration: 0.3 }}
           />
           <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
-          
+
           {/* Time Left Badge */}
           {timeLeft && (
             <div className="absolute bottom-2 left-2">
@@ -160,9 +163,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </div>
 
           {/* Product Title */}
-          <h4 
+          <h4
             className="font-semibold text-foreground mb-2 line-clamp-2 cursor-pointer hover:text-foreground/80 transition-colors"
-            onClick={() => onViewDetails(product)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onViewDetails(product);
+            }}
           >
             {product.title}
           </h4>
@@ -193,7 +199,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               <span className="text-md font-bold text-foreground">
                 GH₵ {currentPrice}
               </span>
-              
+
               {/* Original Price */}
               {originalPrice && originalPrice !== currentPrice && (
                 <span className="text-xs text-foreground/40 line-through">
@@ -201,7 +207,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 </span>
               )}
             </div>
-            
+
             {/* You Save */}
             {originalPrice && originalPrice !== currentPrice && (
               <div className="text-sm text-green-600 font-medium mt-1">
@@ -229,13 +235,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           )} */}
 
           {/* Action Buttons */}
-          <div className="flex gap-2 mt-auto">
+          <div
+            className="flex gap-2 mt-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               onClick={() => onViewDetails(product)}
-              className="hidden md:flex items-center justify-center gap-1 flex-1 px-3 py-2 border border-foreground/20 rounded-md text-sm font-medium hover:bg-foreground/5 transition-colors"
+              className="flex items-center justify-center gap-1 flex-none md:flex-1 px-3 py-2 border border-foreground/20 rounded-md text-sm font-medium hover:bg-foreground/5 transition-colors"
+              title="Quick View"
             >
               <Eye size={16} />
-              Details
+              <span className="hidden md:inline">Quick View</span>
             </button>
             <button
               onClick={handleAddToCart}
@@ -249,7 +259,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                   className="w-4 h-4 border-2 border-background border-t-transparent rounded-full"
                 />
               ) : (
-                <ShoppingCart size={16} />
+                <ShoppingCart size={16} className='hidden md:inline' />
               )}
               <span>{isAddingToCart ? 'Adding...' : 'Add to Cart'}</span>
             </button>
