@@ -104,7 +104,7 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={0.2}
             onDragEnd={handleDragEnd}
-            className="relative bg-background w-full h-[85vh] md:h-auto md:max-h-[95vh] rounded-t-3xl md:rounded-xl shadow-2xl flex flex-col md:max-w-6xl z-10 overflow-hidden"
+            className="relative bg-background w-full h-[95vh] md:h-auto md:max-h-[95vh] rounded-t-3xl md:rounded-xl shadow-2xl flex flex-col md:max-w-6xl z-10 overflow-hidden"
           >
             {/* Drag Handle (Mobile Only) */}
             <div className="w-full flex justify-center py-3 md:hidden cursor-grab active:cursor-grabbing flex-shrink-0 touch-none">
@@ -132,30 +132,29 @@ export const ProductQuickView: React.FC<ProductQuickViewProps> = ({
               </div>
             </div>
 
-            {/* Main Content - Scrollable area */}
-            <div className="flex-1 min-h-0 overflow-hidden">
-              <div className="flex flex-col lg:flex-row h-full">
-                {/* Product Images Area (Top half on mobile, left side on desktop) */}
-                <div className="lg:w-1/2 flex-shrink-0 h-[40%] lg:h-auto overflow-hidden">
-                  <div className="h-full overflow-y-auto custom-scrollbar lg:overflow-hidden">
-                    <QuickViewImageGallery
-                      product={product}
-                      currentImageIndex={currentImageIndex}
-                      onPrevImage={() => setCurrentImageIndex(prev => prev === 0 ? product.images.length - 1 : prev - 1)}
-                      onNextImage={() => setCurrentImageIndex(prev => prev === product.images.length - 1 ? 0 : prev + 1)}
-                      onSelectImage={setCurrentImageIndex}
-                    />
-                  </div>
+            {/* Main Content - Single unified scrollable area */}
+            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
+              <div className="flex flex-col lg:flex-row lg:h-full">
+                {/* Product Images Area (Top on mobile, left side on desktop) */}
+                <div className="lg:w-1/2 lg:overflow-hidden flex-shrink-0">
+                  <QuickViewImageGallery
+                    product={product}
+                    currentImageIndex={currentImageIndex}
+                    onPrevImage={() => setCurrentImageIndex(prev => prev === 0 ? product.images.length - 1 : prev - 1)}
+                    onNextImage={() => setCurrentImageIndex(prev => prev === product.images.length - 1 ? 0 : prev + 1)}
+                    onSelectImage={setCurrentImageIndex}
+                  />
                 </div>
 
-                {/* Product Details Area (Bottom half on mobile, right side on desktop) */}
-                <div className="flex flex-col flex-1 h-[60%] lg:h-auto overflow-hidden bg-background">
-                  <div className="flex-1 overflow-y-auto">
+                {/* Product Details Area & Actions (Bottom on mobile, right side on desktop) */}
+                <div className="flex flex-col flex-1 bg-background lg:overflow-hidden">
+                  {/* Scrollable Details */}
+                  <div className="flex-1 lg:overflow-y-auto">
                     <QuickViewProductInfo product={product} />
                   </div>
 
-                  {/* Actions Area - Fixed at Bottom of details block */}
-                  <div className="w-full">
+                  {/* Actions Area - Fixed at Bottom */}
+                  <div className="w-full border-t border-foreground/10 bg-background flex-shrink-0">
                     <QuickViewActions
                       product={product}
                       isAddingToCart={isAddingToCart}
