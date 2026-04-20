@@ -170,16 +170,16 @@ export const DealsSection: React.FC<DealsSectionProps> = ({
                       product={product}
                       onViewDetails={handleViewDetails}
                     />
-
-                    <ProductQuickView
-                      product={selectedProduct}
-                      open={quickViewOpen}
-                      onClose={handleCloseQuickView}
-                    />
                   </motion.div>
                 ))}
           </div>
         </div>
+
+        <ProductQuickView
+          product={selectedProduct}
+          open={quickViewOpen}
+          onClose={handleCloseQuickView}
+        />
       </div>
 
       <style jsx>{`
