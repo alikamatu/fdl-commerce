@@ -19,7 +19,9 @@ import {
   MapPin,
   CreditCard,
   Info,
-  AlertCircle
+  AlertCircle,
+  Trash2,
+  AlertTriangle
 } from 'lucide-react';
 import { useAlert } from '@/components/ui/Alert';
 
@@ -208,6 +210,8 @@ export default function AdminOrdersPage() {
   const [dateFilter, setDateFilter] = useState<string>('all');
   const [refreshing, setRefreshing] = useState(false);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; orderNumber: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     filterOrders();
@@ -290,6 +294,44 @@ export default function AdminOrdersPage() {
         title: 'Update Failed',
         message: 'Failed to update order status'
       });
+    }
+  };
+
+  const handleDeleteOrder = async (orderId: string) => {
+    setDeleting(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/orders/admin/${orderId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to delete order');
+      }
+
+      addAlert({
+        type: 'success',
+        title: 'Order Deleted',
+        message: 'Order has been permanently deleted'
+      });
+
+      setDeleteConfirm(null);
+      await refetch();
+    } catch (error) {
+      addAlert({
+        type: 'error',
+        title: 'Delete Failed',
+        message: 'Failed to delete order'
+      });
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -677,6 +719,15 @@ export default function AdminOrdersPage() {
                         >
                           <Eye className="w-4 h-4" />
                         </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => setDeleteConfirm({ id: order._id, orderNumber: order.orderNumber })}
+                          className="p-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-all duration-200"
+                          title="Delete Order"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </motion.button>
                       </div>
                     </td>
                   </motion.tr>
@@ -698,6 +749,44 @@ export default function AdminOrdersPage() {
             </div>
           )}
         </motion.div>
+
+        {/* Delete Confirmation Dialog */}
+        {deleteConfirm && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl"
+            >
+              <div className="text-center">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <AlertTriangle className="w-6 h-6 text-red-600" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">Delete Order</h3>
+                <p className="text-gray-600 mb-1">Are you sure you want to permanently delete this order?</p>
+                <p className="text-sm font-semibold text-gray-900 mt-2">{deleteConfirm.orderNumber}</p>
+                <p className="text-xs text-red-500 mt-2">This action cannot be undone. Stock will be restored for non-cancelled orders.</p>
+              </div>
+
+              <div className="flex justify-center gap-3 mt-6">
+                <button
+                  onClick={() => setDeleteConfirm(null)}
+                  disabled={deleting}
+                  className="px-6 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleDeleteOrder(deleteConfirm.id)}
+                  disabled={deleting}
+                  className="px-6 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-200 font-medium disabled:opacity-50"
+                >
+                  {deleting ? 'Deleting...' : 'Delete Order'}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
       </div>
     </div>
   );

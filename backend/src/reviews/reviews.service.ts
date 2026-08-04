@@ -358,6 +358,41 @@ export class ReviewsService {
     return review;
   }
 
+  async adminUpdate(
+    id: string,
+    updateDto: { title?: string; comment?: string; rating?: number; images?: string[] },
+  ): Promise<Review> {
+    const review = await this.reviewModel.findById(id);
+
+    if (!review) {
+      throw new NotFoundException('Review not found');
+    }
+
+    const previousRating = review.rating;
+
+    if (updateDto.title !== undefined) {
+      review.title = updateDto.title;
+    }
+    if (updateDto.comment !== undefined) {
+      review.comment = updateDto.comment;
+    }
+    if (updateDto.rating !== undefined) {
+      review.rating = updateDto.rating;
+    }
+    if (updateDto.images !== undefined) {
+      review.images = updateDto.images;
+    }
+
+    await review.save();
+
+    // Recalculate product rating stats if rating changed
+    if (updateDto.rating !== undefined && updateDto.rating !== previousRating) {
+      await this.updateProductRatingStats(review.productId);
+    }
+
+    return review;
+  }
+
   async adminRemove(id: string): Promise<void> {
     const result = await this.reviewModel.findByIdAndDelete(id);
 

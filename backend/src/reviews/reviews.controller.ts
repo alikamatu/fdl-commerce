@@ -16,6 +16,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
+import { AdminUpdateReviewDto } from './dto/admin-update-review.dto';
 
 @Controller('reviews')
 export class ReviewsController {
@@ -182,6 +183,25 @@ export class ReviewsController {
         message: `Review ${body.isActive ? 'activated' : 'deactivated'} successfully`,
       };
     }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('admin/:id')
+  async adminEditReview(
+    @Param('id') id: string,
+    @Body() body: AdminUpdateReviewDto,
+    @Request() req,
+  ) {
+    if (req.user.role !== 'admin') {
+      throw new ForbiddenException('Admin access required');
+    }
+
+    const review = await this.reviewsService.adminUpdate(id, body);
+    return {
+      success: true,
+      data: review,
+      message: 'Review updated successfully',
+    };
   }
 
   @UseGuards(JwtAuthGuard)

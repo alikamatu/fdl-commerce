@@ -5,6 +5,7 @@ export const dynamic = "force-dynamic";
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw, MessageCircle } from 'lucide-react';
+import { LikeButton } from '@/components/products/LikeButton';
 import { Product } from '@/types/product';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
@@ -210,6 +211,11 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
         </button>
 
         <div className="flex gap-2">
+          <LikeButton
+            productId={product._id}
+            initialLikeCount={product.likeCount || 0}
+            size="md"
+          />
           <button
             onClick={handleWishlist}
             disabled={isAddingToCart}

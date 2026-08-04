@@ -425,4 +425,64 @@ export class ProductsService {
       .sort({ stock: 1 })
       .exec();
   }
+
+  async toggleLike(
+    productId: string,
+    userId: string,
+  ): Promise<{ liked: boolean; likeCount: number }> {
+    const product = await this.productModel.findById(productId);
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    const userObjectId = new Types.ObjectId(userId);
+    const alreadyLiked = product.likedBy.some(
+      (id) => id.toString() === userId,
+    );
+
+    if (alreadyLiked) {
+      // Unlike: remove user and decrement count atomically
+      await this.productModel.findByIdAndUpdate(productId, {
+        $pull: { likedBy: userObjectId },
+        $inc: { likeCount: -1 },
+      });
+
+      return {
+        liked: false,
+        likeCount: Math.max(0, product.likeCount - 1),
+      };
+    } else {
+      // Like: add user and increment count atomically
+      await this.productModel.findByIdAndUpdate(productId, {
+        $addToSet: { likedBy: userObjectId },
+        $inc: { likeCount: 1 },
+      });
+
+      return {
+        liked: true,
+        likeCount: product.likeCount + 1,
+      };
+    }
+  }
+
+  async getLikeStatus(
+    productId: string,
+    userId: string,
+  ): Promise<{ liked: boolean; likeCount: number }> {
+    const product = await this.productModel.findById(productId).select('likeCount likedBy');
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    const liked = product.likedBy.some(
+      (id) => id.toString() === userId,
+    );
+
+    return {
+      liked,
+      likeCount: product.likeCount,
+    };
+  }
 }

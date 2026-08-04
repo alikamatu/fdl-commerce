@@ -5,6 +5,7 @@ import { ShoppingCart, Eye, Clock } from 'lucide-react';
 import { Product } from '@/types/product';
 import { useCart } from '@/context/CartContext';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
+import { LikeButton } from '@/components/products/LikeButton';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -148,6 +149,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               </div>
             </div>
           )}
+
+          {/* Like Button */}
+          <div
+            className={`absolute ${timeLeft ? 'bottom-2 left-24' : 'bottom-2 left-2'}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <LikeButton
+              productId={product._id}
+              initialLikeCount={product.likeCount || 0}
+              size="sm"
+            />
+          </div>
         </div>
 
         <div className="p-4 flex-1 flex flex-col">

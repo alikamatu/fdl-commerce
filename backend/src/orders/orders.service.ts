@@ -786,4 +786,26 @@ export class OrdersService implements OnModuleInit {
     order.status = 'cancelled';
     return order.save();
   }
+
+  async adminDelete(id: string): Promise<void> {
+    const order = await this.orderModel.findById(id);
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    // If the order was not already cancelled, restore stock and decrement soldCount
+    if (order.status !== 'cancelled') {
+      for (const item of order.items) {
+        await this.productModel.findByIdAndUpdate(item.productId, {
+          $inc: {
+            stock: item.quantity,
+            soldCount: -item.quantity,
+          },
+        });
+      }
+    }
+
+    await this.orderModel.findByIdAndDelete(id);
+  }
 }

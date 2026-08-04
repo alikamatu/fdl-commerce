@@ -13,6 +13,7 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
+  Request,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -126,6 +127,33 @@ export class ProductsController {
     return {
       success: true,
       data: product,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('products/:id/like')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Toggle like/unlike on a product' })
+  @ApiResponse({ status: 200, description: 'Like toggled successfully' })
+  async toggleLike(@Param('id') id: string, @Request() req) {
+    const result = await this.productsService.toggleLike(id, req.user._id);
+    return {
+      success: true,
+      data: result,
+      message: result.liked ? 'Product liked' : 'Product unliked',
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('products/:id/like-status')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get like status for a product' })
+  @ApiResponse({ status: 200, description: 'Like status retrieved' })
+  async getLikeStatus(@Param('id') id: string, @Request() req) {
+    const result = await this.productsService.getLikeStatus(id, req.user._id);
+    return {
+      success: true,
+      data: result,
     };
   }
 

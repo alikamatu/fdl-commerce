@@ -40,7 +40,7 @@ const defaultSlides: HeroSlide[] = [
     title: 'Limited Time Offers',
     description: 'Save big on premium items with exclusive discounts',
     ctaText: 'View Deals',
-    ctaLink: '/products?discount=true',
+    ctaLink: '/products?isDeal=true',
     textColor: 'black',
   },
   {

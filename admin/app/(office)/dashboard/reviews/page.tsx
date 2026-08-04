@@ -13,7 +13,9 @@ import {
   Package,
   Calendar,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Edit2,
+  X
 } from 'lucide-react';
 import { useAlert } from '@/components/ui/Alert';
 
@@ -68,6 +70,10 @@ export default function AdminReviewsDashboardPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedReviews, setSelectedReviews] = useState<string[]>([]);
   const [expandedReview, setExpandedReview] = useState<string | null>(null);
+  const [editingReview, setEditingReview] = useState<Review | null>(null);
+  const [editForm, setEditForm] = useState({ title: '', comment: '', rating: 5 });
+  const [editLoading, setEditLoading] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; title: string } | null>(null);
   const [filters, setFilters] = useState<Filters>({
     rating: '',
     status: '',
@@ -219,6 +225,7 @@ export default function AdminReviewsDashboardPage() {
         message: `Review ${action === 'delete' ? 'deleted' : 'updated'} successfully`
       });
 
+      setDeleteConfirm(null);
       fetchReviews(pagination.page);
     } catch (error) {
       addAlert({
@@ -226,6 +233,56 @@ export default function AdminReviewsDashboardPage() {
         title: 'Error',
         message: 'Failed to update review'
       });
+    }
+  };
+
+  const openEditModal = (review: Review) => {
+    setEditingReview(review);
+    setEditForm({
+      title: review.title,
+      comment: review.comment,
+      rating: review.rating,
+    });
+  };
+
+  const handleEditSubmit = async () => {
+    if (!editingReview) return;
+
+    setEditLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/reviews/admin/${editingReview._id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(editForm),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to update review');
+      }
+
+      addAlert({
+        type: 'success',
+        title: 'Success',
+        message: 'Review updated successfully',
+      });
+
+      setEditingReview(null);
+      fetchReviews(pagination.page);
+    } catch (error) {
+      addAlert({
+        type: 'error',
+        title: 'Error',
+        message: 'Failed to update review',
+      });
+    } finally {
+      setEditLoading(false);
     }
   };
 
@@ -384,8 +441,18 @@ export default function AdminReviewsDashboardPage() {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      onClick={() => handleReviewAction(review._id, 'delete')}
+                      onClick={() => openEditModal(review)}
+                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      title="Edit review"
+                    >
+                      <Edit2 size={16} />
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setDeleteConfirm({ id: review._id, title: review.title })}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Delete review"
                     >
                       <Trash2 size={16} />
                     </motion.button>
@@ -670,6 +737,124 @@ export default function AdminReviewsDashboardPage() {
             </div>
           )}
         </motion.div>
+
+        {/* Edit Modal */}
+        {editingReview && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-xl"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-gray-900">Edit Review</h3>
+                <button
+                  onClick={() => setEditingReview(null)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {/* Rating */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Rating</label>
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        onClick={() => setEditForm(prev => ({ ...prev, rating: star }))}
+                        className="p-0.5 transition-colors"
+                      >
+                        <Star
+                          size={24}
+                          className={star <= editForm.rating ? 'fill-amber-400 text-amber-400' : 'text-gray-300 hover:text-amber-300'}
+                        />
+                      </button>
+                    ))}
+                    <span className="text-sm text-gray-600 ml-2">({editForm.rating}/5)</span>
+                  </div>
+                </div>
+
+                {/* Title */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                  <input
+                    type="text"
+                    value={editForm.title}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, title: e.target.value }))}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                    placeholder="Review title"
+                  />
+                </div>
+
+                {/* Comment */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Comment</label>
+                  <textarea
+                    value={editForm.comment}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, comment: e.target.value }))}
+                    rows={4}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none"
+                    placeholder="Review comment"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  onClick={() => setEditingReview(null)}
+                  className="px-4 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleEditSubmit}
+                  disabled={editLoading || !editForm.title.trim() || !editForm.comment.trim()}
+                  className="px-6 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {editLoading ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Dialog */}
+        {deleteConfirm && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl"
+            >
+              <div className="text-center">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <AlertTriangle className="w-6 h-6 text-red-600" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">Delete Review</h3>
+                <p className="text-gray-600 mb-1">Are you sure you want to permanently delete this review?</p>
+                <p className="text-sm text-gray-500 font-medium">&ldquo;{deleteConfirm.title}&rdquo;</p>
+              </div>
+
+              <div className="flex justify-center gap-3 mt-6">
+                <button
+                  onClick={() => setDeleteConfirm(null)}
+                  className="px-6 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleReviewAction(deleteConfirm.id, 'delete')}
+                  className="px-6 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-200 font-medium"
+                >
+                  Delete
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
       </div>
     </div>
   );

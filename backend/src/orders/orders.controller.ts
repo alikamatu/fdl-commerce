@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Patch,
+  Delete,
   Body,
   Param,
   UseGuards,
@@ -11,6 +12,7 @@ import {
   Req,
   BadRequestException,
   Headers,
+  ForbiddenException,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { OrdersService } from './orders.service';
@@ -261,5 +263,19 @@ export class OrdersController {
     const userId = req.user._id;
 
     return this.ordersService.cancelOrder(id, userId, isAdmin);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('admin/:id')
+  async adminDeleteOrder(@Param('id') id: string, @Request() req) {
+    if (req.user.role !== 'admin') {
+      throw new ForbiddenException('Admin access required');
+    }
+
+    await this.ordersService.adminDelete(id);
+    return {
+      success: true,
+      message: 'Order permanently deleted',
+    };
   }
 }
