@@ -62,12 +62,20 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
         setReviews(reviewsData);
         setTotalPages(data.pagination?.pages || 1);
 
-        // Initialize voting state based on votedBy array
+        // Initialize voting state based on helpfulVotedBy / unhelpfulVotedBy arrays
         const newVotingState: {[key: string]: 'helpful' | 'unhelpful' | null} = {};
         reviewsData.forEach((review: Review) => {
-          if (user && review.votedBy && review.votedBy.includes(user.id)) {
-            // User has already voted on this review
-            newVotingState[review._id] = 'helpful'; // Default to helpful since we don't track which type
+          if (user) {
+            if (review.helpfulVotedBy && review.helpfulVotedBy.includes(user.id)) {
+              newVotingState[review._id] = 'helpful';
+            } else if (review.unhelpfulVotedBy && review.unhelpfulVotedBy.includes(user.id)) {
+              newVotingState[review._id] = 'unhelpful';
+            } else if (review.votedBy && review.votedBy.includes(user.id)) {
+              // Legacy fallback
+              newVotingState[review._id] = 'helpful';
+            } else {
+              newVotingState[review._id] = null;
+            }
           } else {
             newVotingState[review._id] = null;
           }
@@ -195,12 +203,46 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
       return;
     }
 
-    // Check if user has already voted
-    if (votingState[reviewId]) {
-      setVoteError('You have already voted on this review.');
-      setTimeout(() => setVoteError(null), 3000);
-      return;
-    }
+    const currentVote = votingState[reviewId];
+
+    // Optimistic UI updates
+    setVotingState(prev => ({
+      ...prev,
+      [reviewId]: currentVote === type ? null : type
+    }));
+
+    setReviews(prevReviews => prevReviews.map(review => {
+      if (review._id !== reviewId) return review;
+
+      let hVotes = review.helpfulVotes;
+      let uVotes = review.unhelpfulVotes;
+
+      if (type === 'helpful') {
+        if (currentVote === 'helpful') {
+          hVotes = Math.max(0, hVotes - 1);
+        } else {
+          hVotes += 1;
+          if (currentVote === 'unhelpful') {
+            uVotes = Math.max(0, uVotes - 1);
+          }
+        }
+      } else {
+        if (currentVote === 'unhelpful') {
+          uVotes = Math.max(0, uVotes - 1);
+        } else {
+          uVotes += 1;
+          if (currentVote === 'helpful') {
+            hVotes = Math.max(0, hVotes - 1);
+          }
+        }
+      }
+
+      return {
+        ...review,
+        helpfulVotes: hVotes,
+        unhelpfulVotes: uVotes
+      };
+    }));
 
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
@@ -216,35 +258,20 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
       );
 
       if (response.ok) {
-        // Update voting state optimistically
-        setVotingState(prev => ({
-          ...prev,
-          [reviewId]: type
-        }));
-        
-        // Refetch reviews to get updated vote counts
+        // Refetch in background to ensure database sync
         fetchReviews(currentPage);
         setVoteError(null);
       } else {
         const errorData = await response.json().catch(() => ({}));
-        
-        if (response.status === 400) {
-          // User has already voted
-          setVoteError('You have already voted on this review.');
-          setVotingState(prev => ({
-            ...prev,
-            [reviewId]: 'helpful' // Mark as voted
-          }));
-        } else {
-          setVoteError(errorData.message || 'Failed to vote. Please try again.');
-        }
-        
-        setTimeout(() => setVoteError(null), 3000);
+        throw new Error(errorData.message || 'Failed to vote');
       }
     } catch (error) {
       console.error('Error voting:', error);
-      setVoteError('Failed to vote. Please try again.');
+      setVoteError('Failed to vote. Rolling back...');
       setTimeout(() => setVoteError(null), 3000);
+      
+      // Rollback optimistic update
+      fetchReviews(currentPage);
     }
   };
 
@@ -451,7 +478,7 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
         ) : (
           <>
             {reviews.map((review, index) => {
-              const hasVoted = votingState[review._id];
+              const userVote = votingState[review._id];
               
               return (
                 <motion.div
@@ -489,7 +516,7 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
                       </div>
                     </div>
                   </div>
-
+ 
                   <div className="space-y-3">
                     <h4 className="font-medium text-foreground text-lg">
                       {review.title}
@@ -497,7 +524,7 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
                     <p className="text-foreground/80 leading-relaxed">
                       {review.comment}
                     </p>
-
+ 
                     {review.images && review.images.length > 0 && (
                       <div className="flex gap-2 mt-3">
                         {review.images.map((image, imgIndex) => (
@@ -511,7 +538,7 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
                         ))}
                       </div>
                     )}
-
+ 
                     <div className="flex items-center justify-between pt-3 border-t border-foreground/5">
                       <div className="text-sm text-foreground/60">
                         Was this review helpful?
@@ -519,32 +546,44 @@ export const ProductReviews: React.FC<ProductReviewsProps> = ({
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleVote(review._id, 'helpful')}
-                          disabled={!!hasVoted}
-                          className={`flex items-center gap-1 px-3 py-1 text-sm border rounded-lg transition-colors ${
-                            hasVoted
-                              ? 'bg-blue-500 text-white border-blue-500 cursor-not-allowed'
+                          className={`flex items-center gap-1 px-3 py-1 text-sm border rounded-lg transition-all duration-300 ${
+                            userVote === 'helpful'
+                              ? 'bg-blue-500 text-white border-blue-500 shadow-sm'
                               : 'border-foreground/20 hover:bg-foreground/5'
                           }`}
-                          title={hasVoted ? 'You have already voted on this review' : 'Mark as helpful'}
+                          title="Mark as helpful"
                         >
-                          <ThumbsUp size={14} />
+                          <motion.div
+                            whileTap={{ scale: 0.7 }}
+                            whileHover={{ scale: 1.15 }}
+                            transition={{ type: "spring", stiffness: 450, damping: 15 }}
+                            className="flex items-center"
+                          >
+                            <ThumbsUp size={14} className={userVote === 'helpful' ? 'fill-current' : ''} />
+                          </motion.div>
                           {review.helpfulVotes > 0 && (
-                            <span className="text-xs">{review.helpfulVotes}</span>
+                            <span className="text-xs font-medium">{review.helpfulVotes}</span>
                           )}
                         </button>
                         <button
                           onClick={() => handleVote(review._id, 'unhelpful')}
-                          disabled={!!hasVoted}
-                          className={`flex items-center gap-1 px-3 py-1 text-sm border rounded-lg transition-colors ${
-                            hasVoted
-                              ? 'bg-blue-500 text-white border-blue-500 cursor-not-allowed'
+                          className={`flex items-center gap-1 px-3 py-1 text-sm border rounded-lg transition-all duration-300 ${
+                            userVote === 'unhelpful'
+                              ? 'bg-red-500 text-white border-red-500 shadow-sm'
                               : 'border-foreground/20 hover:bg-foreground/5'
                           }`}
-                          title={hasVoted ? 'You have already voted on this review' : 'Mark as unhelpful'}
+                          title="Mark as unhelpful"
                         >
-                          <ThumbsDown size={14} />
+                          <motion.div
+                            whileTap={{ scale: 0.7 }}
+                            whileHover={{ scale: 1.15 }}
+                            transition={{ type: "spring", stiffness: 450, damping: 15 }}
+                            className="flex items-center"
+                          >
+                            <ThumbsDown size={14} className={userVote === 'unhelpful' ? 'fill-current' : ''} />
+                          </motion.div>
                           {review.unhelpfulVotes > 0 && (
-                            <span className="text-xs">{review.unhelpfulVotes}</span>
+                            <span className="text-xs font-medium">{review.unhelpfulVotes}</span>
                           )}
                         </button>
                       </div>

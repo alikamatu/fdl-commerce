@@ -16,6 +16,8 @@ export interface Review {
   helpfulVotes: number;
   unhelpfulVotes: number;
   votedBy: string[];
+  helpfulVotedBy?: string[];
+  unhelpfulVotedBy?: string[];
   createdAt: string;
   user?: {
     displayName: string;

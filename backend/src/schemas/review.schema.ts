@@ -43,6 +43,12 @@ export class Review {
   @Prop({ type: [Types.ObjectId], ref: 'User', default: [] })
   votedBy: Types.ObjectId[];
 
+  @Prop({ type: [Types.ObjectId], ref: 'User', default: [] })
+  helpfulVotedBy: Types.ObjectId[];
+
+  @Prop({ type: [Types.ObjectId], ref: 'User', default: [] })
+  unhelpfulVotedBy: Types.ObjectId[];
+
   @Prop({ default: Date.now })
   createdAt: Date;
 }

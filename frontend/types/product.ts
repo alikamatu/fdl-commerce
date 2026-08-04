@@ -36,7 +36,6 @@ export interface Product {
   specifications: ProductSpecification[];
   isActive: boolean;
   soldCount: number;
-  likeCount: number;
   dealExpiresAt?: string;
   createdAt: string;
   updatedAt: string;

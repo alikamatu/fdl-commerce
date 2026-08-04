@@ -93,12 +93,6 @@ export class Product {
     },
   })
   soldCount: number;
-
-  @Prop({ default: 0 })
-  likeCount: number;
-
-  @Prop({ type: [Types.ObjectId], ref: 'User', default: [] })
-  likedBy: Types.ObjectId[];
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

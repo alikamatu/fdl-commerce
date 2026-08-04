@@ -253,12 +253,29 @@ export class ReviewsService {
 
     const userIdObj = new Types.ObjectId(userId);
 
-    if (review.votedBy.includes(userIdObj)) {
-      throw new BadRequestException('You have already voted on this review');
-    }
+    if (!review.helpfulVotedBy) review.helpfulVotedBy = [];
+    if (!review.unhelpfulVotedBy) review.unhelpfulVotedBy = [];
+    if (!review.votedBy) review.votedBy = [];
 
-    review.helpfulVotes += 1;
-    review.votedBy.push(userIdObj);
+    const isHelpful = review.helpfulVotedBy.some(id => id.toString() === userId);
+    const isUnhelpful = review.unhelpfulVotedBy.some(id => id.toString() === userId);
+
+    if (isHelpful) {
+      review.helpfulVotes = Math.max(0, review.helpfulVotes - 1);
+      review.helpfulVotedBy = review.helpfulVotedBy.filter(id => id.toString() !== userId);
+      review.votedBy = review.votedBy.filter(id => id.toString() !== userId);
+    } else {
+      review.helpfulVotes += 1;
+      review.helpfulVotedBy.push(userIdObj);
+      if (!review.votedBy.some(id => id.toString() === userId)) {
+        review.votedBy.push(userIdObj);
+      }
+
+      if (isUnhelpful) {
+        review.unhelpfulVotes = Math.max(0, review.unhelpfulVotes - 1);
+        review.unhelpfulVotedBy = review.unhelpfulVotedBy.filter(id => id.toString() !== userId);
+      }
+    }
 
     return review.save();
   }
@@ -413,12 +430,29 @@ export class ReviewsService {
 
     const userIdObj = new Types.ObjectId(userId);
 
-    if (review.votedBy.includes(userIdObj)) {
-      throw new BadRequestException('You have already voted on this review');
-    }
+    if (!review.helpfulVotedBy) review.helpfulVotedBy = [];
+    if (!review.unhelpfulVotedBy) review.unhelpfulVotedBy = [];
+    if (!review.votedBy) review.votedBy = [];
 
-    review.unhelpfulVotes += 1;
-    review.votedBy.push(userIdObj);
+    const isHelpful = review.helpfulVotedBy.some(id => id.toString() === userId);
+    const isUnhelpful = review.unhelpfulVotedBy.some(id => id.toString() === userId);
+
+    if (isUnhelpful) {
+      review.unhelpfulVotes = Math.max(0, review.unhelpfulVotes - 1);
+      review.unhelpfulVotedBy = review.unhelpfulVotedBy.filter(id => id.toString() !== userId);
+      review.votedBy = review.votedBy.filter(id => id.toString() !== userId);
+    } else {
+      review.unhelpfulVotes += 1;
+      review.unhelpfulVotedBy.push(userIdObj);
+      if (!review.votedBy.some(id => id.toString() === userId)) {
+        review.votedBy.push(userIdObj);
+      }
+
+      if (isHelpful) {
+        review.helpfulVotes = Math.max(0, review.helpfulVotes - 1);
+        review.helpfulVotedBy = review.helpfulVotedBy.filter(id => id.toString() !== userId);
+      }
+    }
 
     return review.save();
   }
