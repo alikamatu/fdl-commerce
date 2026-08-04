@@ -251,29 +251,30 @@ export class ReviewsService {
       throw new NotFoundException('Review not found');
     }
 
-    const userIdObj = new Types.ObjectId(userId);
+    const userIdStr = userId.toString();
+    const userIdObj = new Types.ObjectId(userIdStr);
 
     if (!review.helpfulVotedBy) review.helpfulVotedBy = [];
     if (!review.unhelpfulVotedBy) review.unhelpfulVotedBy = [];
     if (!review.votedBy) review.votedBy = [];
 
-    const isHelpful = review.helpfulVotedBy.some(id => id.toString() === userId);
-    const isUnhelpful = review.unhelpfulVotedBy.some(id => id.toString() === userId);
+    const isHelpful = review.helpfulVotedBy.some(id => id.toString() === userIdStr);
+    const isUnhelpful = review.unhelpfulVotedBy.some(id => id.toString() === userIdStr);
 
     if (isHelpful) {
       review.helpfulVotes = Math.max(0, review.helpfulVotes - 1);
-      review.helpfulVotedBy = review.helpfulVotedBy.filter(id => id.toString() !== userId);
-      review.votedBy = review.votedBy.filter(id => id.toString() !== userId);
+      review.helpfulVotedBy = review.helpfulVotedBy.filter(id => id.toString() !== userIdStr);
+      review.votedBy = review.votedBy.filter(id => id.toString() !== userIdStr);
     } else {
       review.helpfulVotes += 1;
       review.helpfulVotedBy.push(userIdObj);
-      if (!review.votedBy.some(id => id.toString() === userId)) {
+      if (!review.votedBy.some(id => id.toString() === userIdStr)) {
         review.votedBy.push(userIdObj);
       }
 
       if (isUnhelpful) {
         review.unhelpfulVotes = Math.max(0, review.unhelpfulVotes - 1);
-        review.unhelpfulVotedBy = review.unhelpfulVotedBy.filter(id => id.toString() !== userId);
+        review.unhelpfulVotedBy = review.unhelpfulVotedBy.filter(id => id.toString() !== userIdStr);
       }
     }
 
@@ -428,29 +429,30 @@ export class ReviewsService {
       throw new NotFoundException('Review not found');
     }
 
-    const userIdObj = new Types.ObjectId(userId);
+    const userIdStr = userId.toString();
+    const userIdObj = new Types.ObjectId(userIdStr);
 
     if (!review.helpfulVotedBy) review.helpfulVotedBy = [];
     if (!review.unhelpfulVotedBy) review.unhelpfulVotedBy = [];
     if (!review.votedBy) review.votedBy = [];
 
-    const isHelpful = review.helpfulVotedBy.some(id => id.toString() === userId);
-    const isUnhelpful = review.unhelpfulVotedBy.some(id => id.toString() === userId);
+    const isHelpful = review.helpfulVotedBy.some(id => id.toString() === userIdStr);
+    const isUnhelpful = review.unhelpfulVotedBy.some(id => id.toString() === userIdStr);
 
     if (isUnhelpful) {
       review.unhelpfulVotes = Math.max(0, review.unhelpfulVotes - 1);
-      review.unhelpfulVotedBy = review.unhelpfulVotedBy.filter(id => id.toString() !== userId);
-      review.votedBy = review.votedBy.filter(id => id.toString() !== userId);
+      review.unhelpfulVotedBy = review.unhelpfulVotedBy.filter(id => id.toString() !== userIdStr);
+      review.votedBy = review.votedBy.filter(id => id.toString() !== userIdStr);
     } else {
       review.unhelpfulVotes += 1;
       review.unhelpfulVotedBy.push(userIdObj);
-      if (!review.votedBy.some(id => id.toString() === userId)) {
+      if (!review.votedBy.some(id => id.toString() === userIdStr)) {
         review.votedBy.push(userIdObj);
       }
 
       if (isHelpful) {
         review.helpfulVotes = Math.max(0, review.helpfulVotes - 1);
-        review.helpfulVotedBy = review.helpfulVotedBy.filter(id => id.toString() !== userId);
+        review.helpfulVotedBy = review.helpfulVotedBy.filter(id => id.toString() !== userIdStr);
       }
     }
 
