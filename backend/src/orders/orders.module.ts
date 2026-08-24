@@ -5,6 +5,7 @@ import { OrdersService } from './orders.service';
 import { Order, OrderSchema } from '../schemas/order.schema';
 import { Product, ProductSchema } from '../schemas/product.schema';
 import { Counter, CounterSchema } from '../schemas/counter.schema';
+import { RecycledOrderNumber, RecycledOrderNumberSchema } from '../schemas/recycled-order-number.schema';
 import { AuthModule } from 'src/auth/auth.module';
 import { EmailModule } from 'src/email/email.module';
 import { PaystackService } from 'src/paystack/paystack.service';
@@ -15,6 +16,7 @@ import { PaystackService } from 'src/paystack/paystack.service';
       { name: Order.name, schema: OrderSchema },
       { name: Product.name, schema: ProductSchema },
       { name: Counter.name, schema: CounterSchema },
+      { name: RecycledOrderNumber.name, schema: RecycledOrderNumberSchema },
     ]),
     AuthModule,
     EmailModule,

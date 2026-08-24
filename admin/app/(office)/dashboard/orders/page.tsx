@@ -160,6 +160,29 @@ const fetchOrders = async () => {
     }
   };
 
+  const deleteOrder = async (orderId: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete order');
+      }
+
+      await fetchOrders();
+      return true;
+    } catch (err) {
+      console.error('Failed to delete order:', err);
+      return false;
+    }
+  };
+
   useEffect(() => {
     fetchOrders();
     fetchOrderStats();
@@ -172,6 +195,7 @@ const fetchOrders = async () => {
     error,
     refetch: fetchOrders,
     updateOrderStatus,
+    deleteOrder,
   };
 }
 
@@ -202,7 +226,8 @@ export default function AdminOrdersPage() {
     loading,
     error,
     refetch,
-    updateOrderStatus
+    updateOrderStatus,
+    deleteOrder
   } = useOrders();
 
   const [searchTerm, setSearchTerm] = useState('');

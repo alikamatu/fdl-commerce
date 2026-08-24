@@ -18,12 +18,12 @@ export interface HeroSlide {
 const defaultSlides: HeroSlide[] = [
   {
     id: '1',
-    image: '/images/12421.svg',
-    title: 'Cash on Delivery / Pickup @ UPSA Campus',
-    description: 'Free Delivery',
+    image: '/images/2149156431.jpg',
+    title: 'Payment on Delivery (free nationwide delivery) or pickup @ the UPSA campus',
+    description: 'Same-day delivery. Only make payment when you receive your order',
     ctaText: 'Shop Now',
     ctaLink: '/products',
-    textColor: 'black',
+    textColor: 'white',
   },
   {
     id: '2',

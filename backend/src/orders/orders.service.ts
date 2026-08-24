@@ -9,6 +9,7 @@ import { Model, Types } from 'mongoose';
 import { Order, OrderDocument } from '../schemas/order.schema';
 import { Product, ProductDocument } from '../schemas/product.schema';
 import { Counter, CounterDocument } from '../schemas/counter.schema';
+import { RecycledOrderNumber, RecycledOrderNumberDocument } from '../schemas/recycled-order-number.schema';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { EmailService } from '../email/email.service';
 import { PaystackService } from '../paystack/paystack.service';
@@ -21,6 +22,7 @@ export class OrdersService implements OnModuleInit {
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
     // counter model used for generating sequential identifiers
     @InjectModel(Counter.name) private counterModel: Model<CounterDocument>,
+    @InjectModel(RecycledOrderNumber.name) private recycledOrderNumberModel: Model<RecycledOrderNumberDocument>,
     private readonly emailService: EmailService,
     private readonly paystackService: PaystackService,
   ) {}
@@ -376,12 +378,26 @@ export class OrdersService implements OnModuleInit {
       // 1️⃣ Generate a unique sequential order number
       console.log('--- Step 1: Generating order number ---');
       let orderNumber: string;
-      const counter = await this.counterModel.findOneAndUpdate(
-        { key: 'orderNumber' },
-        { $inc: { seq: 1 } },
-        { new: true, upsert: true },
+      
+      // Check for a recycled order number first
+      const recycled = await this.recycledOrderNumberModel.findOneAndDelete(
+        {},
+        { sort: { seq: 1 } }
       );
-      const seq = counter.seq;
+      
+      let seq: number;
+      if (recycled) {
+        seq = recycled.seq;
+        console.log(`♻️ Reusing recycled order number sequence: ${seq}`);
+      } else {
+        const counter = await this.counterModel.findOneAndUpdate(
+          { key: 'orderNumber' },
+          { $inc: { seq: 1 } },
+          { new: true, upsert: true },
+        );
+        seq = counter.seq;
+      }
+      
       orderNumber = `ORD-${seq.toString().padStart(6, '0')}`;
       console.log(`✅ Order number generated: ${orderNumber}`);
 
@@ -803,6 +819,21 @@ export class OrdersService implements OnModuleInit {
             soldCount: -item.quantity,
           },
         });
+      }
+    }
+
+    // Extract the sequence number from the order number (e.g. ORD-000067 -> 67)
+    const numMatch = order.orderNumber.match(/^ORD-0*(\d+)$/);
+    if (numMatch && numMatch[1]) {
+      const seq = parseInt(numMatch[1], 10);
+      if (!isNaN(seq)) {
+        // Add to recycled numbers pool, ignoring duplicates
+        await this.recycledOrderNumberModel.updateOne(
+          { seq },
+          { $setOnInsert: { seq } },
+          { upsert: true }
+        );
+        console.log(`♻️ Added sequence ${seq} to recycled pool`);
       }
     }
 

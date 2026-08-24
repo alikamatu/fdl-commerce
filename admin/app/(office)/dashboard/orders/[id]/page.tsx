@@ -24,7 +24,8 @@ import {
   BadgeCheck,
   FileText,
   Printer,
-  Send
+  Send,
+  Trash2
 } from 'lucide-react';
 import { useAlert } from '@/components/ui/Alert';
 
@@ -262,6 +263,33 @@ function useOrder(id: string) {
     }
   }
 
+  const deleteOrder = async () => {
+    try {
+      setUpdating(true);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/admin/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete order');
+      }
+
+      return true;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to delete order';
+      console.error('Delete error:', err);
+      setError(message);
+      return false;
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   useEffect(() => {
     if (id) {
       fetchOrder();
@@ -279,6 +307,7 @@ function useOrder(id: string) {
     sendPickupNotification,
     updatePaymentMethod,
     sendDeliveredNotification,
+    deleteOrder,
   };
 }
 
@@ -299,6 +328,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
     sendPickupNotification,
     updatePaymentMethod,
     sendDeliveredNotification,
+    deleteOrder,
   } = useOrder(orderId);
 
   const [selectedStatus, setSelectedStatus] = useState<Order['status']>('confirmed');
@@ -430,6 +460,26 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
       }
       setSendingNotification(false);
     }
+
+  const handleDelete = async () => {
+    if (confirm(`Are you sure you want to delete order ${order.orderNumber}? This action cannot be undone.`)) {
+      const success = await deleteOrder();
+      if (success) {
+        addAlert({
+          type: 'success',
+          title: 'Order Deleted',
+          message: `Order ${order.orderNumber} was deleted successfully.`
+        });
+        router.push('/dashboard/orders');
+      } else {
+        addAlert({
+          type: 'error',
+          title: 'Delete Failed',
+          message: 'Failed to delete order.'
+        });
+      }
+    }
+  };
 
   const formatPrice = (priceCents: number) => {
     return `₵${(priceCents / 100).toFixed(2)}`;
@@ -607,6 +657,16 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
           </div>
           
           <div className="flex items-center gap-3">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleDelete}
+              disabled={updating}
+              className="flex items-center gap-2 px-4 py-2 border border-red-200 text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition-all duration-200"
+            >
+              <Trash2 className="w-4 h-4" />
+              Delete
+            </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
