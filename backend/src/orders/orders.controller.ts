@@ -13,7 +13,6 @@ import {
   BadRequestException,
   Headers,
   ForbiddenException,
-  Delete,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { OrdersService } from './orders.service';
