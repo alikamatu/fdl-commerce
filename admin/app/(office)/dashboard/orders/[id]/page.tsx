@@ -462,6 +462,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
     }
 
   const handleDelete = async () => {
+    if (!order) return;
     if (confirm(`Are you sure you want to delete order ${order.orderNumber}? This action cannot be undone.`)) {
       const success = await deleteOrder();
       if (success) {
