@@ -41,12 +41,12 @@ const defaultSlides: HeroSlide[] = [
     description: 'Save big on premium items with exclusive discounts',
     ctaText: 'View Deals',
     ctaLink: '/products?isDeal=true',
-    textColor: 'black',
+    textColor: 'white',
   },
   {
     id: '4',
     image: '/images/2149404179.jpg',
-    title: 'Premium Quality Guranteed',
+    title: 'Premium Quality Guaranteed',
     description: 'Shop with confidence with our authenticity promise',
     ctaText: 'Learn More',
     ctaLink: '/faqs',
@@ -105,31 +105,34 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
               className="absolute inset-0"
             >
               <div
-                className="w-full h-full bg-cover bg-center"
+                className="w-full h-full bg-cover bg-center relative"
                 style={{
                   backgroundImage: `url(${slides[currentSlide].image})`,
                 }}
               >
+                {/* Dark overlay for enhanced text readability */}
+                <div className="absolute inset-0 bg-black/20 bg-gradient-to-r from-black/40 via-black/25 to-black/30" />
+
                 {/* Content */}
-                <div className="relative h-full flex items-center">
+                <div className="relative z-10 h-full flex items-center">
                   <div className="w-full px-6 sm:px-8 md:px-12 lg:px-16">
                     <motion.div
                       initial={{ opacity: 0, y: 30 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.7, delay: 0.2 }}
-                      className={`max-w-2xl ${slides[currentSlide].textColor === 'white' ? 'text-white' : 'text-black'}`}
+                      className={`max-w-2xl ${slides[currentSlide].textColor === 'black' ? 'text-black' : 'text-white'}`}
                     >
-                      <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light mb-3 md:mb-4 leading-tight">
+                      <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light mb-3 md:mb-4 leading-tight drop-shadow-sm">
                         {slides[currentSlide].title}
                       </h1>
-                      <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 opacity-90 font-light">
+                      <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 opacity-90 font-light drop-shadow-sm">
                         {slides[currentSlide].description}
                       </p>
                       <motion.a
                         href={slides[currentSlide].ctaLink}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="inline-flex items-center px-6 py-3 md:px-8 md:py-4 bg-white text-black text-base md:text-lg font-medium rounded-lg hover:bg-gray-100 transition-colors duration-300"
+                        className="inline-flex items-center px-6 py-3 md:px-8 md:py-4 bg-white text-black text-base md:text-lg font-medium rounded-lg hover:bg-gray-100 transition-colors duration-300 shadow-md"
                       >
                         {slides[currentSlide].ctaText}
                       </motion.a>
