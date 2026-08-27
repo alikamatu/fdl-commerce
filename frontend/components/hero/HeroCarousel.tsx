@@ -146,7 +146,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
           {/* Navigation Arrows - Hidden on mobile */}
           <button
             onClick={prevSlide}
-            className="hidden md:block absolute left-4 top-1/2 transform -translate-y-1/2 p-3 bg-black/50 hover:bg-black/70 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300"
+            className="hidden md:block absolute z-20 left-4 top-1/2 transform -translate-y-1/2 p-3 bg-black/50 hover:bg-black/70 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300"
             aria-label="Previous slide"
           >
             <ChevronLeft size={24} />
@@ -154,14 +154,14 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
           
           <button
             onClick={nextSlide}
-            className="hidden md:block absolute right-4 top-1/2 transform -translate-y-1/2 p-3 bg-black/50 hover:bg-black/70 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300"
+            className="hidden md:block absolute z-20 right-4 top-1/2 transform -translate-y-1/2 p-3 bg-black/50 hover:bg-black/70 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300"
             aria-label="Next slide"
           >
             <ChevronRight size={24} />
           </button>
 
           {/* Indicators */}
-          <div className="absolute bottom-4 md:bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2 md:space-x-3">
+          <div className="absolute z-20 bottom-4 md:bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2 md:space-x-3">
             {slides.map((_, index) => (
               <button
                 key={index}
@@ -179,7 +179,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
           {/* Auto-play Toggle */}
           <button
             onClick={toggleAutoPlay}
-            className="absolute bottom-4 md:bottom-6 right-4 md:right-6 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-300"
+            className="absolute z-20 bottom-4 md:bottom-6 right-4 md:right-6 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-300"
             aria-label={isPaused ? 'Play slideshow' : 'Pause slideshow'}
           >
             {isPaused ? <Play size={18} className="md:w-5 md:h-5" /> : <Pause size={18} className="md:w-5 md:h-5" />}
@@ -192,7 +192,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
               initial={{ width: '0%' }}
               animate={{ width: '100%' }}
               transition={{ duration: autoPlayInterval / 1000, ease: 'linear' }}
-              className="absolute bottom-0 left-0 h-1 bg-white/80"
+              className="absolute z-20 bottom-0 left-0 h-1 bg-white/80"
             />
           )}
         </div>
