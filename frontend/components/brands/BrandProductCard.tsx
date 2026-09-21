@@ -7,16 +7,20 @@ import { useCart } from '@/context/CartContext';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-
+import { ProductCardImageSlider } from '../products/ProductCardImageSlider';
 
 interface BrandProductCardProps {
   product: Product;
   onViewDetails: (product: Product) => void;
+  autoSlide?: boolean;
+  slideInterval?: number;
 }
 
 export const BrandProductCard: React.FC<BrandProductCardProps> = ({
   product,
   onViewDetails,
+  autoSlide = true,
+  slideInterval = 2000,
 }) => {
   console.log('ProductCard product:', product); 
   const { addItem } = useCart();
@@ -83,14 +87,15 @@ export const BrandProductCard: React.FC<BrandProductCardProps> = ({
           className="relative aspect-[4/3] overflow-hidden cursor-pointer bg-gray-50"
           onClick={() => router.push(`/products/${product._id}`)}
         >
-          <motion.img
-            src={mainImage}
-            alt={product.images[0]?.alt || product.title}
-            className="w-full h-full object-contain"
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.3 }}
-          />
-          <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
+          <div className="w-full h-full transition-transform duration-300 group-hover:scale-105">
+            <ProductCardImageSlider
+              images={product.images}
+              title={product.title}
+              interval={slideInterval}
+              autoSlide={autoSlide}
+            />
+          </div>
+          <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none" />
         </div>
 
         <div className="p-4 flex-1 flex flex-col">

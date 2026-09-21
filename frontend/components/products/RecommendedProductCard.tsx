@@ -7,13 +7,18 @@ import { useCart } from '@/context/CartContext';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { ProductCardImageSlider } from './ProductCardImageSlider';
 
 interface RecommendedProductCardProps {
   product: Product;
+  autoSlide?: boolean;
+  slideInterval?: number;
 }
 
 export const RecommendedProductCard: React.FC<RecommendedProductCardProps> = ({
   product,
+  autoSlide = true,
+  slideInterval = 2000,
 }) => {
   const { addItem } = useCart();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
@@ -117,13 +122,14 @@ export const RecommendedProductCard: React.FC<RecommendedProductCardProps> = ({
 
         {/* Product Image */}
         <div className="relative aspect-[4/3] overflow-hidden">
-          <motion.img
-            src={mainImage}
-            alt={product.images[0]?.alt || product.title}
-            className="w-full h-full object-contain"
-            whileHover={{ scale: 1.08 }}
-            transition={{ type: "spring", duration: 0.5, bounce: 0.2 }}
-          />
+          <div className="w-full h-full transition-transform duration-300 group-hover:scale-105">
+            <ProductCardImageSlider
+              images={product.images}
+              title={product.title}
+              interval={slideInterval}
+              autoSlide={autoSlide}
+            />
+          </div>
           
           {/* Time Left Badge */}
           {timeLeft && (

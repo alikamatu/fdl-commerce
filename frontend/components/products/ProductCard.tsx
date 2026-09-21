@@ -7,15 +7,20 @@ import { useCart } from '@/context/CartContext';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ProductCardImageSlider } from './ProductCardImageSlider';
 
 interface ProductCardProps {
   product: Product;
   onViewDetails: (product: Product) => void;
+  autoSlide?: boolean;
+  slideInterval?: number;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
   product,
   onViewDetails,
+  autoSlide = true,
+  slideInterval = 2000,
 }) => {
   const { addItem } = useCart();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
@@ -127,21 +132,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         )}
 
         {/* Product Image */}
-        <div
-          className="relative aspect-[4/3] overflow-hidden bg-gray-50"
-        >
-          <motion.img
-            src={mainImage}
-            alt={product.images[0]?.alt || product.title}
-            className="w-full h-full object-contain"
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.3 }}
-          />
-          <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
+        <div className="relative aspect-[4/3] overflow-hidden bg-gray-50">
+          <div className="w-full h-full transition-transform duration-300 group-hover:scale-105">
+            <ProductCardImageSlider
+              images={product.images}
+              title={product.title}
+              interval={slideInterval}
+              autoSlide={autoSlide}
+            />
+          </div>
+          <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none" />
 
           {/* Time Left Badge */}
           {timeLeft && (
-            <div className="absolute bottom-2 left-2">
+            <div className="absolute bottom-2 left-2 z-10 pointer-events-none">
               <div className="bg-background/90 backdrop-blur-sm text-foreground text-xs px-2 py-1 rounded flex items-center gap-1">
                 <Clock size={10} />
                 <span>{timeLeft}</span>
