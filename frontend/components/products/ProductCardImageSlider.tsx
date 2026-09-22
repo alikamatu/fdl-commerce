@@ -14,7 +14,7 @@ interface ProductCardImageSliderProps {
 export const ProductCardImageSlider: React.FC<ProductCardImageSliderProps> = ({
   images = [],
   title,
-  interval = 2000,
+  interval = 3000,
   autoSlide = true,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -48,7 +48,7 @@ export const ProductCardImageSlider: React.FC<ProductCardImageSliderProps> = ({
     }
   }, [validImages]);
 
-  // Auto slide interval (default: 2-second intervals, no controls or navigation)
+  // Auto slide interval (default: 3-second intervals, no controls or navigation)
   useEffect(() => {
     if (!autoSlide || validImages.length <= 1) return;
 
@@ -79,10 +79,10 @@ export const ProductCardImageSlider: React.FC<ProductCardImageSliderProps> = ({
       <AnimatePresence initial={false}>
         <motion.div
           key={currentIndex}
-          initial={{ x: '100%' }}
-          animate={{ x: '0%' }}
-          exit={{ x: '-100%' }}
-          transition={{ duration: 0.5, ease: 'easeInOut' }}
+          initial={{ opacity: 0, x: '15%' }}
+          animate={{ opacity: 1, x: '0%' }}
+          exit={{ opacity: 0, x: '-15%' }}
+          transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
           className="absolute inset-0 w-full h-full"
         >
           <img

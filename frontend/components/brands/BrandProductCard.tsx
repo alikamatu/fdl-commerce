@@ -20,7 +20,7 @@ export const BrandProductCard: React.FC<BrandProductCardProps> = ({
   product,
   onViewDetails,
   autoSlide = true,
-  slideInterval = 2000,
+  slideInterval = 3000,
 }) => {
   console.log('ProductCard product:', product); 
   const { addItem } = useCart();

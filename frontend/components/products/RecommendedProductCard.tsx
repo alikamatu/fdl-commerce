@@ -18,7 +18,7 @@ interface RecommendedProductCardProps {
 export const RecommendedProductCard: React.FC<RecommendedProductCardProps> = ({
   product,
   autoSlide = true,
-  slideInterval = 2000,
+  slideInterval = 3000,
 }) => {
   const { addItem } = useCart();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
