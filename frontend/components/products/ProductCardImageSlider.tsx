@@ -14,7 +14,7 @@ interface ProductCardImageSliderProps {
 export const ProductCardImageSlider: React.FC<ProductCardImageSliderProps> = ({
   images = [],
   title,
-  interval = 3000,
+  interval = 4500,
   autoSlide = true,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
