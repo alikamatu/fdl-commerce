@@ -37,7 +37,7 @@ export class ProductsController {
   constructor(
     private readonly productsService: ProductsService,
     private readonly fileUploadService: FileUploadService,
-  ) {}
+  ) { }
 
   @Post('admin/products')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -69,7 +69,7 @@ export class ProductsController {
     @Query('maxPrice') maxPrice: string,
     @Query('inStock') inStock: string,
     @Query('isDeal') isDeal: string,
-    @Query('sortBy') sortBy: string, // Add sortBy parameter
+    @Query('sortBy') sortBy: string,
   ) {
     const result = await this.productsService.findAll({
       page: page ? parseInt(page) : 1,

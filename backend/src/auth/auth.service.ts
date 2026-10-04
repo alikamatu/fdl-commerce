@@ -213,7 +213,7 @@ export class AuthService {
   async register(
     registerDto: RegisterDto,
   ): Promise<{ user: any; token: string }> {
-    const { email, password, displayName } = registerDto;
+    const { email, password, displayName, role = 'user' } = registerDto;
 
     // Check if user exists
     const existingUser = await this.userModel.findOne({ email });
@@ -234,7 +234,7 @@ export class AuthService {
       email,
       passwordHash,
       displayName,
-      role: 'user',
+      role: role || 'user',
       isEmailVerified: false,
       emailVerificationToken,
       emailVerificationExpires,
