@@ -82,7 +82,7 @@ export const QuickViewImageGallery: React.FC<QuickViewImageGalleryProps> = ({
               <img
                 src={image.url}
                 alt={image.alt}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain transition-transform duration-300 hover:scale-110"
               />
             </button>
           ))}
