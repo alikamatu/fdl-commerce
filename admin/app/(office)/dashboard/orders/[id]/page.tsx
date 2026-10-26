@@ -622,66 +622,70 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
   return (
     <div className="min-h-screen bg-white py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          <div className="flex w-full items-center justify-center gap-2 ml-12">
-            <img src="/logo/fdll.jpeg" className='w-16 h-auto rounded-2xl' alt="" />
-            <p className='font-bold text-2xl flex flex-col'>Forbes Digital Lifeline <span className='text-lg font-light'>Your Digital 🆘 </span></p>
+          <div className="flex w-full items-center justify-center gap-2 px-2">
+            <img src="/logo/fdll.jpeg" className='w-12 sm:w-16 h-auto rounded-2xl flex-shrink-0' alt="" />
+            <p className='font-bold text-lg sm:text-2xl flex flex-col min-w-0'>
+              <span className="truncate">Forbes Digital Lifeline</span>
+              <span className='text-sm sm:text-lg font-light'>Your Digital 🆘 </span>
+            </p>
           </div>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="flex flex-col lg:flex-row lg:items-start justify-between gap-6"
+          className="flex flex-col gap-4 sm:gap-6"
         >
-          <div className="flex items-start gap-4">
+          <div className="flex items-start gap-3 sm:gap-4 min-w-0">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => router.push('/dashboard/orders')}
-              className="p-3 bg-white rounded-2xl border border-gray-200 hover:bg-gray-50 transition-all duration-200 mt-1"
+              className="p-3 min-h-11 min-w-11 inline-flex items-center justify-center bg-white rounded-2xl border border-gray-200 hover:bg-gray-50 transition-all duration-200 mt-1 flex-shrink-0"
             >
               <ArrowLeft className="w-5 h-5 text-gray-700" />
             </motion.button>
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-3 bg-gray-100 rounded-2xl">
-                  <Package className="w-7 h-7 text-gray-700" />
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                <div className="p-2.5 sm:p-3 bg-gray-100 rounded-2xl flex-shrink-0">
+                  <Package className="w-6 h-6 sm:w-7 sm:h-7 text-gray-700" />
                 </div>
-                <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                  Order #{order.orderNumber} <span className='bg-amber-600 rounded-full text-lg text-white p-2 px-4'>{order.deliveryMethod}</span>
+                <h1 className="text-xl sm:text-3xl font-bold text-gray-900 flex flex-wrap items-center gap-2 sm:gap-3 min-w-0">
+                  <span className="break-all">Order #{order.orderNumber}</span>
+                  <span className='bg-amber-600 rounded-full text-sm sm:text-lg text-white px-3 py-1.5 capitalize'>{order.deliveryMethod}</span>
                 </h1>
               </div>
-              <p className="text-gray-600 text-lg">
+              <p className="text-gray-600 text-base sm:text-lg">
                 Order details and management
               </p>
             </div>
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="admin-toolbar">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleDelete}
               disabled={updating}
-              className="flex items-center gap-2 px-4 py-2 border border-red-200 text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition-all duration-200"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 min-h-11 border border-red-200 text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition-all duration-200"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-4 h-4 flex-shrink-0" />
               Delete
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={printOrder}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 min-h-11 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200"
             >
-              <Printer className="w-4 h-4" />
+              <Printer className="w-4 h-4 flex-shrink-0" />
               Print
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={refetch}
-              className="p-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200"
+              className="p-3 min-h-11 min-w-11 inline-flex items-center justify-center bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200"
               title="Refresh"
             >
               <RefreshCw className="w-5 h-5 text-gray-600" />
@@ -716,17 +720,17 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
               transition={{ duration: 0.5 }}
               className="bg-gray-50 rounded-2xl p-6 border border-gray-200"
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className={`p-3 rounded-xl ${getStatusColor(order.status).split(' ')[0]}`}>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                  <div className={`p-3 rounded-xl flex-shrink-0 ${getStatusColor(order.status).split(' ')[0]}`}>
                     {getStatusIcon(order.status)}
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="text-lg font-semibold text-gray-900">Order Status</h3>
-                    <p className="text-gray-600">Current status of the order</p>
+                    <p className="text-gray-600 text-sm sm:text-base">Current status of the order</p>
                   </div>
                 </div>
-                <span className={`px-4 py-2 text-sm font-semibold border rounded-xl ${getStatusColor(order.status)}`}>
+                <span className={`px-4 py-2 text-sm font-semibold border rounded-xl w-fit ${getStatusColor(order.status)}`}>
                   {formatStatusLabel(order.status)}
                 </span>
               </div>

@@ -341,20 +341,20 @@ export default function AdminReviewsDashboardPage() {
           isExpanded ? 'shadow-sm' : ''
         }`}
       >
-        <div className="p-4">
-          <div className="flex items-start gap-4">
+        <div className="p-3 sm:p-4">
+          <div className="flex items-start gap-3 sm:gap-4">
             {/* Selection Checkbox */}
             <div className="flex-shrink-0 mt-1">
               <input
                 type="checkbox"
                 checked={isSelected}
                 onChange={() => toggleReviewSelection(review._id)}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4"
               />
             </div>
 
             {/* Product Image */}
-            <div className="flex-shrink-0 w-12 h-12 rounded-lg border border-gray-200 overflow-hidden bg-gray-100">
+            <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-lg border border-gray-200 overflow-hidden bg-gray-100">
               {review.product?.images?.[0] ? (
                 <img
                   src={review.product.images[0].url}
@@ -362,16 +362,16 @@ export default function AdminReviewsDashboardPage() {
                   className="w-full h-full object-contain"
                 />
               ) : (
-                <Package className="w-6 h-6 text-gray-400 m-auto mt-2" />
+                <Package className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400 m-auto mt-2" />
               )}
             </div>
 
             {/* Review Content */}
             <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="font-semibold text-gray-900 line-clamp-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-2">
+                    <h3 className="font-semibold text-gray-900 line-clamp-2 sm:line-clamp-1">
                       {review.title}
                     </h3>
                     {renderStars(review.rating)}
@@ -381,28 +381,28 @@ export default function AdminReviewsDashboardPage() {
                     {review.comment}
                   </p>
 
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <div className="flex items-center gap-1">
-                      <User size={14} />
-                      <span>{review.userId.displayName}</span>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
+                    <div className="flex items-center gap-1 min-w-0">
+                      <User size={14} className="flex-shrink-0" />
+                      <span className="truncate">{review.userId.displayName}</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Package size={14} />
-                      <span className="line-clamp-1 max-w-[200px]">
+                    <div className="flex items-center gap-1 min-w-0">
+                      <Package size={14} className="flex-shrink-0" />
+                      <span className="truncate max-w-[12rem] sm:max-w-[200px]">
                         {review.product?.title || 'Product not found'}
                       </span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Calendar size={14} />
-                      <span>{formatDate(review.createdAt)}</span>
+                      <Calendar size={14} className="flex-shrink-0" />
+                      <span className="whitespace-nowrap">{formatDate(review.createdAt)}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Status & Actions */}
-                <div className="flex items-center gap-3">
-                  <div className="flex flex-col items-end gap-2">
-                    <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center justify-between gap-3 lg:flex-nowrap lg:justify-end">
+                  <div className="flex flex-col items-start lg:items-end gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       {review.isVerified && (
                         <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full font-medium">
                           Verified
@@ -417,7 +417,7 @@ export default function AdminReviewsDashboardPage() {
                       </span>
                     </div>
                     
-                    <div className="flex items-center gap-3 text-sm text-gray-500">
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
                       <div className="flex items-center gap-1">
                         <MessageSquare size={14} />
                         <span>{review.helpfulVotes} helpful</span>
@@ -433,7 +433,7 @@ export default function AdminReviewsDashboardPage() {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setExpandedReview(isExpanded ? null : review._id)}
-                      className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                      className="p-2.5 min-h-11 min-w-11 inline-flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
                     >
                       {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                     </motion.button>
@@ -442,7 +442,7 @@ export default function AdminReviewsDashboardPage() {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => openEditModal(review)}
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      className="p-2.5 min-h-11 min-w-11 inline-flex items-center justify-center text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       title="Edit review"
                     >
                       <Edit2 size={16} />
@@ -451,7 +451,7 @@ export default function AdminReviewsDashboardPage() {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setDeleteConfirm({ id: review._id, title: review.title })}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      className="p-2.5 min-h-11 min-w-11 inline-flex items-center justify-center text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       title="Delete review"
                     >
                       <Trash2 size={16} />
@@ -551,13 +551,13 @@ export default function AdminReviewsDashboardPage() {
             </div>
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="admin-toolbar">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleRefresh}
               disabled={refreshing}
-              className="p-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-sm disabled:opacity-50"
+              className="p-3 min-h-11 min-w-11 inline-flex items-center justify-center bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-sm disabled:opacity-50"
             >
               <RefreshCw className={`w-5 h-5 text-gray-600 ${refreshing ? 'animate-spin' : ''}`} />
             </motion.button>
@@ -569,18 +569,18 @@ export default function AdminReviewsDashboardPage() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm"
+          className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm"
         >
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3 sm:gap-4">
             {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <div className="relative sm:col-span-2 xl:col-span-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
               <input
                 type="text"
                 placeholder="Search reviews..."
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                className="w-full pl-10 pr-4 py-2.5 min-h-11 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
               />
             </div>
 
@@ -588,7 +588,7 @@ export default function AdminReviewsDashboardPage() {
             <select
               value={filters.rating}
               onChange={(e) => handleFilterChange('rating', e.target.value)}
-              className="px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              className="px-4 py-2.5 min-h-11 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
             >
               <option value="">All Ratings</option>
               <option value="5">5 Stars</option>
@@ -602,7 +602,7 @@ export default function AdminReviewsDashboardPage() {
             <select
               value={filters.status}
               onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              className="px-4 py-2.5 min-h-11 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
             >
               <option value="">All Status</option>
               <option value="active">Active</option>
@@ -613,7 +613,7 @@ export default function AdminReviewsDashboardPage() {
             <select
               value={filters.verified}
               onChange={(e) => handleFilterChange('verified', e.target.value)}
-              className="px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              className="px-4 py-2.5 min-h-11 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
             >
               <option value="">All Reviews</option>
               <option value="true">Verified Only</option>
@@ -621,16 +621,16 @@ export default function AdminReviewsDashboardPage() {
             </select>
 
             {/* Action Buttons */}
-            <div className="flex gap-2">
+            <div className="flex gap-2 sm:col-span-2 xl:col-span-1">
               <button
                 onClick={applyFilters}
-                className="flex-1 bg-blue-600 text-white px-4 py-2.5 rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium"
+                className="flex-1 bg-blue-600 text-white px-4 py-2.5 min-h-11 rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium"
               >
                 Apply
               </button>
               <button
                 onClick={clearFilters}
-                className="px-4 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium"
+                className="px-4 py-2.5 min-h-11 border border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium"
               >
                 Clear
               </button>
@@ -645,16 +645,16 @@ export default function AdminReviewsDashboardPage() {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-blue-50 border border-blue-200 rounded-2xl p-4"
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <AlertTriangle className="w-5 h-5 text-blue-600" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <AlertTriangle className="w-5 h-5 text-blue-600 flex-shrink-0" />
                 <span className="text-blue-800 font-medium">
                   {selectedReviews.length} review(s) selected
                 </span>
               </div>
                 <button
                   onClick={() => handleBulkAction('delete')}
-                  className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-200 text-sm font-medium"
+                  className="px-4 py-2.5 min-h-11 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-200 text-sm font-medium w-full sm:w-auto"
                 >
                   Delete
                 </button>
@@ -670,13 +670,13 @@ export default function AdminReviewsDashboardPage() {
           className="space-y-4"
         >
           {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
               <input
                 type="checkbox"
                 checked={selectedReviews.length === reviews.length && reviews.length > 0}
                 onChange={selectAllReviews}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4"
               />
               <span className="text-sm text-gray-600">
                 Showing {reviews.length} of {pagination.total} reviews
@@ -684,21 +684,21 @@ export default function AdminReviewsDashboardPage() {
             </div>
             
             {/* Pagination */}
-            <div className="flex items-center gap-2">
+            <div className="admin-toolbar">
               <button
                 onClick={() => fetchReviews(Number(pagination.page) - 1)}
                 disabled={Number(pagination.page) === 1}
-                className="px-3 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                className="px-3 py-2 min-h-11 border border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
               >
                 Previous
               </button>
-              <span className="text-sm text-gray-600 px-3">
+              <span className="text-sm text-gray-600 px-2 sm:px-3 whitespace-nowrap">
                 Page {pagination.page} of {pagination.pages}
               </span>
               <button
                 onClick={() => fetchReviews(Number(pagination.page) + 1)}
                 disabled={Number(pagination.page) === Number(pagination.pages)}
-                className="px-3 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                className="px-3 py-2 min-h-11 border border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
               >
                 Next
               </button>

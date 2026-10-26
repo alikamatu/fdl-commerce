@@ -324,29 +324,29 @@ const fetchProducts = async () => {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col lg:flex-row lg:items-start justify-between gap-6"
+          className="flex flex-col gap-4 sm:gap-6"
         >
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-blue-50 rounded-2xl">
-              <Package className="w-7 h-7 text-blue-600" />
+          <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+            <div className="p-2.5 sm:p-3 bg-blue-50 rounded-2xl flex-shrink-0">
+              <Package className="w-6 h-6 sm:w-7 sm:h-7 text-blue-600" />
             </div>
-            <div>
-              <h1 className="lg font-bold text-gray-900">
+            <div className="min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
                 Inventory Management
               </h1>
-              <p className="text-gray-600 mt-2 text-lg">
+              <p className="text-gray-600 mt-1 sm:mt-2 text-base sm:text-lg">
                 Monitor and manage your product inventory in real-time
               </p>
             </div>
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="admin-toolbar">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleRefresh}
               disabled={refreshing}
-              className="p-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-sm disabled:opacity-50"
+              className="p-3 min-h-11 min-w-11 inline-flex items-center justify-center bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-sm disabled:opacity-50"
               title="Refresh inventory"
             >
               <RefreshCw className={`w-5 h-5 text-gray-600 ${refreshing ? 'animate-spin' : ''}`} />
@@ -356,9 +356,9 @@ const fetchProducts = async () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={exportInventory}
-              className="flex items-center space-x-3 px-5 py-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium shadow-sm"
+              className="flex items-center justify-center gap-2 px-4 sm:px-5 py-3 min-h-11 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium shadow-sm"
             >
-              <Download className="w-5 h-5 text-gray-600" />
+              <Download className="w-5 h-5 text-gray-600 flex-shrink-0" />
               <span>Export CSV</span>
             </motion.button>
             
@@ -366,9 +366,9 @@ const fetchProducts = async () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => router.push('/dashboard/products/new')}
-              className="flex items-center space-x-3 px-6 py-3.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
+              className="flex items-center justify-center gap-2 px-4 sm:px-6 py-3 min-h-11 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-5 h-5 flex-shrink-0" />
               <span>Add Product</span>
             </motion.button>
           </div>
@@ -481,24 +481,24 @@ const fetchProducts = async () => {
           transition={{ delay: 0.5 }}
           className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm"
         >
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
+            <div className="relative sm:col-span-2 xl:col-span-1">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
               <input
                 type="text"
-                placeholder="Search products by name, SKU, brand, or category..."
+                placeholder="Search name, SKU, brand..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
+                className="w-full pl-12 pr-4 py-3 min-h-11 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
               />
             </div>
 
             <div className="relative">
-              <Filter className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Filter className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
               <select
                 value={stockFilter}
                 onChange={(e) => setStockFilter(e.target.value)}
-                className="w-full pl-12 pr-10 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white appearance-none cursor-pointer"
+                className="w-full pl-12 pr-10 py-3 min-h-11 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white appearance-none cursor-pointer"
               >
                 <option value="all">All Stock Levels</option>
                 <option value="in-stock">In Stock (10+)</option>
@@ -508,11 +508,11 @@ const fetchProducts = async () => {
             </div>
 
             <div className="relative">
-              <BarChart3 className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <BarChart3 className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full pl-12 pr-10 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white appearance-none cursor-pointer"
+                className="w-full pl-12 pr-10 py-3 min-h-11 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white appearance-none cursor-pointer"
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
@@ -521,13 +521,13 @@ const fetchProducts = async () => {
               </select>
             </div>
 
-            <div className="flex items-center justify-between text-sm text-gray-600 bg-gray-50 rounded-xl p-4">
+            <div className="flex items-center justify-between text-sm text-gray-600 bg-gray-50 rounded-xl p-3 sm:p-4 min-h-11">
               <div className="flex items-center gap-2">
-                <Info className="w-4 h-4" />
+                <Info className="w-4 h-4 flex-shrink-0" />
                 <span>Showing</span>
               </div>
               <span className="font-semibold text-gray-900">
-                {filteredProducts.length} of {products.length} products
+                {filteredProducts.length} of {products.length}
               </span>
             </div>
           </div>
@@ -541,14 +541,14 @@ const fetchProducts = async () => {
             transition={{ delay: 0.6 }}
             className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-6 border border-amber-200"
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-amber-100 rounded-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0">
+                <div className="p-3 bg-amber-100 rounded-xl flex-shrink-0">
                   <AlertTriangle className="w-6 h-6 text-amber-600" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <h3 className="text-lg font-semibold text-amber-900">Stock Alerts</h3>
-                  <p className="text-amber-700">
+                  <p className="text-amber-700 text-sm sm:text-base">
                     {stats.outOfStockItems > 0 && `${stats.outOfStockItems} products out of stock`}
                     {stats.outOfStockItems > 0 && stats.lowStockItems > 0 && ' • '}
                     {stats.lowStockItems > 0 && `${stats.lowStockItems} products running low`}
@@ -557,7 +557,7 @@ const fetchProducts = async () => {
               </div>
               <button
                 onClick={() => setStockFilter('out-of-stock')}
-                className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-xl hover:bg-amber-700 transition-colors font-medium"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 min-h-11 bg-amber-600 text-white rounded-xl hover:bg-amber-700 transition-colors font-medium w-full sm:w-auto"
               >
                 <span>View Alerts</span>
                 <ArrowUpRight className="w-4 h-4" />
@@ -566,25 +566,70 @@ const fetchProducts = async () => {
           </motion.div>
         )}
 
-        {/* Inventory Table */}
+        {/* Inventory list: cards on mobile, table on md+ */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
           className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden"
         >
-          <div className="overflow-x-auto">
+          <div className="md:hidden divide-y divide-gray-100">
+            {filteredProducts.map((product) => {
+              const stockStatus = getStockStatus(product.stock);
+              const productStatus = getStatusBadge(product);
+              const productValue = product.priceCents * product.stock;
+              return (
+                <div key={product._id} className="p-4 space-y-3">
+                  <div className="flex items-start gap-3">
+                    {product.images && product.images.length > 0 ? (
+                      <img
+                        src={product.images[0].url}
+                        alt={product.images[0].alt || product.title}
+                        className="w-12 h-12 object-contain rounded-xl border border-gray-200 flex-shrink-0"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 flex items-center justify-center border border-gray-200 rounded-xl bg-gray-100 flex-shrink-0">
+                        <Package className="w-6 h-6 text-gray-400" />
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-gray-900 line-clamp-2">{product.title}</p>
+                      <p className="text-sm text-gray-600 truncate">{product.brand}</p>
+                      <code className="text-xs bg-gray-100 px-2 py-1 rounded mt-1 inline-block">{product.sku}</code>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className={`px-2.5 py-1 text-xs font-semibold border rounded-lg ${stockStatus.style}`}>
+                      {stockStatus.text}: {product.stock}
+                    </span>
+                    <span className={`px-2.5 py-1 text-xs font-semibold border rounded-lg ${productStatus.style}`}>
+                      {productStatus.text}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3 text-sm">
+                    <div>
+                      <p className="font-semibold text-gray-900">{formatPrice(product.priceCents)}</p>
+                      <p className="text-xs text-gray-500">Value {formatPrice(productValue)}</p>
+                    </div>
+                    <p className="text-gray-600">Sold {product.soldCount || 0}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="hidden md:block admin-table-scroll">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50">
-                  <th className="text-left p-6 font-semibold text-gray-900">Product</th>
-                  <th className="text-left p-6 font-semibold text-gray-900">SKU</th>
-                  <th className="text-left p-6 font-semibold text-gray-900">Category</th>
-                  <th className="text-left p-6 font-semibold text-gray-900">Price</th>
-                  <th className="text-left p-6 font-semibold text-gray-900">Stock</th>
-                  <th className="text-left p-6 font-semibold text-gray-900">Status</th>
-                  <th className="text-left p-6 font-semibold text-gray-900">Value</th>
-                  <th className="text-left p-6 font-semibold text-gray-900">Sold</th>
+                  <th className="text-left p-4 lg:p-6 font-semibold text-gray-900 whitespace-nowrap">Product</th>
+                  <th className="text-left p-4 lg:p-6 font-semibold text-gray-900 whitespace-nowrap hidden lg:table-cell">SKU</th>
+                  <th className="text-left p-4 lg:p-6 font-semibold text-gray-900 whitespace-nowrap hidden xl:table-cell">Category</th>
+                  <th className="text-left p-4 lg:p-6 font-semibold text-gray-900 whitespace-nowrap">Price</th>
+                  <th className="text-left p-4 lg:p-6 font-semibold text-gray-900 whitespace-nowrap">Stock</th>
+                  <th className="text-left p-4 lg:p-6 font-semibold text-gray-900 whitespace-nowrap">Status</th>
+                  <th className="text-left p-4 lg:p-6 font-semibold text-gray-900 whitespace-nowrap hidden lg:table-cell">Value</th>
+                  <th className="text-left p-4 lg:p-6 font-semibold text-gray-900 whitespace-nowrap hidden xl:table-cell">Sold</th>
                 </tr>
               </thead>
               <tbody>
@@ -602,36 +647,37 @@ const fetchProducts = async () => {
                       transition={{ delay: 0.8 + index * 0.05 }}
                       className="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200"
                     >
-                      <td className="p-6">
-                        <div className="flex items-center space-x-4">
+                      <td className="p-4 lg:p-6">
+                        <div className="flex items-center space-x-3 lg:space-x-4">
                           {product.images && product.images.length > 0 ? (
                             <img
                               src={product.images[0].url}
                               alt={product.images[0].alt || product.title}
-                              className="w-12 h-12 object-contain rounded-xl border border-gray-200"
+                              className="w-12 h-12 object-contain rounded-xl border border-gray-200 flex-shrink-0"
                             />
                           ) : (
-                            <div className="w-12 h-12 flex items-center justify-center border border-gray-200 rounded-xl bg-gray-100">
+                            <div className="w-12 h-12 flex items-center justify-center border border-gray-200 rounded-xl bg-gray-100 flex-shrink-0">
                               <Package className="w-6 h-6 text-gray-400" />
                             </div>
                           )}
                           <div className="min-w-0 flex-1">
                             <p className="font-semibold text-gray-900 line-clamp-1">{product.title}</p>
                             <p className="text-sm text-gray-600 line-clamp-1">{product.brand}</p>
+                            <code className="text-xs bg-gray-100 px-2 py-0.5 rounded mt-1 inline-block lg:hidden">{product.sku}</code>
                           </div>
                         </div>
                       </td>
-                      <td className="p-6">
+                      <td className="p-4 lg:p-6 hidden lg:table-cell">
                         <code className="text-sm bg-gray-100 px-3 py-1.5 rounded-lg font-medium text-gray-700">
                           {product.sku}
                         </code>
                       </td>
-                      <td className="p-6">
+                      <td className="p-4 lg:p-6 hidden xl:table-cell">
                         <span className="text-sm text-gray-700 font-medium">{getCategoryName(product.categoryId)}</span>
                       </td>
-                      <td className="p-6">
+                      <td className="p-4 lg:p-6">
                         <div className="flex flex-col">
-                          <span className="font-semibold text-gray-900">{formatPrice(product.priceCents)}</span>
+                          <span className="font-semibold text-gray-900 whitespace-nowrap">{formatPrice(product.priceCents)}</span>
                           {product.isDeal && product.originalPriceCents && (
                             <span className="text-sm text-gray-500 line-through">
                               {formatPrice(product.originalPriceCents)}
@@ -639,7 +685,7 @@ const fetchProducts = async () => {
                           )}
                         </div>
                       </td>
-                      <td className="p-6">
+                      <td className="p-4 lg:p-6">
                         <div className="flex items-center space-x-3">
                           <span className={`font-semibold ${
                             product.stock === 0 ? 'text-red-600' : 
@@ -661,22 +707,22 @@ const fetchProducts = async () => {
                           )}
                         </div>
                       </td>
-                      <td className="p-6">
+                      <td className="p-4 lg:p-6">
                         <div className="flex flex-col gap-2">
-                          <span className={`px-3 py-1.5 text-xs font-semibold border rounded-lg ${stockStatus.style}`}>
+                          <span className={`px-3 py-1.5 text-xs font-semibold border rounded-lg w-fit ${stockStatus.style}`}>
                             {stockStatus.text}
                           </span>
-                          <span className={`px-3 py-1.5 text-xs font-semibold border rounded-lg ${productStatus.style}`}>
+                          <span className={`px-3 py-1.5 text-xs font-semibold border rounded-lg w-fit ${productStatus.style}`}>
                             {productStatus.text}
                           </span>
                         </div>
                       </td>
-                      <td className="p-6">
-                        <span className="font-semibold text-gray-900">
+                      <td className="p-4 lg:p-6 hidden lg:table-cell">
+                        <span className="font-semibold text-gray-900 whitespace-nowrap">
                           {formatPrice(productValue)}
                         </span>
                       </td>
-                      <td className="p-6">
+                      <td className="p-4 lg:p-6 hidden xl:table-cell">
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-gray-900">{product.soldCount || 0}</span>
                           {product.soldCount > 0 && (

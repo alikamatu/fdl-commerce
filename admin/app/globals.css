@@ -22,3 +22,26 @@ body {
   color: var(--foreground);
   font-family: var(--font-inter);
 }
+
+/* Admin listing helpers: horizontal scroll without page blowout */
+.admin-table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+.admin-table-scroll > table {
+  min-width: 40rem;
+}
+
+/* Prefer wrapping toolbars over overflow on narrow viewports */
+.admin-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-toolbar > * {
+  flex-shrink: 0;
+}
