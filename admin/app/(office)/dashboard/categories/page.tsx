@@ -224,9 +224,9 @@ function CategoryManagement() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleAddNew}
-              className="flex items-center space-x-3 px-6 py-3.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
+              className="flex items-center justify-center gap-2 px-4 sm:px-6 py-3 min-h-11 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium shadow-sm hover:shadow-md w-full sm:w-auto"
             >
-              <FolderPlus className="w-5 h-5" />
+              <FolderPlus className="w-5 h-5 flex-shrink-0" />
               <span>Add Category</span>
             </motion.button>
           )}

@@ -362,36 +362,36 @@ export default function ProductsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-gray-50/30 p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-white to-gray-50/30 py-6 sm:py-8 px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="space-y-6"
+          className="space-y-4 sm:space-y-6"
         >
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100">
-                <Package className="w-7 h-7 text-blue-600" />
+          <div className="flex flex-col gap-4 sm:gap-6">
+            <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+              <div className="p-2.5 sm:p-3 bg-white rounded-2xl shadow-sm border border-gray-100 flex-shrink-0">
+                <Package className="w-6 h-6 sm:w-7 sm:h-7 text-blue-600" />
               </div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
                   Products
                 </h1>
-                <p className="text-gray-600 mt-2 text-lg">
+                <p className="text-gray-600 mt-1 sm:mt-2 text-base sm:text-lg">
                   Manage your store&#39;s product inventory and catalog
                 </p>
               </div>
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="admin-toolbar">
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleRefresh}
                 disabled={isRefreshing}
-                className="p-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-sm disabled:opacity-50"
+                className="p-3 min-h-11 min-w-11 inline-flex items-center justify-center bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-sm disabled:opacity-50"
                 title="Refresh products and ratings"
               >
                 <RefreshCw className={`w-5 h-5 text-gray-600 ${isRefreshing ? 'animate-spin' : ''}`} />
@@ -401,36 +401,36 @@ export default function ProductsPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => router.push('/dashboard/products/new')}
-                className="flex items-center space-x-2 px-6 py-3.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
+                className="flex items-center justify-center gap-2 px-4 sm:px-6 py-3 min-h-11 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="w-5 h-5 flex-shrink-0" />
                 <span>Add Product</span>
               </motion.button>
             </div>
           </div>
 
           {/* Filters and Search */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {/* Search */}
-              <div className="lg:col-span-2 relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <div className="sm:col-span-2 relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Search products by name, description, SKU, or brand..."
+                  placeholder="Search name, SKU, or brand..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-900 placeholder-gray-500"
+                  className="w-full pl-12 pr-4 py-3 min-h-11 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-900 placeholder-gray-500"
                 />
               </div>
 
               {/* Category Filter */}
               <div className="relative">
-                <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full pl-12 pr-10 py-3.5 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none cursor-pointer text-gray-900"
+                  className="w-full pl-12 pr-10 py-3 min-h-11 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none cursor-pointer text-gray-900"
                 >
                   <option value="all">All Categories</option>
                   {Array.isArray(categories) && categories.map((category) => (
@@ -447,7 +447,7 @@ export default function ProductsPage() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full pl-4 pr-10 py-3.5 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none cursor-pointer text-gray-900"
+                  className="w-full pl-4 pr-10 py-3 min-h-11 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none cursor-pointer text-gray-900"
                 >
                   <option value="name">Sort by Name</option>
                   <option value="newest">Newest First</option>
@@ -762,15 +762,15 @@ export default function ProductsPage() {
                     )}
 
                     {/* Actions */}
-                    <div className="flex items-center space-x-2 pt-4 border-t border-gray-100">
+                    <div className="flex flex-wrap items-center gap-2 pt-4 border-t border-gray-100">
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => router.push(`/dashboard/products/${productId}`)}
-                        className="flex-1 flex items-center justify-center space-x-2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-all duration-200 font-medium text-sm"
+                        className="flex-1 min-w-[5.5rem] min-h-11 flex items-center justify-center gap-2 px-3 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-all duration-200 font-medium text-sm"
                         title="View Details"
                       >
-                        <Eye className="w-4 h-4" />
+                        <Eye className="w-4 h-4 flex-shrink-0" />
                         <span>View</span>
                       </motion.button>
                       
@@ -778,10 +778,10 @@ export default function ProductsPage() {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => router.push(`/dashboard/products/edit/${productId}`)}
-                        className="flex-1 flex items-center justify-center space-x-2 px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition-all duration-200 font-medium text-sm"
+                        className="flex-1 min-w-[5.5rem] min-h-11 flex items-center justify-center gap-2 px-3 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition-all duration-200 font-medium text-sm"
                         title="Edit Product"
                       >
-                        <Edit2 className="w-4 h-4" />
+                        <Edit2 className="w-4 h-4 flex-shrink-0" />
                         <span>Edit</span>
                       </motion.button>
                       
@@ -790,13 +790,13 @@ export default function ProductsPage() {
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleDelete(productId!, productTitle)}
                         disabled={isDeleting === productId}
-                        className="flex-1 flex items-center justify-center space-x-2 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg transition-all duration-200 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1 min-w-[5.5rem] min-h-11 flex items-center justify-center gap-2 px-3 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg transition-all duration-200 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         title="Delete Product"
                       >
                         {isDeleting === productId ? (
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-700" />
                         ) : (
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4 flex-shrink-0" />
                         )}
                         <span>Delete</span>
                       </motion.button>

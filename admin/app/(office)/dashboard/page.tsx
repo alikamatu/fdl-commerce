@@ -242,13 +242,13 @@ export default function AdminHome() {
             </div>
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="admin-toolbar">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleRefresh}
               disabled={refreshing}
-              className="p-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-sm disabled:opacity-50"
+              className="p-3 min-h-11 min-w-11 inline-flex items-center justify-center bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-sm disabled:opacity-50"
               title="Refresh dashboard"
             >
               <RefreshCw className={`w-5 h-5 text-gray-600 ${refreshing ? 'animate-spin' : ''}`} />
@@ -258,9 +258,9 @@ export default function AdminHome() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => router.push('/dashboard/products/new')}
-              className="flex items-center space-x-3 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
+              className="flex items-center justify-center gap-2 px-4 sm:px-6 py-3 min-h-11 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-5 h-5 flex-shrink-0" />
               <span>Add Product</span>
             </motion.button>
 
@@ -268,7 +268,7 @@ export default function AdminHome() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={logout}
-              className="px-6 py-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium shadow-sm"
+              className="px-4 sm:px-6 py-3 min-h-11 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium shadow-sm"
             >
               Logout
             </motion.button>
@@ -308,10 +308,10 @@ export default function AdminHome() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.6 + index * 0.1 }}
-                        className="flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:shadow-sm transition-all duration-200 group"
+                        className="flex items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border border-gray-200 hover:shadow-sm transition-all duration-200 group"
                       >
                         {/* Product Image */}
-                        <div className="flex-shrink-0 w-16 h-16 rounded-xl border border-gray-200 overflow-hidden bg-gray-100">
+                        <div className="flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-xl border border-gray-200 overflow-hidden bg-gray-100">
                           {product.images && product.images.length > 0 ? (
                             <img
                               src={product.images[0].url}
@@ -327,17 +327,17 @@ export default function AdminHome() {
 
                         {/* Product Info */}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-4">
+                          <div className="flex items-start justify-between gap-2 sm:gap-4">
                             <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-gray-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
+                              <h3 className="font-semibold text-gray-900 line-clamp-2 sm:line-clamp-1 group-hover:text-blue-600 transition-colors">
                                 {product.title}
                               </h3>
-                              <div className="flex items-center gap-3 mt-1">
-                                <span className="text-sm text-gray-600">{product.brand}</span>
-                                <span className="text-sm text-gray-500">•</span>
-                                <span className="text-sm text-gray-600">{getCategoryName(product.categoryId)}</span>
+                              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
+                                <span className="text-sm text-gray-600 truncate max-w-[8rem] sm:max-w-none">{product.brand}</span>
+                                <span className="text-sm text-gray-500 hidden sm:inline">•</span>
+                                <span className="text-sm text-gray-600 truncate max-w-[8rem] sm:max-w-none">{getCategoryName(product.categoryId)}</span>
                               </div>
-                              <div className="flex items-center gap-3 mt-2">
+                              <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2">
                                 <span className="font-semibold text-gray-900">
                                   {formatPrice(product.priceCents)}
                                 </span>
@@ -352,18 +352,18 @@ export default function AdminHome() {
                               </div>
                             </div>
                             
-                            <div className="flex flex-col items-end gap-2">
-                              <span className={`px-2 py-1 text-xs font-medium rounded-full ${stockStatus.style}`}>
+                            <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                              <span className={`px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap ${stockStatus.style}`}>
                                 {stockStatus.text}
                               </span>
-                              <span className="text-xs text-gray-500">
+                              <span className="text-xs text-gray-500 whitespace-nowrap">
                                 {formatTimeAgo(product.createdAt)}
                               </span>
                             </div>
                           </div>
                           
                           {/* Product Status */}
-                          <div className="flex items-center gap-2 mt-2">
+                          <div className="flex flex-wrap items-center gap-2 mt-2">
                             {product.isDeal && (
                               <span className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full font-medium">
                                 On Deal
@@ -374,18 +374,18 @@ export default function AdminHome() {
                                 Inactive
                               </span>
                             )}
-                            <span className="text-xs text-gray-500 font-mono">
+                            <span className="text-xs text-gray-500 font-mono truncate max-w-full">
                               SKU: {product.sku}
                             </span>
                           </div>
                         </div>
 
-                        {/* View Button */}
+                        {/* View Button — always visible on touch devices */}
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => router.push(`/dashboard/products/${product._id}`)}
-                          className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-blue-100 hover:text-blue-600 transition-all duration-200 opacity-0 group-hover:opacity-100"
+                          className="p-2.5 min-h-11 min-w-11 inline-flex items-center justify-center bg-gray-100 text-gray-600 rounded-lg hover:bg-blue-100 hover:text-blue-600 transition-all duration-200 sm:opacity-0 sm:group-hover:opacity-100 flex-shrink-0"
                           title="View product"
                         >
                           <Eye className="w-4 h-4" />

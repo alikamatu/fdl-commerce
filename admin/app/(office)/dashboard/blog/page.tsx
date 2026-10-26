@@ -355,36 +355,36 @@ export default function BlogDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-gray-50/30 p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-white to-gray-50/30 py-6 sm:py-8 px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="space-y-6"
+          className="space-y-4 sm:space-y-6"
         >
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100">
-                <FileText className="w-7 h-7 text-blue-600" />
+          <div className="flex flex-col gap-4 sm:gap-6">
+            <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+              <div className="p-2.5 sm:p-3 bg-white rounded-2xl shadow-sm border border-gray-100 flex-shrink-0">
+                <FileText className="w-6 h-6 sm:w-7 sm:h-7 text-blue-600" />
               </div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
                   Blog Management
                 </h1>
-                <p className="text-gray-600 mt-2 text-lg">
+                <p className="text-gray-600 mt-1 sm:mt-2 text-base sm:text-lg">
                   Create and manage your blog posts
                 </p>
               </div>
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="admin-toolbar">
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={loadBlogPosts}
                 disabled={loading}
-                className="p-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-sm"
+                className="p-3 min-h-11 min-w-11 inline-flex items-center justify-center bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-sm"
                 title="Refresh blogs"
               >
                 <RefreshCw className={`w-5 h-5 text-gray-600 ${loading ? 'animate-spin' : ''}`} />
@@ -394,35 +394,35 @@ export default function BlogDashboardPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setIsFormOpen(true)}
-                className="flex items-center space-x-2 px-6 py-3.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
+                className="flex items-center justify-center gap-2 px-4 sm:px-6 py-3 min-h-11 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="w-5 h-5 flex-shrink-0" />
                 <span>New Post</span>
               </motion.button>
             </div>
           </div>
 
           {/* Filters and Search */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {/* Search */}
-              <div className="lg:col-span-2 relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <div className="sm:col-span-2 relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                 <input
                   type="text"
                   placeholder="Search posts by title, content, or tags..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-900 placeholder-gray-500"
+                  className="w-full pl-12 pr-4 py-3 min-h-11 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-900 placeholder-gray-500"
                 />
               </div>
 
               {/* Status Filter */}
-              <div className="relative">
+              <div className="relative sm:col-span-2 lg:col-span-1">
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full pl-4 pr-10 py-3.5 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none cursor-pointer text-gray-900"
+                  className="w-full pl-4 pr-10 py-3 min-h-11 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none cursor-pointer text-gray-900"
                 >
                   <option value="all">All Status</option>
                   <option value="published">Published</option>
@@ -433,14 +433,14 @@ export default function BlogDashboardPage() {
             </div>
 
             {/* Sort */}
-            <div className="mt-4 flex items-center gap-4">
-              <span className="text-sm text-gray-600 font-medium">Sort by:</span>
-              <div className="flex gap-2">
+            <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+              <span className="text-sm text-gray-600 font-medium flex-shrink-0">Sort by:</span>
+              <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
                 {['newest', 'oldest', 'title', 'views'].map((sort) => (
                   <button
                     key={sort}
                     onClick={() => setSortBy(sort)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    className={`px-4 py-2 min-h-11 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0 ${
                       sortBy === sort
                         ? 'bg-blue-100 text-blue-700'
                         : 'text-gray-600 hover:bg-gray-100'
