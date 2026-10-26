@@ -471,59 +471,59 @@ export default function AddProductPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-gray-50/30 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-white to-gray-50/30 py-6 sm:py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 mb-8"
+          className="flex flex-col gap-4 sm:gap-6 mb-6 sm:mb-8"
         >
-          <div className="flex items-start gap-4">
+          <div className="flex items-start gap-3 sm:gap-4 min-w-0">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => router.back()}
-              className="p-3 bg-white rounded-2xl border border-gray-200 hover:bg-gray-50 transition-all duration-200 shadow-sm mt-1"
+              className="p-3 min-h-11 min-w-11 inline-flex items-center justify-center bg-white rounded-2xl border border-gray-200 hover:bg-gray-50 transition-all duration-200 shadow-sm mt-1 flex-shrink-0"
             >
               <ArrowLeft className="w-5 h-5 text-gray-700" />
             </motion.button>
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-3 bg-blue-50 rounded-2xl">
+                <div className="p-2.5 sm:p-3 bg-blue-50 rounded-2xl flex-shrink-0">
                   <Package className="w-6 h-6 text-blue-600" />
                 </div>
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
                   Add New Product
                 </h1>
               </div>
-              <p className="text-gray-600 text-lg">
+              <p className="text-gray-600 text-base sm:text-lg">
                 Create a new product for your store catalog
               </p>
             </div>
           </div>
 
           {/* Progress Indicator */}
-          <div className="flex items-center gap-4 bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 sm:gap-4 bg-white rounded-2xl p-3 sm:p-4 border border-gray-200 shadow-sm overflow-x-auto">
+            <div className="flex items-center gap-2 flex-shrink-0">
               <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
                 1
               </div>
-              <span className="text-sm font-medium text-gray-700">Basic Info</span>
+              <span className="text-sm font-medium text-gray-700 whitespace-nowrap">Basic Info</span>
             </div>
-            <div className="w-8 h-0.5 bg-gray-300"></div>
-            <div className="flex items-center gap-2">
+            <div className="w-6 sm:w-8 h-0.5 bg-gray-300 flex-shrink-0"></div>
+            <div className="flex items-center gap-2 flex-shrink-0">
               <div className="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm font-semibold">
                 2
               </div>
-              <span className="text-sm text-gray-500">Pricing</span>
+              <span className="text-sm text-gray-500 whitespace-nowrap">Pricing</span>
             </div>
-            <div className="w-8 h-0.5 bg-gray-300"></div>
-            <div className="flex items-center gap-2">
+            <div className="w-6 sm:w-8 h-0.5 bg-gray-300 flex-shrink-0"></div>
+            <div className="flex items-center gap-2 flex-shrink-0">
               <div className="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm font-semibold">
                 3
               </div>
-              <span className="text-sm text-gray-500">Media</span>
+              <span className="text-sm text-gray-500 whitespace-nowrap">Media</span>
             </div>
           </div>
         </motion.div>
@@ -955,14 +955,14 @@ export default function AddProductPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6"
+            className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6"
           >
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-indigo-50 rounded-xl">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="p-2 bg-indigo-50 rounded-xl flex-shrink-0">
                   <Layers className="w-5 h-5 text-indigo-600" />
                 </div>
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
                   Specifications
                 </h2>
               </div>
@@ -971,36 +971,36 @@ export default function AddProductPage() {
                 whileTap={{ scale: 0.95 }}
                 type="button"
                 onClick={addSpecification}
-                className="flex items-center space-x-2 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium"
+                className="flex items-center justify-center gap-2 px-4 py-3 min-h-11 w-full sm:w-auto bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium flex-shrink-0"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-4 h-4 flex-shrink-0" />
                 <span>Add Specification</span>
               </motion.button>
             </div>
             
             <div className="space-y-4">
-              {specifications.map((spec, index) => (
+              {specifications.map((spec) => (
                 <motion.div
                   key={spec.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl border border-gray-200"
+                  className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 sm:p-4 bg-gray-50 rounded-xl border border-gray-200"
                 >
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0 w-full">
                     <input
                       placeholder="Key (e.g., Processor)"
                       value={spec.key}
                       onChange={(e) => updateSpecification(spec.id, 'key', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
+                      className="w-full min-w-0 px-4 py-3 min-h-11 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
                       maxLength={100}
                     />
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0 w-full">
                     <input
                       placeholder="Value (e.g., Intel Core i9)"
                       value={spec.value}
                       onChange={(e) => updateSpecification(spec.id, 'value', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
+                      className="w-full min-w-0 px-4 py-3 min-h-11 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
                       maxLength={500}
                     />
                   </div>
@@ -1010,7 +1010,8 @@ export default function AddProductPage() {
                       whileTap={{ scale: 0.9 }}
                       type="button"
                       onClick={() => removeSpecification(spec.id)}
-                      className="p-3 hover:bg-red-50 rounded-lg transition-colors duration-200 text-red-600"
+                      className="p-3 min-h-11 min-w-11 inline-flex items-center justify-center self-end sm:self-auto hover:bg-red-50 rounded-lg transition-colors duration-200 text-red-600 flex-shrink-0"
+                      aria-label="Remove specification"
                     >
                       <X className="w-4 h-4" />
                     </motion.button>
@@ -1025,7 +1026,7 @@ export default function AddProductPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="flex justify-end space-x-4 pt-6 border-t border-gray-200"
+            className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-4 pt-6 border-t border-gray-200"
           >
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -1033,7 +1034,7 @@ export default function AddProductPage() {
               type="button"
               onClick={() => router.back()}
               disabled={submitting}
-              className="px-8 py-4 border border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium disabled:opacity-50"
+              className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 min-h-11 border border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium disabled:opacity-50"
             >
               Cancel
             </motion.button>
@@ -1042,14 +1043,14 @@ export default function AddProductPage() {
               whileTap={{ scale: 0.95 }}
               type="submit"
               disabled={submitting || imageFiles.length === 0}
-              className="flex items-center space-x-3 px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3.5 sm:py-4 min-h-11 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg"
             >
               {submitting ? (
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
               ) : (
-                <Save className="w-5 h-5" />
+                <Save className="w-5 h-5 flex-shrink-0" />
               )}
-              <span className="text-lg">
+              <span className="text-base sm:text-lg">
                 {submitting ? 'Creating Product...' : 'Create Product'}
               </span>
             </motion.button>
