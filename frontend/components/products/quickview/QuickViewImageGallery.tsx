@@ -57,11 +57,6 @@ export const QuickViewImageGallery: React.FC<QuickViewImageGalleryProps> = ({
                 className="text-foreground/60 group-hover:text-foreground"
               />
             </button>
-
-            {/* Image Counter */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 bg-background/80 backdrop-blur-sm rounded-full text-sm text-foreground/60">
-              {currentImageIndex + 1} / {product.images.length}
-            </div>
           </>
         )}
       </div>
