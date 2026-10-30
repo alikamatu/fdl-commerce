@@ -303,8 +303,9 @@ const initializePaystackPayment = (order: any) => {
     { number: 3, title: 'Review', icon: Lock },
   ];
 
+  // Orders are only placed via the explicit button on the Review step; prevent implicit submits (e.g. Enter key)
   return (
-    <form onSubmit={(e) => { e.preventDefault(); handlePlaceOrder(); }}>
+    <form onSubmit={(e) => e.preventDefault()}>
       <div className="max-w-4xl mx-auto">
         {/* Progress Steps */}
         <motion.div 
@@ -571,6 +572,7 @@ const initializePaystackPayment = (order: any) => {
 
               <div className="flex justify-between pt-6">
                 <button
+                  type="button"
                   onClick={() => setStep(1)}
                   className="flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50"
                 >
@@ -578,7 +580,8 @@ const initializePaystackPayment = (order: any) => {
                   Back
                 </button>
                 <button
-                  onClick={() => setStep(3)}
+                  type="button"
+                  onClick={() => { setStep(3); setError(''); }}
                   className="flex items-center gap-2 px-8 py-3 bg-black text-white rounded-lg hover:bg-gray-800"
                 >
                   Review Order
@@ -681,6 +684,7 @@ const initializePaystackPayment = (order: any) => {
 
               <div className="flex justify-between pt-6">
                 <button
+                  type="button"
                   onClick={() => setStep(2)}
                   className="flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50"
                 >
@@ -688,6 +692,7 @@ const initializePaystackPayment = (order: any) => {
                   Back
                 </button>
                 <button
+                  type="button"
                   onClick={handlePlaceOrder}
                   disabled={loading}
                   className="flex items-center gap-2 px-8 py-3 bg-black text-white rounded-lg hover:bg-gray-800 disabled:opacity-50"
